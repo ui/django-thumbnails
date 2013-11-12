@@ -19,14 +19,19 @@ class ImageFieldTest(TestCase):
         super(ImageFieldTest, self).tearDown()
 
     def test_image_field(self):
-        self.instance.avatar.get_thumbnail(size='small')
-
         avatar_folder = \
             os.path.join(self.instance.avatar.storage.temporary_location, 'avatars')
 
-        avatars = os.listdir(avatar_folder)
-        self.assertTrue('tests_small.png' in avatars)
+        # 1. Test for thumbnail creation
+        self.assertFalse(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
+        thumb = self.instance.avatar.create_thumbnail(size='small')
+        self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
 
+        # 2. Test for getting thumbnail
+        self.assertEqual(thumb, self.instance.avatar.get_thumbnail(size='small'))
+
+        # 3. Test for thumbnail deletion
+        self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
         self.instance.avatar.delete_thumbnail(size='small')
-        avatars = os.listdir(avatar_folder)
-        self.assertFalse('tests_small.png' in avatars)
+        self.assertFalse(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
+
