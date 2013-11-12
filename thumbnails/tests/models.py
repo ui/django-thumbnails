@@ -1,7 +1,7 @@
 from django.db import models
 
-from thumbnails.fields import ThumbnailedImageField
+from thumbnails.fields import ImageField
 
 
 class TestModel(models.Model):
-    avatar = ThumbnailedImageField(upload_to='avatars')
+    avatar = ImageField(upload_to='avatars')
