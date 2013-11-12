@@ -4,30 +4,29 @@ from django.core.files import File
 from django.test import TestCase
 
 from .models import TestModel
-from .storage import TemporaryStorage
 
 
 class ImageFieldTest(TestCase):
 
     def setUp(self):
-        self.storage = TemporaryStorage()
-
+        self.instance = TestModel.objects.create()
         with open('thumbnails/tests/tests.png') as image_file:
-            self.storage.save('tests.png', File(image_file))
-
-        self.instance = TestModel.objects.create(avatar='tests.png')
-        self.instance.avatar.storage = self.storage
+            self.instance.avatar = File(image_file)
+            self.instance.save()
 
     def tearDown(self):
-        self.storage.delete_temporary_storage()
+        self.instance.avatar.storage.delete_temporary_storage()
         super(ImageFieldTest, self).tearDown()
 
     def test_image_field(self):
-        avatar = self.instance.avatar.get_thumbnail(size='small')
+        self.instance.avatar.get_thumbnail(size='small')
 
-        avatars = os.listdir(self.storage.temporary_location)
+        avatar_folder = \
+            os.path.join(self.instance.avatar.storage.temporary_location, 'avatars')
+
+        avatars = os.listdir(avatar_folder)
         self.assertTrue('tests_small.png' in avatars)
 
         self.instance.avatar.delete_thumbnail(size='small')
-        avatars = os.listdir(self.storage.temporary_location)
+        avatars = os.listdir(avatar_folder)
         self.assertFalse('tests_small.png' in avatars)

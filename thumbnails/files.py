@@ -1,7 +1,6 @@
 import os
 
 from django.db.models.fields.files import ImageFieldFile, FieldFile
-from django.core.files.storage import FileSystemStorage
 
 from .backends.metadata import DatabaseBackend
 
@@ -17,8 +16,6 @@ class ThumbnailedImageFile(FieldFile):
     def __init__(self, *args, **kwargs):
         super(ThumbnailedImageFile, self).__init__(*args, **kwargs)
         self.backend = DatabaseBackend()
-        self.storage = FileSystemStorage()
-        self.backend.add_source(self.name)
 
     def _get_thumbnail_name(self, size):
         filename, extension = os.path.splitext(self.name)
@@ -45,3 +42,8 @@ class ThumbnailedImageFile(FieldFile):
         # 2. Call metadata_storage.remove_thumbnail(self.name, size)
         self.storage.delete(self._get_thumbnail_name(size))
         self.backend.delete_thumbnail(self.name, size)
+
+    def save(self, name, content, save=True):
+        thumbnail_file = super(ThumbnailedImageFile, self).save(name, content, save)
+        self.backend.add_source(self.name)
+        return thumbnail_file
