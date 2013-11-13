@@ -16,8 +16,6 @@ INSTALLED_APPS = (
 SECRET_KEY = 'a'
 
 THUMBNAILS = {
-    'METADATA_BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
-    'STORAGE_BACKEND': 'django.core.files.storage.FileSystemStorage',
     'SIZES': {
         'small': {
             'width': 10,
