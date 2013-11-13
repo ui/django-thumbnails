@@ -47,13 +47,7 @@ class DatabaseBackend(BaseBackend):
     def add_thumbnail(self, source_name, size, name):
         source = self.get_source(source_name)
 
-        if not settings.SIZES:
-            raise ImproperlyConfigured("Cannot find THUMBNAIL SIZES in settings.")
-
-        size_desc = settings.SIZES.get(size, None)
-        if not size_desc:
-            raise ImproperlyConfigured("Cannot find %s in settings." % size)
-        else:
+        if settings.get_size(size):
             filename, extension = os.path.splitext(name)
             name = "%s_%s%s" % (filename, size, extension)
 
