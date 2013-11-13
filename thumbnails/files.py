@@ -1,9 +1,12 @@
 import os
+import tempfile
 
+from django.core.files import File
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 
 from .backends.metadata import DatabaseBackend
-from .conf.settings import get_all_sizes
+from .conf.settings import get_all_sizes, get_size
+from .processors import resize
 
 class SourceImage(ImageFieldFile):
 
@@ -61,7 +64,14 @@ class ThumbnailedImageFile(FieldFile):
         # 1. Use Storage API to create a thumbnail (and get its filename)
         # 2. Call metadata_storage.add_thumbnail(self.name, size, filename)
         filename = self._get_thumbnail_name(size)
-        self.storage.save(filename, self.file)
+
+        size_dict = get_size(size)
+        image = resize(self.file, size_dict['width'], size_dict['height'], filename)
+        temp = tempfile.TemporaryFile(mode='wrb+')
+        image._pil_image.save(temp, format='png')
+        temp.seek(0)
+
+        self.storage.save(filename, File(temp))
         metadata = self.metadata_backend.add_thumbnail(self.name, size, filename)
         thumbnail = ThumbnailedFile(instance=self.instance, field=self.field, name=metadata.name)
         self._thumbnails[size] = thumbnail
