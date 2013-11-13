@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-META_STORAGE_BACKEND = getattr(settings, 'META_STORAGE_BACKEND', None)
-FILE_STORAGE_BACKEND = getattr(settings, 'FILE_STORAGE_BACKEND', None)
 THUMBNAILS = getattr(settings, 'THUMBNAILS', {})
+
+METADATA_BACKEND = THUMBNAILS.get('METADATA_BACKEND', None)
+STORAGE_BACKEND = THUMBNAILS.get('STORAGE_BACKEND', None)
 SIZES = THUMBNAILS.get('SIZES', None)
 
 
