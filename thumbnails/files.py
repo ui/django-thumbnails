@@ -11,30 +11,60 @@ class SourceImage(ImageFieldFile):
         self.name = name
 
 
-class ThumbnailedImageFile(FieldFile):
+class GalleryFile(FieldFile):
 
     def __init__(self, *args, **kwargs):
-        super(ThumbnailedImageFile, self).__init__(*args, **kwargs)
+        super(GalleryFile, self).__init__(*args, **kwargs)
         self.metadata_backend = DatabaseBackend()
+        self._thumbnails = {}
+
+    def __getattribute__(self, name):
+        if name == "small":
+            print "FIXME GalleryFile.__getattribute__: should check for available size name"
+            return self.get_thumbnail(name)
+        else:
+            return super(GalleryFile, self).__getattribute__(name)
+
+    def all(self):
+        # 1. Get all available sizes
+        # 2. Get or create all thumbnails
+        # 3. Return all thumbnails as list
+        raise NotImplementedError()
 
     def _get_thumbnail_name(self, size):
         filename, extension = os.path.splitext(self.name)
         return "%s_%s%s" % (filename, size, extension)
 
+    def _get_thumbnails(self, size, metadata):
+        """
+        Cache thumbnail instances
+        """
+        thumbnail = self._thumbnails.get(size)
+        if thumbnail is None:
+            thumbnail = ThumbnailedFile(instance=self.instance,
+                                        field=self.field,
+                                        name=metadata.name)
+            self._thumbnails[size] = thumbnail
+        return thumbnail
+
     def get_thumbnail(self, size):
         # 1. Get thumbnail from meta store
         # 2. If it doesn't exist, create thumbnail and return it
-        thumbnail = self.metadata_backend.get_thumbnail(self.name, size)
-        if thumbnail is None:
+        metadata = self.metadata_backend.get_thumbnail(self.name, size)
+        if metadata is None:
             return self.create_thumbnail(size)
-        return thumbnail
+        else:
+            return self._get_thumbnails(size, metadata)
 
     def create_thumbnail(self, size):
         # 1. Use Storage API to create a thumbnail (and get its filename)
         # 2. Call metadata_storage.add_thumbnail(self.name, size, filename)
         filename = self._get_thumbnail_name(size)
         self.storage.save(filename, self.file)
-        return self.metadata_backend.add_thumbnail(self.name, size, filename)
+        metadata = self.metadata_backend.add_thumbnail(self.name, size, filename)
+        thumbnail = ThumbnailedFile(instance=self.instance, field=self.field, name=metadata.name)
+        self._thumbnails[size] = thumbnail
+        return thumbnail
 
 
     def delete_thumbnail(self, size):
@@ -42,8 +72,28 @@ class ThumbnailedImageFile(FieldFile):
         # 2. Call metadata_storage.remove_thumbnail(self.name, size)
         self.storage.delete(self._get_thumbnail_name(size))
         self.metadata_backend.delete_thumbnail(self.name, size)
+        del(self._thumbnails[size])
 
     def save(self, name, content, save=True):
-        thumbnail_file = super(ThumbnailedImageFile, self).save(name, content, save)
+        thumbnail_file = super(GalleryFile, self).save(name, content, save)
         self.metadata_backend.add_source(self.name)
         return thumbnail_file
+
+
+class ThumbnailedFile(FieldFile):
+    """
+    Class for thumbnail image, restriction on save and delete are copied from
+    SmileyChris' easy_thumbnails.files.ThumbnailFile
+    """
+    def __init__(self, instance, field, name, *args, **kwargs):
+        super(ThumbnailedFile, self).__init__(instance, field, name)
+
+    def save(self, *args, **kwargs):
+        # Can't save a ``ThumbnailFile`` directly.
+        raise NotImplementedError()
+
+    def delete(self, *args, **kwargs):
+        # Can't delete a ``ThumbnailFile`` directly, it doesn't have a
+        # reference to the source image, so it can't update the cache. If you
+        # really need to do this, do it with ``self.storage.delete`` directly.
+        raise NotImplementedError()

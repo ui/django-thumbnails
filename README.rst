@@ -34,7 +34,7 @@ In python::
 
     class Food(models.Model):
         image = thumbnails.Field()
-    
+
 
     food = Food.objects.latest('id')
     food.image.thumbnails.all()
