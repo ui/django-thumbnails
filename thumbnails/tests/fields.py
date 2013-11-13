@@ -45,3 +45,14 @@ class ImageFieldTest(TestCase):
         self.assertTrue(self.instance.avatar.thumbnails.small, ThumbnailedFile)
         self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.small.name),
                          'tests_small.png')
+        self.assertTrue(self.instance.avatar.thumbnails.default, ThumbnailedFile)
+        self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.default.name),
+                         'tests_default.png')
+        self.assertTrue(self.instance.avatar.thumbnails.large, ThumbnailedFile)
+        self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.large.name),
+                         'tests_large.png')
+
+    def test_thumbnails_all(self):
+        self.assertIn(self.instance.avatar.thumbnails.default, self.instance.avatar.thumbnails.all())
+        self.assertIn(self.instance.avatar.thumbnails.large, self.instance.avatar.thumbnails.all())
+        self.assertIn(self.instance.avatar.thumbnails.small, self.instance.avatar.thumbnails.all())

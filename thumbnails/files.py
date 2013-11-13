@@ -3,7 +3,7 @@ import os
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 
 from .backends.metadata import DatabaseBackend
-
+from .conf.settings import get_all_sizes
 
 class SourceImage(ImageFieldFile):
 
@@ -23,7 +23,14 @@ class ThumbnailedImageFile(FieldFile):
         # 1. Get all available sizes
         # 2. Get or create all thumbnails
         # 3. Return all thumbnails as list
-        raise NotImplementedError()
+        if not hasattr(self, '_all_thumbnails'):
+            sizes = get_all_sizes()
+            thumbnails = []
+            for size in sizes:
+                thumb = self.get_thumbnail(size)
+                thumbnails.append(thumb)
+            self._all_thumbnails = thumbnails
+        return self._all_thumbnails
 
     def _get_thumbnail_name(self, size):
         filename, extension = os.path.splitext(self.name)
@@ -82,7 +89,7 @@ class Gallery(object):
         super(Gallery, self).__init__(*args, **kwargs)
 
     def __getattr__(self, name):
-        if name == "small":
+        if name in get_all_sizes():
             return self.get_thumbnail(name)
 
     def all(self):
