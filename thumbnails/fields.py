@@ -1,7 +1,7 @@
 from django.db.models import ImageField as DjangoImageField
 
-from .files import GalleryFile
+from .files import ThumbnailedImageFile
 
 
 class ImageField(DjangoImageField):
-    attr_class = GalleryFile
+    attr_class = ThumbnailedImageFile

@@ -11,19 +11,13 @@ class SourceImage(ImageFieldFile):
         self.name = name
 
 
-class GalleryFile(FieldFile):
+class ThumbnailedImageFile(FieldFile):
+    _thumbnails = {}
 
     def __init__(self, *args, **kwargs):
-        super(GalleryFile, self).__init__(*args, **kwargs)
+        super(ThumbnailedImageFile, self).__init__(*args, **kwargs)
         self.metadata_backend = DatabaseBackend()
-        self._thumbnails = {}
-
-    def __getattribute__(self, name):
-        if name == "small":
-            print "FIXME GalleryFile.__getattribute__: should check for available size name"
-            return self.get_thumbnail(name)
-        else:
-            return super(GalleryFile, self).__getattribute__(name)
+        self.thumbnails = Gallery(source=self)
 
     def all(self):
         # 1. Get all available sizes
@@ -74,10 +68,34 @@ class GalleryFile(FieldFile):
         self.metadata_backend.delete_thumbnail(self.name, size)
         del(self._thumbnails[size])
 
+
     def save(self, name, content, save=True):
-        thumbnail_file = super(GalleryFile, self).save(name, content, save)
+        thumbnail = super(ThumbnailedImageFile, self).save(name, content, save)
         self.metadata_backend.add_source(self.name)
-        return thumbnail_file
+        return thumbnail
+
+
+class Gallery(object):
+
+    def __init__(self, *args, **kwargs):
+        self.source = kwargs.pop('source')
+        super(Gallery, self).__init__(*args, **kwargs)
+
+    def __getattr__(self, name):
+        if name == "small":
+            return self.get_thumbnail(name)
+
+    def all(self):
+        return self.source.all()
+
+    def get_thumbnail(self, size):
+        return self.source.get_thumbnail(size)
+
+    def create_thumbnail(self, size):
+        return self.source.create_thumbnail(size)
+
+    def delete_thumbnail(self, size):
+        return self.source.delete_thumbnail(size)
 
 
 class ThumbnailedFile(FieldFile):
