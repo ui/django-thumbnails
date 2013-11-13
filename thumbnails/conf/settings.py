@@ -8,6 +8,15 @@ STORAGE_BACKEND = THUMBNAILS.get('STORAGE_BACKEND', None)
 SIZES = THUMBNAILS.get('SIZES', None)
 
 
+def get_all_sizes():
+    if not SIZES:
+        raise ImproperlyConfigured("Cannot find THUMBNAIL SIZES in settings.")
+    sizes = []
+    for size in SIZES:
+        sizes.append(size)
+    return sizes
+
+
 def get_size(size):
     if not SIZES:
         raise ImproperlyConfigured("Cannot find THUMBNAIL SIZES in settings.")

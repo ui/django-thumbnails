@@ -10,6 +10,9 @@ class SettingsTest(TestCase):
         self.assertNotEqual(settings.THUMBNAILS, {})
         self.assertNotEqual(settings.SIZES, None)
 
+    def test_get_all_sizes(self):
+        self.assertEqual(settings.get_all_sizes(), ['small', 'default', 'large'])
+
     def test_get_size(self):
         self.assertEqual(settings.get_size('small'), {'width': 10, 'height': 10})
         self.assertEqual(settings.get_size('default'), {'width': 20, 'height': 20})
