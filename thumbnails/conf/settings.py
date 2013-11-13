@@ -11,7 +11,7 @@ def get_size(size):
     if not SIZES:
         raise ImproperlyConfigured("Cannot find THUMBNAIL SIZES in settings.")
 
-    size_dict = settings.SIZES.get(size, None)
+    size_dict = SIZES.get(size, None)
     if not size_dict:
         raise ImproperlyConfigured("Cannot find %s in settings." % size)
     return size_dict
