@@ -1,4 +1,3 @@
-import os
 from thumbnails.models import Source, ThumbnailMeta
 
 
@@ -47,10 +46,7 @@ class DatabaseBackend(BaseBackend):
 
     def get_thumbnails(self, name):
         metas = ThumbnailMeta.objects.filter(source__name=name)
-        img_metas = []
-        for meta in metas:
-            img_metas.append(ImageMeta(name, meta.name, meta.size))
-        return img_metas
+        return [ImageMeta(name, meta.name, meta.size) for meta in metas]
 
     def get_thumbnail(self, source_name, size):
         try:
