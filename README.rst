@@ -1,4 +1,8 @@
+# This is a work in progress and is not ready for use
+
+
 Design:
+
 * Uses Django Storage API
 * Uses flexible meta data store
 
@@ -18,7 +22,7 @@ settings.py::
             'default': {
                 'width': 20,
                 'height': 20,
-                'processor': 'thumbnails.processors.resize',
+                'processors': ['thumbnails.processors.resize', 'thumbnails.processors.grayscale', 'your.own.processor'],
             },
             'large': {
                 'width': 30,
