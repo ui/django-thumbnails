@@ -68,6 +68,7 @@ class ImageFieldTest(TestCase):
 
         # Should also work on deletion
         self.instance.avatar.thumbnails.delete_thumbnail('large')
+        self.assertRaises(AttributeError, getattr, self.instance.avatar.thumbnails, '_all_thumbnails')  # cache for all_thumbnails is purged
         self.assertEqual(self.instance.avatar.thumbnails.all().get('large'), None)
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
 
