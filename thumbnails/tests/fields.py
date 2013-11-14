@@ -34,4 +34,3 @@ class ImageFieldTest(TestCase):
         self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
         self.instance.avatar.delete_thumbnail(size='small')
         self.assertFalse(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
-

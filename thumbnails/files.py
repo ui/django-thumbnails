@@ -36,7 +36,6 @@ class ThumbnailedImageFile(FieldFile):
         self.storage.save(filename, self.file)
         return self.metadata_backend.add_thumbnail(self.name, size, filename)
 
-
     def delete_thumbnail(self, size):
         # 1. Use Storage API to delete thumbnail
         # 2. Call metadata_storage.remove_thumbnail(self.name, size)
