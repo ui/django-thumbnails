@@ -1,7 +1,14 @@
 import os
 from thumbnails.models import Source, ThumbnailMeta
 from thumbnails.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+
+
+class ImageMeta:
+
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+
 
 class BaseBackend:
 
@@ -40,7 +47,8 @@ class DatabaseBackend(BaseBackend):
 
     def get_thumbnail(self, source_name, size):
         try:
-            return ThumbnailMeta.objects.get(source__name=source_name, size=size)
+            meta = ThumbnailMeta.objects.get(source__name=source_name, size=size)
+            return ImageMeta(meta.name, meta.size)
         except ThumbnailMeta.DoesNotExist:
             return None
 
