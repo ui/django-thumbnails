@@ -1,6 +1,4 @@
-import os
 from thumbnails.models import Source, ThumbnailMeta
-from thumbnails.conf import settings
 
 
 class ImageMeta:
@@ -54,11 +52,6 @@ class DatabaseBackend(BaseBackend):
 
     def add_thumbnail(self, source_name, size, name):
         source = self.get_source(source_name)
-
-        if settings.get_size(size):
-            filename, extension = os.path.splitext(name)
-            name = "%s_%s%s" % (filename, size, extension)
-
         return ThumbnailMeta.objects.create(source=source, size=size, name=name)
 
     def delete_thumbnail(self, source_name, size):
