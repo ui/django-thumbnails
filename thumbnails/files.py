@@ -1,6 +1,6 @@
 import os
 
-from django.db.models.fields.files import ImageFieldFile, FieldFile
+from django.db.models.fields.files import ImageFieldFile
 
 from .backends.metadata import DatabaseBackend
 from . import conf
@@ -12,7 +12,7 @@ class SourceImage(ImageFieldFile):
         self.name = name
 
 
-class ThumbnailedImageFile(FieldFile):
+class ThumbnailedImageFile(ImageFieldFile):
     _thumbnails = {}
 
     def __init__(self, *args, **kwargs):
