@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from thumbnails.backends.metadata import ImageMeta
 from thumbnails.models import Source, ThumbnailMeta
-from thumbnails.backends.metadata import DatabaseBackend
+from thumbnails.backends.metadata import DatabaseBackend, RedisBackend
 
 
 class DatabaseBackendTest(TestCase):
@@ -48,3 +48,24 @@ class DatabaseBackendTest(TestCase):
                 ImageMeta(source_name, 'image_large', 'large')
             ]
         )
+
+
+class RedisBackendTest(TestCase):
+
+    def setUp(self):
+        self.backend = RedisBackend()
+
+    def test_add_delete_source(self):
+        source_name = 'image'
+        # self.backend.add_source(source_name)
+        # self.assertTrue(Source.objects.filter(name=source_name).exists())
+        # self.backend.delete_source(source_name)
+        # self.assertFalse(Source.objects.filter(name=source_name).exists())
+
+
+    # def test_get_source(self):
+
+    # def test_add_delete_thumbnail(self):
+
+    # def test_get_thumbnail(self):
+
