@@ -4,6 +4,7 @@ from django.core.files import File
 from django.test import TestCase
 
 from .models import TestModel
+from thumbnails.backends.metadata import ImageMeta
 
 
 class ImageFieldTest(TestCase):
@@ -28,7 +29,8 @@ class ImageFieldTest(TestCase):
         self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
 
         # 2. Test for getting thumbnail
-        self.assertEqual(thumb, self.instance.avatar.get_thumbnail(size='small'))
+        img_meta = self.instance.avatar.get_thumbnail(size='small')
+        self.assertEqual(img_meta, ImageMeta(thumb.source.name ,thumb.name, thumb.size))
 
         # 3. Test for thumbnail deletion
         self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
