@@ -57,7 +57,8 @@ class DatabaseBackend(BaseBackend):
 
     def add_thumbnail(self, source_name, size, name):
         source = self.get_source(source_name)
-        return ThumbnailMeta.objects.create(source=source, size=size, name=name)
+        meta = ThumbnailMeta.objects.create(source=source, size=size, name=name)
+        return ImageMeta(source_name, meta.name, meta.size)
 
     def delete_thumbnail(self, source_name, size):
         ThumbnailMeta.objects.filter(source__name=source_name, size=size).delete()

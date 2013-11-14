@@ -1,9 +1,10 @@
 import os
 
 from django.core.files import File
+from django.db import connection
 from django.test import TestCase
 
-from thumbnails.files import ThumbnailedFile
+from thumbnails.files import Thumbnail
 from .models import TestModel
 
 
@@ -29,7 +30,7 @@ class ImageFieldTest(TestCase):
         self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
 
         # Make sure the returned thumbnail is of thumbnail class, not metadata
-        self.assertTrue(isinstance(thumb, ThumbnailedFile))
+        self.assertTrue(isinstance(thumb, Thumbnail))
 
         # 2. Test for getting thumbnail
         self.assertEqual(thumb, self.instance.avatar.thumbnails.get_thumbnail(size='small'))
@@ -41,22 +42,38 @@ class ImageFieldTest(TestCase):
 
     def test_thumbnail_field(self):
         # Make sure gallery return the correct thumbnail
-        self.assertTrue(self.instance.avatar.thumbnails.small, ThumbnailedFile)
+        self.assertTrue(self.instance.avatar.thumbnails.small, Thumbnail)
         self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.small.name),
                          'tests_small.png')
-        self.assertTrue(self.instance.avatar.thumbnails.default, ThumbnailedFile)
+        self.assertTrue(self.instance.avatar.thumbnails.default, Thumbnail)
         self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.default.name),
                          'tests_default.png')
-        self.assertTrue(self.instance.avatar.thumbnails.large, ThumbnailedFile)
+        self.assertTrue(self.instance.avatar.thumbnails.large, Thumbnail)
         self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.large.name),
                          'tests_large.png')
 
-    def test_thumbnails_all(self):
-        self.assertEqual(self.instance.avatar.thumbnails.default, self.instance.avatar.thumbnails.all().get('default'))
+    def test_thumbnails_cache(self):
 
+        # No thumbnails should be cached
+        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 0)
+
+        # Thumbnail with size `default` created and populated to the cache
+        self.assertEqual(self.instance.avatar.thumbnails.default, self.instance.avatar.thumbnails.all().get('default'))
+        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
+
+        # Creating thumbnail should populate the cache correctly
         large_thumb = self.instance.avatar.thumbnails.large
         self.assertEqual(large_thumb, self.instance.avatar.thumbnails.all().get('large'))
+        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 2)
 
-        # Cache for all thumbnails should be correctly updated on deletion
+        # Should also work on deletion
         self.instance.avatar.thumbnails.delete_thumbnail('large')
         self.assertEqual(self.instance.avatar.thumbnails.all().get('large'), None)
+        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
+
+        # Once cached, it should not hit backend on other call.
+        backend_hit = len(connection.queries)
+        self.instance.avatar.thumbnails.default
+        self.instance.avatar.thumbnails.all()['default']
+        self.instance.avatar.thumbnails.get_thumbnail('default')
+        self.assertEqual(backend_hit, len(connection.queries))
