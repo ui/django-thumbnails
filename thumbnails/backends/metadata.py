@@ -1,13 +1,16 @@
 import os
 from thumbnails.models import Source, ThumbnailMeta
-from thumbnails.conf import settings
 
 
 class ImageMeta:
 
-    def __init__(self, name, size):
+    def __init__(self, source_name, name, size):
+        self.source_name = source_name
         self.name = name
         self.size = size
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class BaseBackend:
@@ -43,22 +46,21 @@ class DatabaseBackend(BaseBackend):
         return Source.objects.filter(name=name).delete()
 
     def get_thumbnails(self, name):
-        return ThumbnailMeta.objects.filter(source__name=name)
+        metas = ThumbnailMeta.objects.filter(source__name=name)
+        img_metas = []
+        for meta in metas:
+            img_metas.append(ImageMeta(name, meta.name, meta.size))
+        return img_metas
 
     def get_thumbnail(self, source_name, size):
         try:
             meta = ThumbnailMeta.objects.get(source__name=source_name, size=size)
-            return ImageMeta(meta.name, meta.size)
+            return ImageMeta(source_name, meta.name, meta.size)
         except ThumbnailMeta.DoesNotExist:
             return None
 
     def add_thumbnail(self, source_name, size, name):
         source = self.get_source(source_name)
-
-        if settings.get_size(size):
-            filename, extension = os.path.splitext(name)
-            name = "%s_%s%s" % (filename, size, extension)
-
         return ThumbnailMeta.objects.create(source=source, size=size, name=name)
 
     def delete_thumbnail(self, source_name, size):

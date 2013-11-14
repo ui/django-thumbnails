@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from thumbnails.backends.metadata import ImageMeta
 from thumbnails.models import Source, ThumbnailMeta
 from thumbnails.backends.metadata import DatabaseBackend
 
@@ -37,16 +38,13 @@ class DatabaseBackendTest(TestCase):
         source_name = 'image'
         self.backend.add_source(source_name)
         self.backend.add_thumbnail(source_name, 'small', 'image_small')
-        source = Source.objects.get(name=source_name)
-        self.assertEqual(
-            self.backend.get_thumbnail(source_name, 'small'),
-            ThumbnailMeta.objects.get(source=source, size='small')
-        )
+        self.assertEqual(self.backend.get_thumbnail(source_name, 'small'), ImageMeta(source_name, 'image_small', 'small'))
         self.backend.add_thumbnail(source_name, 'large', 'image_large')
+
         self.assertEqual(
-            set(self.backend.get_thumbnails(source_name)),
-            {
-                ThumbnailMeta.objects.get(source=source, size='small'),
-                ThumbnailMeta.objects.get(source=source, size='large')
-            }
+            self.backend.get_thumbnails(source_name),
+            [
+                ImageMeta(source_name, 'image_small', 'small'),
+                ImageMeta(source_name, 'image_large', 'large')
+            ]
         )
