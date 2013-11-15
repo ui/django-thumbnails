@@ -47,6 +47,15 @@ In python::
 
 
 
+Builtin processors::
+
+    # To use the following processors, put the arguments in SIZES definition
+    thumbnails.processors.resize(width, height)
+    thumbnails.processors.rotate(degrees)
+    thumbnails.processors.flip(direction)
+    thumbnails.processors.scale(scale)
+
+
 Running tests::
 
     `which django-admin.py` test thumbnails --settings=thumbnails.tests.settings --pythonpath=.

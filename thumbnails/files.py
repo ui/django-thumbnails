@@ -1,13 +1,10 @@
 import os
-import tempfile
 
-from django.core.files import File
 from django.db.models.fields.files import ImageFieldFile
 from picasso import images
 
 from . import conf
 from .backends.metadata import DatabaseBackend
-from .utils import import_attribute
 
 
 class SourceImage(ImageFieldFile):
@@ -84,29 +81,21 @@ class Gallery(object):
         name = self._get_thumbnail_name(size)
 
         # open image in piccaso
-        image = images.from_file(self.source_image.path)
-
+        image = images.from_file(self.storage.open(self.source_image.name))
         size_definition = conf.SIZES.get(size)
         if size_definition is None:
             raise ValueError('%s size is not defined' % size)
 
         # run through all processors, if defined
-        processors = size_definition.get('processors')
+        processors = size_definition.get('processors', [])
         if processors:
-
-            if not isinstance(processors, list):
-                raise ValueError('%s processors must be in list format' % size)
-
             for processor in processors:
-                processor = import_attribute(processor)
                 processor(image, **size_definition)
 
-        # save to temporary file
-        temporary = tempfile.TemporaryFile(mode='wrb+')
-        image._pil_image.save(temporary, format='png')
-
         # save to Storage
-        name = self.storage.save(name, File(temporary))
+        new_file = self.storage.open(name, 'w')
+        image.save(new_file)
+        new_file.close()
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
         thumbnail = Thumbnail(metadata=metadata, storage=self.storage)

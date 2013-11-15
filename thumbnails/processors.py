@@ -7,4 +7,12 @@ def grayscale(image, **kwargs):
 
 
 def rotate(image, **kwargs):
-    pass
+    image.rotate(degrees=kwargs['degrees'])
+
+
+def flip(image, **kwargs):
+    image.flip(direction=kwargs['direction'])
+
+
+def scale(image, **kwargs):
+    image.scale(scale=kwargs['scale'])

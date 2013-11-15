@@ -25,10 +25,14 @@ THUMBNAILS = {
         'default': {
             'width': 20,
             'height': 20,
+            'direction': 'horizontal',
+            'processors': ['thumbnails.processors.resize', 'thumbnails.processors.flip'],
         },
         'large': {
             'width': 30,
             'height': 30,
+            'degrees': 45,
+            'processors': ['thumbnails.processors.resize', 'thumbnails.processors.rotate'],
         }
     }
 }
