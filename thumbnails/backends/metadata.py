@@ -68,12 +68,8 @@ class RedisBackend(BaseBackend):
     con = redis.StrictRedis(host='localhost', port=6379, db=0)
 
     def add_source(self, name):
-        value = {
-            'metas': {},
-            'source_name': name
-        }
-        self.con.set("source:%s" % name, json.dumps(value))
-        return value
+        self.con.set("source:%s" % name, json.dumps({}))
+        return {}
 
     def get_source(self, name):
         return json.loads(self.con.get("source:%s" % name))
@@ -82,30 +78,29 @@ class RedisBackend(BaseBackend):
         return self.con.delete("source:%s" % name)
 
     def get_thumbnails(self, name):
-        source = self.con.get("source:%s" % name)
-        return [ImageMeta(name, meta.name, meta.size) for meta in source['metas']]
+        source = self.get_source(name)
+        return [ImageMeta(name, meta['name'], meta['size']) for meta in source.values()]
 
     def get_thumbnail(self, source_name, size):
         try:
             source = json.loads(self.con.get("source:%s" % source_name))
-            meta = source['metas']["%s_%s" % (source_name, size)]
+            meta = source["%s_%s" % (source_name, size)]
             return ImageMeta(source_name, meta['name'], meta['size'])
         except KeyError:
             return None
 
     def add_thumbnail(self, source_name, size, name):
         meta = {
-            'source_name': source_name,
             'name': name,
             'size': size
         }
         source = self.get_source(source_name)
-        source['metas'][name] = meta
-        self.con.set("source:%s" % name, json.dumps(source))
+        source["%s_%s" % (source_name, size)] = meta
+        self.con.set("source:%s" % source_name, json.dumps(source))
         return ImageMeta(source_name, name, size)
 
     def delete_thumbnail(self, source_name, size):
         name = "%s_%s" % (source_name, size)
         source = self.get_source(source_name)
-        del source['metas'][name]
-        self.con.set("source:%s" % name, json.dumps(source))
+        del source[name]
+        self.con.set("source:%s" % source_name, json.dumps(source))
