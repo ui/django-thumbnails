@@ -49,11 +49,13 @@ In python::
 
 Builtin processors::
 
-    # To use the following processors, put the arguments in SIZES definition
+    # To use the following processors, put the arguments of processors in SIZES definition
     thumbnails.processors.resize(width, height)
     thumbnails.processors.rotate(degrees)
     thumbnails.processors.flip(direction)
-    thumbnails.processors.scale(scale)
+    thumbnails.processors.crop(width, height, center_offset, shape)
+
+    Processors will be applied to the image sequentially with the order of definition
 
 
 Running tests::

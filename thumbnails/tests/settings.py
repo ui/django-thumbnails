@@ -29,10 +29,12 @@ THUMBNAILS = {
             'processors': ['thumbnails.processors.resize', 'thumbnails.processors.flip'],
         },
         'large': {
-            'width': 30,
-            'height': 30,
+            'width': 80,
+            'height': 80,
             'degrees': 45,
-            'processors': ['thumbnails.processors.resize', 'thumbnails.processors.rotate'],
+            'processors': ['thumbnails.processors.resize',
+                           'thumbnails.processors.rotate',
+                           'thumbnails.processors.crop'],
         }
     }
 }

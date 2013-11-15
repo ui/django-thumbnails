@@ -1,7 +1,9 @@
 import os
+import StringIO
 
+from django.core.files.base import ContentFile
 from django.db.models.fields.files import ImageFieldFile
-from picasso import images
+from da_vinci import images
 
 from . import conf
 from .backends.metadata import DatabaseBackend
@@ -82,20 +84,19 @@ class Gallery(object):
 
         # open image in piccaso
         image = images.from_file(self.storage.open(self.source_image.name))
-        size_definition = conf.SIZES.get(size)
-        if size_definition is None:
-            raise ValueError('%s size is not defined' % size)
+        size_dict = conf.SIZES[size]
 
         # run through all processors, if defined
-        processors = size_definition.get('processors', [])
+        processors = size_dict.get('processors', [])
         if processors:
             for processor in processors:
-                processor(image, **size_definition)
+                processor(image, **size_dict)
 
         # save to Storage
-        new_file = self.storage.open(name, 'w')
-        image.save(new_file)
-        new_file.close()
+        thumbnail_io = StringIO.StringIO()
+        image.save(thumbnail_io)
+        thumbnail_file = ContentFile(thumbnail_io.getvalue())
+        name = self.storage.save(name, thumbnail_file)
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
         thumbnail = Thumbnail(metadata=metadata, storage=self.storage)

@@ -14,5 +14,14 @@ def flip(image, **kwargs):
     image.flip(direction=kwargs['direction'])
 
 
-def scale(image, **kwargs):
-    image.scale(scale=kwargs['scale'])
+def crop(image, **kwargs):
+    params = {
+        'width': kwargs['width'],
+        'height': kwargs['height']
+    }
+    if kwargs.get('center_offset'):
+        params['center_offset'] = kwargs['center_offset']
+    if kwargs.get('shape'):
+        params['shape'] = kwargs['shape']
+
+    image.crop(**params)
