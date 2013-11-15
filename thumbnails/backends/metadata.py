@@ -1,4 +1,6 @@
-import redis, json
+from redis import Redis
+from django.core.exceptions import ObjectDoesNotExist
+
 from thumbnails.models import Source, ThumbnailMeta
 
 
@@ -65,42 +67,37 @@ class DatabaseBackend(BaseBackend):
 
 
 class RedisBackend(BaseBackend):
-    con = redis.StrictRedis(host='localhost', port=6379, db=0)
+    redis = Redis()
 
     def add_source(self, name):
-        self.con.set("source:%s" % name, json.dumps({}))
-        return {}
+        self.redis.hset('sources', name, name)
+        return name
 
     def get_source(self, name):
-        return json.loads(self.con.get("source:%s" % name))
+        return self.redis.hget('sources', name)
 
     def delete_source(self, name):
-        return self.con.delete("source:%s" % name)
+        return self.redis.hdel('sources', name)
 
     def get_thumbnails(self, name):
-        source = self.get_source(name)
-        return [ImageMeta(name, meta['name'], meta['size']) for meta in source.values()]
+        key = "%s:thumbnails" % name
+        metas = self.redis.hgetall(key)
+        return [ImageMeta(name, meta[1], meta[0]) for meta in metas.iteritems()]
 
     def get_thumbnail(self, source_name, size):
-        try:
-            source = json.loads(self.con.get("source:%s" % source_name))
-            meta = source["%s_%s" % (source_name, size)]
-            return ImageMeta(source_name, meta['name'], meta['size'])
-        except KeyError:
-            return None
+        key = "%s:thumbnails" % source_name
+        name = self.redis.hget(key, size)
+        if name:
+            return ImageMeta(source_name, name, size)
+        return None
 
     def add_thumbnail(self, source_name, size, name):
-        meta = {
-            'name': name,
-            'size': size
-        }
-        source = self.get_source(source_name)
-        source["%s_%s" % (source_name, size)] = meta
-        self.con.set("source:%s" % source_name, json.dumps(source))
-        return ImageMeta(source_name, name, size)
+        if self.redis.hexists('sources', source_name):
+            key = "%s:thumbnails" % source_name
+            self.redis.hset(key, size, name)
+            return ImageMeta(source_name, name, size)
+        raise ObjectDoesNotExist
 
     def delete_thumbnail(self, source_name, size):
-        name = "%s_%s" % (source_name, size)
-        source = self.get_source(source_name)
-        del source[name]
-        self.con.set("source:%s" % source_name, json.dumps(source))
+        key = "%s:thumbnails" % source_name
+        self.redis.hdel(key, size)

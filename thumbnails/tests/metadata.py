@@ -1,4 +1,4 @@
-import redis, json
+from redis import Redis
 from django.test import TestCase
 
 from thumbnails.backends.metadata import ImageMeta
@@ -55,37 +55,30 @@ class RedisBackendTest(TestCase):
 
     def setUp(self):
         self.backend = RedisBackend()
-        self.con = redis.StrictRedis(host='localhost', port=6379, db=0)
+        self.redis = Redis()
 
     def test_add_delete_source(self):
         source_name = 'image.jpg'
         self.backend.add_source(source_name)
-        self.assertEqual(self.con.get("source:%s" % source_name), '{}')
+        self.assertTrue(self.redis.hexists("sources", source_name))
         self.backend.delete_source(source_name)
-        self.assertEqual(self.con.get("source:%s" % source_name), None)
+        self.assertFalse(self.redis.hexists("sources", source_name))
 
     def test_get_source(self):
         source_name = 'image.jpg'
         self.backend.add_source(source_name)
-        self.assertEqual(self.backend.get_source(source_name), {})
+        self.assertEqual(self.backend.get_source(source_name), source_name)
 
     def test_add_delete_thumbnail(self):
         source_name = 'image.jpg'
-        name = 'image_small.jpg'
         size = 'small'
-        expected = {
-            'image.jpg_small': {
-                'name': name,
-                'size': size
-            }
-        }
 
         self.backend.add_source(source_name)
-        self.backend.add_thumbnail(source_name, size, name)
-        self.assertEqual(self.con.get("source:%s" % source_name), json.dumps(expected))
+        self.backend.add_thumbnail(source_name, size, 'image_small.jpg')
+        self.assertTrue(self.redis.hexists("image.jpg:thumbnails", size))
 
         self.backend.delete_thumbnail(source_name, size)
-        self.assertEqual(self.con.get("source:%s" % source_name), '{}')
+        self.assertFalse(self.redis.hexists("image.jpg:thumbnails", size))
 
     def test_get_thumbnail(self):
         source_name = 'image.jpg'
