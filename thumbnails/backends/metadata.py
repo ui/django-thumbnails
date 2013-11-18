@@ -1,5 +1,4 @@
 from redis import Redis
-from django.core.exceptions import ObjectDoesNotExist
 
 from thumbnails.models import Source, ThumbnailMeta
 
@@ -69,35 +68,36 @@ class DatabaseBackend(BaseBackend):
 class RedisBackend(BaseBackend):
     redis = Redis()
 
+    def get_source_key(name):
+        return "djthumbs:sources:%s" % name
+
+    def get_thumbnail_key(name):
+        return "djthumbs:thumbnails:%s" % name
+
     def add_source(self, name):
-        self.redis.hset('sources', name, name)
+        self.redis.hset(get_source_key(name), name, name)
         return name
 
     def get_source(self, name):
-        return self.redis.hget('sources', name)
+        return self.redis.hget(get_source_key(name), name)
 
     def delete_source(self, name):
-        return self.redis.hdel('sources', name)
+        return self.redis.hdel(get_source_key(name), name)
 
     def get_thumbnails(self, name):
-        key = "%s:thumbnails" % name
+        key = get_thumbnail_key(name)
         metas = self.redis.hgetall(key)
-        return [ImageMeta(name, meta[1], meta[0]) for meta in metas.iteritems()]
+        return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in metas.iteritems()]
 
     def get_thumbnail(self, source_name, size):
-        key = "%s:thumbnails" % source_name
-        name = self.redis.hget(key, size)
+        name = self.redis.hget(get_thumbnail_key(name), size)
         if name:
             return ImageMeta(source_name, name, size)
         return None
 
     def add_thumbnail(self, source_name, size, name):
-        if self.redis.hexists('sources', source_name):
-            key = "%s:thumbnails" % source_name
-            self.redis.hset(key, size, name)
-            return ImageMeta(source_name, name, size)
-        raise ObjectDoesNotExist
+        self.redis.hset(get_thumbnail_key(name), size, name)
+        return ImageMeta(source_name, name, size)
 
     def delete_thumbnail(self, source_name, size):
-        key = "%s:thumbnails" % source_name
-        self.redis.hdel(key, size)
+        self.redis.hdel(get_thumbnail_key(name), size)
