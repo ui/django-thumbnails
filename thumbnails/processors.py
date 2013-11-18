@@ -1,17 +1,20 @@
 def resize(image, **kwargs):
     image.resize(width=kwargs['width'], height=kwargs['height'])
+    return image
 
 
 def grayscale(image, **kwargs):
-    pass
+    return image
 
 
 def rotate(image, **kwargs):
     image.rotate(degrees=kwargs['degrees'])
+    return image
 
 
 def flip(image, **kwargs):
     image.flip(direction=kwargs['direction'])
+    return image
 
 
 def crop(image, **kwargs):
@@ -21,7 +24,6 @@ def crop(image, **kwargs):
     }
     if kwargs.get('center_offset'):
         params['center_offset'] = kwargs['center_offset']
-    if kwargs.get('shape'):
-        params['shape'] = kwargs['shape']
 
     image.crop(**params)
+    return image

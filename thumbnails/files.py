@@ -88,7 +88,7 @@ class Gallery(object):
 
         # run through all processors, if defined
         for processor in size_dict.get('processors'):
-            processor(image, **size_dict)
+            image = processor(image, **size_dict)
 
         # save to Storage
         thumbnail_io = io.BytesIO()
