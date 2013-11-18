@@ -22,8 +22,7 @@ def crop(image, **kwargs):
         'width': kwargs['width'],
         'height': kwargs['height']
     }
-    if kwargs.get('center_offset'):
-        params['center_offset'] = kwargs['center_offset']
-
+    if kwargs.get('center'):
+        params['center'] = kwargs['center']
     image.crop(**params)
     return image

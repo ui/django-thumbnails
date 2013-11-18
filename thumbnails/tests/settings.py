@@ -32,6 +32,7 @@ THUMBNAILS = {
             'width': 80,
             'height': 80,
             'degrees': 45,
+            'center': '50%,50%',
             'processors': ['thumbnails.processors.resize',
                            'thumbnails.processors.rotate',
                            'thumbnails.processors.crop'],
