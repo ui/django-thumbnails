@@ -1,5 +1,5 @@
 import os
-import StringIO
+import io
 
 from django.core.files.base import ContentFile
 from django.db.models.fields.files import ImageFieldFile
@@ -87,13 +87,11 @@ class Gallery(object):
         size_dict = conf.SIZES[size]
 
         # run through all processors, if defined
-        processors = size_dict.get('processors', [])
-        if processors:
-            for processor in processors:
-                processor(image, **size_dict)
+        for processor in size_dict.get('processors'):
+            processor(image, **size_dict)
 
         # save to Storage
-        thumbnail_io = StringIO.StringIO()
+        thumbnail_io = io.BytesIO()
         image.save(thumbnail_io)
         thumbnail_file = ContentFile(thumbnail_io.getvalue())
         name = self.storage.save(name, thumbnail_file)
