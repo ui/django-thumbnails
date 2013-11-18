@@ -31,3 +31,6 @@ THUMBNAILS = {
         }
     }
 }
+
+
+THUMBNAIL_BASEDIR = 'thumbs'
