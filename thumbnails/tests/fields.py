@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from thumbnails.files import Thumbnail
 from .models import TestModel
+from thumbnails import conf
 
 
 class ImageFieldTest(TestCase):
@@ -16,7 +17,7 @@ class ImageFieldTest(TestCase):
             self.instance.avatar = File(image_file)
             self.instance.save()
         self.avatar_folder = \
-            os.path.join(self.instance.avatar.storage.temporary_location, 'avatars')
+            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASEDIR, 'avatars')
 
     def tearDown(self):
         self.instance.avatar.storage.delete_temporary_storage()
@@ -31,7 +32,6 @@ class ImageFieldTest(TestCase):
 
         # Make sure the returned thumbnail is of thumbnail class, not metadata
         self.assertTrue(isinstance(thumb, Thumbnail))
-
         # 2. Test for getting thumbnail
         self.assertEqual(thumb, self.instance.avatar.thumbnails.get_thumbnail(size='small'))
 

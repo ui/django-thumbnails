@@ -16,6 +16,7 @@ default_storage = {
 METADATA = THUMBNAILS.get('METADATA', default_metadata)
 STORAGE = THUMBNAILS.get('STORAGE', default_storage)
 SIZES = THUMBNAILS.get('SIZES', {})
+BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')
 
 # import the processors as a functions and replace the import string
 for size in SIZES:
