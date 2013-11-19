@@ -16,19 +16,19 @@ class ImageFieldTest(TestCase):
         with open('thumbnails/tests/tests.png') as image_file:
             self.instance.avatar = File(image_file)
             self.instance.save()
+        self.avatar_folder = \
+            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASEDIR, 'avatars')
 
     def tearDown(self):
         self.instance.avatar.storage.delete_temporary_storage()
         super(ImageFieldTest, self).tearDown()
 
     def test_image_field(self):
-        avatar_folder = \
-            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASEDIR, 'avatars')
 
         # 1. Test for thumbnail creation
-        self.assertFalse(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
+        self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, 'tests_small.png')))
         thumb = self.instance.avatar.thumbnails.create_thumbnail(size='small')
-        self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
+        self.assertTrue(os.path.isfile(os.path.join(self.avatar_folder, 'tests_small.png')))
 
         # Make sure the returned thumbnail is of thumbnail class, not metadata
         self.assertTrue(isinstance(thumb, Thumbnail))
@@ -36,9 +36,9 @@ class ImageFieldTest(TestCase):
         self.assertEqual(thumb, self.instance.avatar.thumbnails.get_thumbnail(size='small'))
 
         # 3. Test for thumbnail deletion
-        self.assertTrue(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
+        self.assertTrue(os.path.isfile(os.path.join(self.avatar_folder, 'tests_small.png')))
         self.instance.avatar.thumbnails.delete_thumbnail(size='small')
-        self.assertFalse(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))
+        self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, 'tests_small.png')))
 
     def test_thumbnail_field(self):
         # Make sure gallery return the correct thumbnail
@@ -51,6 +51,13 @@ class ImageFieldTest(TestCase):
         self.assertTrue(self.instance.avatar.thumbnails.large, Thumbnail)
         self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.large.name),
                          'tests_large.png')
+
+        # Test for name clashing with another file with the same name
+        self.instance.avatar.thumbnails.delete_thumbnail('large')
+        open(os.path.join(self.avatar_folder, 'tests_large.png'), 'w').close()
+        self.instance.avatar.thumbnails.create_thumbnail('large')
+        self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.large.name),
+                         'tests_large_1.png')
 
     def test_thumbnails_cache(self):
 

@@ -2,8 +2,9 @@ import os
 
 from django.db.models.fields.files import ImageFieldFile
 
-from .backends.metadata import DatabaseBackend
 from . import conf
+from .backends.metadata import DatabaseBackend
+from .processors import process
 
 
 class SourceImage(ImageFieldFile):
@@ -13,7 +14,6 @@ class SourceImage(ImageFieldFile):
 
 
 class ThumbnailedImageFile(ImageFieldFile):
-    _thumbnails = {}
 
     def __init__(self, *args, **kwargs):
         super(ThumbnailedImageFile, self).__init__(*args, **kwargs)
@@ -47,14 +47,13 @@ class Gallery(object):
         filename = "%s_%s%s" % (name, size, extension)
         return os.path.join(conf.BASEDIR, filename)
 
-    def _purge_thumbnails_cache(self):
+    def _purge_all_thumbnails_cache(self):
         if hasattr(self, '_all_thumbnails'):
             del self._all_thumbnails
 
     def all(self):
         # 1. Get all available sizes
-        # 2. Get or create all thumbnails
-        # 3. Return all thumbnails as list
+        # 2. Return all thumbnails as list
         if not hasattr(self, '_all_thumbnails'):
             metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
             thumbnails = {metadata.size: Thumbnail(metadata=metadata, storage=self.storage) for metadata in metadatas}
@@ -79,10 +78,13 @@ class Gallery(object):
         # 1. Use Storage API to create a thumbnail (and get its filename)
         # 2. Call metadata_storage.add_thumbnail(self.name, size, filename)
         name = self._get_thumbnail_name(size)
-        name = self.storage.save(name, self.source_image.file)
+
+        thumbnail_file = process(self.storage.open(self.source_image.name), size)
+        name = self.storage.save(name, thumbnail_file)
+
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
         thumbnail = Thumbnail(metadata=metadata, storage=self.storage)
-        self._purge_thumbnails_cache()
+        self._purge_all_thumbnails_cache()
         return thumbnail
 
     def delete_thumbnail(self, size):
@@ -90,7 +92,7 @@ class Gallery(object):
         # 2. Call metadata_storage.remove_thumbnail(self.name, size)
         self.storage.delete(self._get_thumbnail_name(size))
         self.metadata_backend.delete_thumbnail(self.source_image.name, size)
-        self._purge_thumbnails_cache()
+        self._purge_all_thumbnails_cache()
         del(self._thumbnails[size])
 
 
