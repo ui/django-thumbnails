@@ -1,12 +1,10 @@
 import os
-import io
 
-from django.core.files.base import ContentFile
 from django.db.models.fields.files import ImageFieldFile
-from da_vinci import images
 
 from . import conf
 from .backends.metadata import DatabaseBackend
+from .utils import process_image
 
 
 class SourceImage(ImageFieldFile):
@@ -80,18 +78,7 @@ class Gallery(object):
         # 2. Call metadata_storage.add_thumbnail(self.name, size, filename)
         name = self._get_thumbnail_name(size)
 
-        # open image in piccaso
-        image = images.from_file(self.storage.open(self.source_image.name))
-        size_dict = conf.SIZES[size]
-
-        # run through all processors, if defined
-        for processor in size_dict.get('processors'):
-            image = processor(image, **size_dict)
-
-        # save to Storage
-        thumbnail_io = io.BytesIO()
-        image.save(file=thumbnail_io)
-        thumbnail_file = ContentFile(thumbnail_io.getvalue())
+        thumbnail_file = process_image(self.storage.open(self.source_image.name), size)
         name = self.storage.save(name, thumbnail_file)
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)

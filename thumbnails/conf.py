@@ -15,3 +15,5 @@ for size in SIZES:
         raise ValueError('%s processors must be in list format' % size)
     if processors:
         SIZES[size]['processors'] = [import_attribute(processor) for processor in processors]
+    else:
+        SIZES[size]['processors'] = processors

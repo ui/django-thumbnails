@@ -36,6 +36,11 @@ THUMBNAILS = {
             'processors': ('thumbnails.processors.resize',
                            'thumbnails.processors.rotate',
                            'thumbnails.processors.crop'),
+        },
+        'source': {
+            'width': 90,
+            'height': 90,
+            'processors': ['thumbnails.processors.resize']
         }
     }
 }
