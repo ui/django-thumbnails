@@ -16,7 +16,6 @@ class SourceImage(ImageFieldFile):
 
 
 class ThumbnailedImageFile(ImageFieldFile):
-    _thumbnails = {}
 
     def __init__(self, *args, **kwargs):
         super(ThumbnailedImageFile, self).__init__(*args, **kwargs)
@@ -49,14 +48,13 @@ class Gallery(object):
         name, extension = os.path.splitext(self.source_image.name)
         return "%s_%s%s" % (name, size, extension)
 
-    def _purge_thumbnails_cache(self):
+    def _purge_all_thumbnails_cache(self):
         if hasattr(self, '_all_thumbnails'):
             del self._all_thumbnails
 
     def all(self):
         # 1. Get all available sizes
-        # 2. Get or create all thumbnails
-        # 3. Return all thumbnails as list
+        # 2. Return all thumbnails as list
         if not hasattr(self, '_all_thumbnails'):
             metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
             thumbnails = {metadata.size: Thumbnail(metadata=metadata, storage=self.storage) for metadata in metadatas}
@@ -92,13 +90,13 @@ class Gallery(object):
 
         # save to Storage
         thumbnail_io = io.BytesIO()
-        image.save(thumbnail_io)
+        image.save(file=thumbnail_io)
         thumbnail_file = ContentFile(thumbnail_io.getvalue())
         name = self.storage.save(name, thumbnail_file)
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
         thumbnail = Thumbnail(metadata=metadata, storage=self.storage)
-        self._purge_thumbnails_cache()
+        self._purge_all_thumbnails_cache()
         return thumbnail
 
     def delete_thumbnail(self, size):
@@ -106,7 +104,7 @@ class Gallery(object):
         # 2. Call metadata_storage.remove_thumbnail(self.name, size)
         self.storage.delete(self._get_thumbnail_name(size))
         self.metadata_backend.delete_thumbnail(self.source_image.name, size)
-        self._purge_thumbnails_cache()
+        self._purge_all_thumbnails_cache()
         del(self._thumbnails[size])
 
 
