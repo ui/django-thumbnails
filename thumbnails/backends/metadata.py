@@ -1,3 +1,6 @@
+from redis import StrictRedis
+
+from thumbnails import conf
 from thumbnails.models import Source, ThumbnailMeta
 
 
@@ -10,7 +13,6 @@ class ImageMeta:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
 
 class BaseBackend:
 
@@ -62,3 +64,46 @@ class DatabaseBackend(BaseBackend):
 
     def delete_thumbnail(self, source_name, size):
         ThumbnailMeta.objects.filter(source__name=source_name, size=size).delete()
+
+
+class RedisBackend(BaseBackend):
+
+    def __init__(self):
+        host = conf.METADATA.get('host', 'localhost')
+        port = conf.METADATA.get('port', 6379)
+        password = conf.METADATA.get('password', None)
+        db = conf.METADATA.get('db', 0)
+        self.redis = StrictRedis(host=host, port=port, password=password)
+
+    def get_source_key(self, name):
+        return "djthumbs:sources:%s" % name
+
+    def get_thumbnail_key(self, name):
+        return "djthumbs:thumbnails:%s" % name
+
+    def add_source(self, name):
+        self.redis.hset(self.get_source_key(name), name, name)
+        return name
+
+    def get_source(self, name):
+        return self.redis.hget(self.get_source_key(name), name)
+
+    def delete_source(self, name):
+        return self.redis.hdel(self.get_source_key(name), name)
+
+    def get_thumbnails(self, name):
+        metas = self.redis.hgetall(self.get_thumbnail_key(name))
+        return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in metas.iteritems()]
+
+    def get_thumbnail(self, source_name, size):
+        name = self.redis.hget(self.get_thumbnail_key(source_name), size)
+        if name:
+            return ImageMeta(source_name, name, size)
+        return None
+
+    def add_thumbnail(self, source_name, size, name):
+        self.redis.hset(self.get_thumbnail_key(source_name), size, name)
+        return ImageMeta(source_name, name, size)
+
+    def delete_thumbnail(self, source_name, size):
+        self.redis.hdel(self.get_thumbnail_key(source_name), size)

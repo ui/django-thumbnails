@@ -4,8 +4,17 @@ from .utils import import_attribute
 
 THUMBNAILS = getattr(settings, 'THUMBNAILS', {})
 
-METADATA_BACKEND = THUMBNAILS.get('METADATA_BACKEND', 'thumbnails.backends.metadata.DatabaseBackend')
-STORAGE_BACKEND = THUMBNAILS.get('STORAGE_BACKEND', 'django.core.files.storage.FileSystemStorage')
+
+default_metadata = {
+    'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend'
+}
+
+default_storage = {
+    'BACKEND': 'django.core.files.storage.FileSystemStorage'
+}
+
+METADATA = THUMBNAILS.get('METADATA', default_metadata)
+STORAGE = THUMBNAILS.get('STORAGE', default_storage)
 SIZES = THUMBNAILS.get('SIZES', {})
 
 # import the processors as a functions and replace the import string

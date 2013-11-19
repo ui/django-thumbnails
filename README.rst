@@ -12,8 +12,12 @@ Usage
 settings.py::
 
     THUMBNAILS = {
-        'METADATA_BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
-        'STORAGE_BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'METADATA': {
+            'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
+        },
+        'STORAGE': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        }
         'SIZES': {
             'small': {
                 'width': 10,
