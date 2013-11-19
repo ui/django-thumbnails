@@ -14,3 +14,4 @@ default_storage = {
 METADATA = THUMBNAILS.get('METADATA', default_metadata)
 STORAGE = THUMBNAILS.get('STORAGE', default_storage)
 SIZES = THUMBNAILS.get('SIZES', {})
+BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')

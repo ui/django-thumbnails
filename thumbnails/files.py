@@ -44,7 +44,8 @@ class Gallery(object):
 
     def _get_thumbnail_name(self, size):
         name, extension = os.path.splitext(self.source_image.name)
-        return "%s_%s%s" % (name, size, extension)
+        filename = "%s_%s%s" % (name, size, extension)
+        return os.path.join(conf.BASEDIR, filename)
 
     def _purge_thumbnails_cache(self):
         if hasattr(self, '_all_thumbnails'):
