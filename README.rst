@@ -53,7 +53,7 @@ Builtin processors::
     thumbnails.processors.resize(width, height)
     thumbnails.processors.rotate(degrees)
     thumbnails.processors.flip(direction)
-    thumbnails.processors.crop(width, height, center_offset, shape)
+    thumbnails.processors.crop(width, height, center)
 
     Processors will be applied to the image sequentially with the order of definition
 

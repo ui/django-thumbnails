@@ -3,10 +3,6 @@ def resize(image, **kwargs):
     return image
 
 
-def grayscale(image, **kwargs):
-    return image
-
-
 def rotate(image, **kwargs):
     image.rotate(degrees=kwargs['degrees'])
     return image

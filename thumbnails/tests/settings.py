@@ -20,7 +20,7 @@ THUMBNAILS = {
         'small': {
             'width': 10,
             'height': 10,
-            'processors': ['thumbnails.processors.resize', 'thumbnails.processors.grayscale'],
+            'processors': ['thumbnails.processors.resize'],
         },
         'default': {
             'width': 20,
