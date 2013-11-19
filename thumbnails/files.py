@@ -34,7 +34,7 @@ class Gallery(object):
         self.metadata_backend = metadata_backend
         self.storage = storage
         self.source_image = source_image
-        self.thumb_basedir = conf.THUMBNAIL_BASEDIR
+        self.thumb_basedir = conf.BASEDIR
         self._thumbnails = {}
 
     def __getattr__(self, name):

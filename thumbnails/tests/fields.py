@@ -23,7 +23,7 @@ class ImageFieldTest(TestCase):
 
     def test_image_field(self):
         avatar_folder = \
-            os.path.join(self.instance.avatar.storage.temporary_location, conf.THUMBNAIL_BASEDIR, 'avatars')
+            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASEDIR, 'avatars')
 
         # 1. Test for thumbnail creation
         self.assertFalse(os.path.isfile(os.path.join(avatar_folder, 'tests_small.png')))

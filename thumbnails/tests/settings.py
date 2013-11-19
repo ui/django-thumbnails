@@ -16,6 +16,7 @@ INSTALLED_APPS = (
 SECRET_KEY = 'a'
 
 THUMBNAILS = {
+    'BASEDIR': 'thumbs',
     'SIZES': {
         'small': {
             'width': 10,
@@ -31,6 +32,3 @@ THUMBNAILS = {
         }
     }
 }
-
-
-THUMBNAIL_BASEDIR = 'thumbs'
