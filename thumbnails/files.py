@@ -4,7 +4,7 @@ from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
 from .backends.metadata import DatabaseBackend
-from .utils import process_image
+from .processors import process
 
 
 class SourceImage(ImageFieldFile):
@@ -79,7 +79,7 @@ class Gallery(object):
         # 2. Call metadata_storage.add_thumbnail(self.name, size, filename)
         name = self._get_thumbnail_name(size)
 
-        thumbnail_file = process_image(self.storage.open(self.source_image.name), size)
+        thumbnail_file = process(self.storage.open(self.source_image.name), size)
         name = self.storage.save(name, thumbnail_file)
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
