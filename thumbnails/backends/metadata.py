@@ -1,5 +1,6 @@
-from redis import Redis
+from redis import StrictRedis
 
+from thumbnails import conf
 from thumbnails.models import Source, ThumbnailMeta
 
 
@@ -12,7 +13,6 @@ class ImageMeta:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
 
 class BaseBackend:
 
@@ -67,7 +67,13 @@ class DatabaseBackend(BaseBackend):
 
 
 class RedisBackend(BaseBackend):
-    redis = Redis()
+
+    def __init__(self):
+        host = conf.METADATA.get('host', 'localhost')
+        port = conf.METADATA.get('port', 6379)
+        password = conf.METADATA.get('password', None)
+        db = conf.METADATA.get('db', 0)
+        self.redis = StrictRedis(host=host, port=port, password=password)
 
     def get_source_key(self, name):
         return "djthumbs:sources:%s" % name
