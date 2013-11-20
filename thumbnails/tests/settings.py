@@ -16,6 +16,9 @@ INSTALLED_APPS = (
 SECRET_KEY = 'a'
 
 THUMBNAILS = {
+    'METADATA': {
+        'PREFIX': 'djthumbs-test'
+    },
     'BASEDIR': 'thumbs',
     'SIZES': {
         'small': {

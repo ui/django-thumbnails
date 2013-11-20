@@ -57,6 +57,12 @@ class RedisBackendTest(TestCase):
         self.backend = RedisBackend()
         self.redis = StrictRedis()
 
+    def test_get_source_key(self):
+        self.assertEqual(self.backend.get_source_key('a.jpg'), 'djthumbs-test:sources:a.jpg')
+
+    def test_get_thumbnail_key(self):
+        self.assertEqual(self.backend.get_thumbnail_key('a.jpg'), 'djthumbs-test:thumbnails:a.jpg')
+
     def test_add_delete_source(self):
         source_name = 'test-thumbnail.jpg'
         source_key = self.backend.get_source_key(source_name)
