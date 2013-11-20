@@ -23,3 +23,13 @@ class ImageField(DjangoImageField):
                 image_file = process(file, self.resize_original)
             file.save(file.name, image_file, save=False)
         return file
+
+    def south_field_triple(self):
+        """
+        Return a suitable description of this field for South.
+        Taken from smiley chris' easy_thumbnails
+        """
+        from south.modelsinspector import introspector
+        field_class = 'django.db.models.fields.files.ImageField'
+        args, kwargs = introspector(self)
+        return (field_class, args, kwargs)
