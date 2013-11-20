@@ -14,6 +14,7 @@ class ImageMeta:
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+
 class BaseBackend:
 
     def add_source(name):
@@ -73,13 +74,15 @@ class RedisBackend(BaseBackend):
         port = conf.METADATA.get('port', 6379)
         password = conf.METADATA.get('password', None)
         db = conf.METADATA.get('db', 0)
-        self.redis = StrictRedis(host=host, port=port, password=password)
+        prefix = conf.METADATA.get('PREFIX', 'djthumbs')
+        self.prefix = prefix + ":"
+        self.redis = StrictRedis(host=host, port=port, password=password, db=db)
 
     def get_source_key(self, name):
-        return "djthumbs:sources:%s" % name
+        return "%ssources:%s" % (self.prefix, name)
 
     def get_thumbnail_key(self, name):
-        return "djthumbs:thumbnails:%s" % name
+        return "%sthumbnails:%s" % (self.prefix, name)
 
     def add_source(self, name):
         self.redis.hset(self.get_source_key(name), name, name)

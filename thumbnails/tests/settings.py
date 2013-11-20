@@ -16,6 +16,10 @@ INSTALLED_APPS = (
 SECRET_KEY = 'a'
 
 THUMBNAILS = {
+    'METADATA': {
+        'BACKEND': 'thumbnails.backends.metadata.RedisBackend',
+        'PREFIX': 'djthumbs-test'
+    },
     'BASEDIR': 'thumbs',
     'SIZES': {
         'small': {
