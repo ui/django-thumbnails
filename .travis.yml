@@ -19,6 +19,7 @@ install:
   - pip install Django==$DJANGO times
   - pip install da-vinci
   - pip install pillow
+  - pip install redis
 
 script: make test
 services: redis
