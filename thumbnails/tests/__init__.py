@@ -1,3 +1,3 @@
-from .metadata import DatabaseBackendTest, RedisBackendTest
-from .fields import ImageFieldTest
-from .settings_test import SettingsTest
+from .test_metadata import DatabaseBackendTest, RedisBackendTest
+from .test_fields import ImageFieldTest
+from .test_settings import SettingsTest
