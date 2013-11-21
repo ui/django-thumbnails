@@ -56,7 +56,11 @@ class Gallery(object):
         # 2. Return all thumbnails as list
         if not hasattr(self, '_all_thumbnails'):
             metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
-            thumbnails = {metadata.size: Thumbnail(metadata=metadata, storage=self.storage) for metadata in metadatas}
+
+            thumbnails = {}
+            for metadata in metadatas:
+                thumbnails[metadata.size] = Thumbnail(metadata=metadata, storage=self.storage)
+
             self._thumbnails = thumbnails
             self._all_thumbnails = thumbnails
         return self._all_thumbnails
