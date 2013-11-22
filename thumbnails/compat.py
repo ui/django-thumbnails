@@ -7,7 +7,6 @@ PY3 = sys.version_info[0] == 3
 if PY2:
     string_types = (str, unicode)
     text_type = unicode
-    _iteritems = "iteritems"
 
     def as_text(v):
         return v
@@ -15,7 +14,6 @@ if PY2:
 else:
     string_types = (str,)
     text_type = str
-    _iteritems = "items"
 
     def as_text(v):
         if v is None:
@@ -26,9 +24,3 @@ else:
             return v
         else:
             raise ValueError('Unknown type %r' % type(v))
-
-
-def iteritems(d, **kw):
-    """Return an iterator over the (key, value) pairs of a dictionary."""
-    """Taken from six"""
-    return iter(getattr(d, _iteritems)(**kw))

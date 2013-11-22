@@ -99,7 +99,7 @@ class RedisBackend(BaseBackend):
 
     def get_thumbnails(self, name):
         metas = self.redis.hgetall(self.get_thumbnail_key(name))
-        return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in compat.iteritems(metas)]
+        return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in metas.items()]
 
     def get_thumbnail(self, source_name, size):
         name = compat.as_text(self.redis.hget(self.get_thumbnail_key(source_name), size))
