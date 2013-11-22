@@ -11,6 +11,9 @@ class ImageField(DjangoImageField):
         self.resize_original = kwargs.pop('resize_original', None)
         super(ImageField, self).__init__(self, *args, **kwargs)
 
+    def __unicode__(self):
+        return self.attname
+
     def pre_save(self, model_instance, add):
         """
         Process the source image through the defined processors.
