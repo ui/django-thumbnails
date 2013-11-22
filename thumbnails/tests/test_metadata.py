@@ -105,9 +105,9 @@ class RedisBackendTest(TestCase):
         self.assertEqual(self.backend.get_thumbnail(source_name, 'small'), ImageMeta(source_name, 'test-thumbnail_small.jpg', 'small'))
         self.backend.add_thumbnail(source_name, 'large', 'test-thumbnail_large.jpg')
 
-        expected = [ImageMeta(source_name, 'test-thumbnail_large.jpg', 'large'),
-                    ImageMeta(source_name, 'test-thumbnail_small.jpg', 'small')]
-        self.assertEqual(self.backend.get_thumbnails(source_name).sort(), expected.sort())
+        expected = ['test-thumbnail_large.jpg', 'test-thumbnail_small.jpg']
+        result = [image_meta.name for image_meta in self.backend.get_thumbnails(source_name)]
+        self.assertEqual(result.sort(), expected.sort())
 
         # Delete Source & Thumbnails
         thumbnail_key = self.backend.get_thumbnail_key(source_name)
