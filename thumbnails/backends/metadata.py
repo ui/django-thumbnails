@@ -1,6 +1,6 @@
 from redis import StrictRedis
 
-from thumbnails import conf
+from thumbnails import conf, compat
 from thumbnails.models import Source, ThumbnailMeta
 
 
@@ -89,17 +89,17 @@ class RedisBackend(BaseBackend):
         return name
 
     def get_source(self, name):
-        return self.redis.hget(self.get_source_key(name), name)
+        return compat.as_text(self.redis.hget(self.get_source_key(name), name))
 
     def delete_source(self, name):
         return self.redis.hdel(self.get_source_key(name), name)
 
     def get_thumbnails(self, name):
         metas = self.redis.hgetall(self.get_thumbnail_key(name))
-        return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in metas.iteritems()]
+        return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in metas.items()]
 
     def get_thumbnail(self, source_name, size):
-        name = self.redis.hget(self.get_thumbnail_key(source_name), size)
+        name = compat.as_text(self.redis.hget(self.get_thumbnail_key(source_name), size))
         if name:
             return ImageMeta(source_name, name, size)
         return None
