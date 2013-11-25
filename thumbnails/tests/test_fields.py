@@ -4,9 +4,10 @@ from django.core.files import File
 from django.db import connection
 from django.test import TestCase
 
-from thumbnails.files import Thumbnail
-from .models import TestModel
 from thumbnails import conf
+from thumbnails.files import Thumbnail
+
+from .models import TestModel
 
 
 class ImageFieldTest(TestCase):

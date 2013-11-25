@@ -1,7 +1,13 @@
 from redis import StrictRedis
 
-from thumbnails import conf, compat
+from thumbnails import compat, conf
 from thumbnails.models import Source, ThumbnailMeta
+from thumbnails.utils import import_attribute
+
+
+def get_backend():
+    metadata = import_attribute(conf.METADATA.get('BACKEND', 'thumbnails.backends.metadata.DatabaseBackend'))
+    return metadata()
 
 
 class ImageMeta:
