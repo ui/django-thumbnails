@@ -3,7 +3,6 @@ import os
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
-from .backends.metadata import DatabaseBackend
 from .processors import process
 
 
@@ -17,7 +16,7 @@ class ThumbnailedImageFile(ImageFieldFile):
 
     def __init__(self, *args, **kwargs):
         super(ThumbnailedImageFile, self).__init__(*args, **kwargs)
-        self.metadata_backend = DatabaseBackend()
+        self.metadata_backend = conf.METADATA['backend']()
         self.thumbnails = Gallery(metadata_backend=self.metadata_backend,
                                   storage=self.storage,
                                   source_image=self)
