@@ -27,5 +27,3 @@ for size in SIZES:
         SIZES[size]['processors'] = [import_attribute(processor) for processor in processors]
     else:
         SIZES[size]['processors'] = processors
-
-METADATA['backend'] = import_attribute(METADATA.get('BACKEND', 'thumbnails.backends.metadata.DatabaseBackend'))
