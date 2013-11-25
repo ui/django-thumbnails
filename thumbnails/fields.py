@@ -8,7 +8,7 @@ class ImageField(DjangoImageField):
     attr_class = ThumbnailedImageFile
 
     def __init__(self, *args, **kwargs):
-        self.resize_original = kwargs.pop('resize_original', None)
+        self.resize_source_to = kwargs.pop('resize_source_to', None)
         super(ImageField, self).__init__(self, *args, **kwargs)
 
     def __unicode__(self):
@@ -22,8 +22,8 @@ class ImageField(DjangoImageField):
 
         if file and not file._committed:
             image_file = file
-            if self.resize_original:
-                image_file = process(file, self.resize_original)
+            if self.resize_source_to:
+                image_file = process(file, self.resize_source_to)
             file.save(file.name, image_file, save=False)
         return file
 

@@ -6,4 +6,4 @@ from .storage import TemporaryStorage
 
 class TestModel(models.Model):
     avatar = ImageField(storage=TemporaryStorage(), upload_to='avatars',
-                        resize_original='source')
+                        resize_source_to='source')
