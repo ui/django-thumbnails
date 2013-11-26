@@ -17,7 +17,8 @@ settings.py::
         },
         'STORAGE': {
             'BACKEND': 'django.core.files.storage.FileSystemStorage',
-        }
+        },
+        'DEFAULT_PROCESSORS': ['thumbnails.processors.resize', '...'],
         'SIZES': {
             'small': {
                 'width': 10,
@@ -60,6 +61,10 @@ Builtin processors::
     thumbnails.processors.crop(width, height, center)
 
     Processors will be applied to the image sequentially with the order of definition
+
+    If no processors are defined in SIZES definition, django_thumbnails will
+    try to find processors defined in default_processors. In this case, arguments
+    for the default processor still needs to be defined in respective SIZES definition
 
 
 Running tests::
