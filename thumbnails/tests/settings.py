@@ -17,7 +17,11 @@ SECRET_KEY = 'a'
 
 THUMBNAILS = {
     'METADATA': {
-        'PREFIX': 'djthumbs-test'
+        'PREFIX': 'djthumbs-test',
+        'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
+    },
+    'STORAGE': {
+        'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASEDIR': 'thumbs',
     'SIZES': {
