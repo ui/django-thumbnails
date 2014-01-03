@@ -11,7 +11,7 @@ class ImageField(DjangoImageField):
     def __init__(self, *args, **kwargs):
         self.resize_source_to = kwargs.pop('resize_source_to', None)
         if kwargs.get('storage'):
-            raise ValueError('Override Storage on settings')
+            raise ValueError('Please define storage backend in settings.py instead of on the field itself')
         kwargs['storage'] = storage.get_backend()
         self.backend = metadata.get_backend()
         super(ImageField, self).__init__(self, *args, **kwargs)
