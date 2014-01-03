@@ -1,5 +1,6 @@
 from django.db.models import ImageField as DjangoImageField
 
+from .backends import get_storage_backend
 from .files import ThumbnailedImageFile
 from .processors import process
 
@@ -9,6 +10,9 @@ class ImageField(DjangoImageField):
 
     def __init__(self, *args, **kwargs):
         self.resize_source_to = kwargs.pop('resize_source_to', None)
+        if kwargs.get('storage'):
+            raise ValueError('Override Storage on settings')
+        kwargs['storage'] = get_storage_backend()
         super(ImageField, self).__init__(self, *args, **kwargs)
 
     def __unicode__(self):

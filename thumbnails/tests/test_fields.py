@@ -14,6 +14,7 @@ class ImageFieldTest(TestCase):
 
     def setUp(self):
         self.instance = TestModel.objects.create()
+
         with open('thumbnails/tests/tests.png', 'rb') as image_file:
             self.instance.avatar = File(image_file)
             self.instance.save()

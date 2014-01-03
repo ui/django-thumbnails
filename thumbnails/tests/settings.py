@@ -19,6 +19,9 @@ THUMBNAILS = {
     'METADATA': {
         'PREFIX': 'djthumbs-test'
     },
+    'STORAGE': {
+        'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
+    },
     'BASEDIR': 'thumbs',
     'SIZES': {
         'small': {
