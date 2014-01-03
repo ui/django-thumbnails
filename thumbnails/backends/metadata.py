@@ -6,7 +6,9 @@ from thumbnails.utils import import_attribute
 
 
 def get_backend():
-    metadata = import_attribute(conf.METADATA.get('BACKEND', 'thumbnails.backends.metadata.DatabaseBackend'))
+    if not conf.METADATA.get('BACKEND'):
+        raise ValueError('BACKEND for STORAGE must be defined')
+    metadata = import_attribute(conf.METADATA['BACKEND'])
     return metadata()
 
 
