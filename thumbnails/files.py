@@ -5,6 +5,7 @@ from django.db.models.fields.files import ImageFieldFile
 from . import conf
 from .backends import storage
 from .processors import process
+from utils import generate_filename
 
 
 class SourceImage(ImageFieldFile):
@@ -43,8 +44,7 @@ class Gallery(object):
             return super(Gallery, self).__getattr__(name)
 
     def _get_thumbnail_name(self, size):
-        name, extension = os.path.splitext(self.source_image.name)
-        filename = "%s_%s%s" % (name, size, extension)
+        filename = generate_filename(self.source_image.name, size)
         return os.path.join(conf.BASEDIR, filename)
 
     def _purge_all_thumbnails_cache(self):
@@ -123,19 +123,17 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
-def exists(source, size=None):
+def exists(source_name, size=None):
     if size is None:
-        filename = source
+        filename = source_name
     else:
-        name, extension = os.path.splitext(source)
-        filename = "%s_%s%s" % (name, size, extension)
+        filename = generate_filename(source_name, size)
     return storage.get_backend().exists(os.path.join(conf.BASEDIR, filename))
 
 
-def delete(source, size=None):
+def delete(source_name, size=None):
     if size is None:
-        filename = source
+        filename = source_name
     else:
-        name, extension = os.path.splitext(source)
-        filename = "%s_%s%s" % (name, size, extension)
+        filename = generate_filename(source_name, size)
     return storage.get_backend().delete(os.path.join(conf.BASEDIR, filename))
