@@ -125,16 +125,22 @@ class Thumbnail(object):
 
 def get_filename(source_name, size=None):
     if size is None:
-        source = metadata.get_backend().get_source(source_name)
-        return source.name
+        instance = metadata.get_backend().get_source(source_name)
     else:
-        thumbnail = metadata.get_backend().get_thumbnail(source_name, size)
-        return thumbnail.name
+        instance = metadata.get_backend().get_thumbnail(source_name, size)
+
+    if instance is None:
+        return None
+    else:
+        return instance.name
 
 
 def exists(source_name, size=None):
     filename = get_filename(source_name, size)
-    return storage.get_backend().exists(os.path.join(conf.BASEDIR, filename))
+    if filename:
+        return storage.get_backend().exists(os.path.join(conf.BASEDIR, filename))
+    else:
+        return False
 
 
 def delete(source_name, size=None):
