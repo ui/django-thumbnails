@@ -16,21 +16,21 @@ class ThumbnailedImageFile(ImageFieldFile):
 
     def __init__(self, instance, field, name, **kwargs):
         super(ThumbnailedImageFile, self).__init__(instance, field, name, **kwargs)
-        self.backend = field.backend
-        self.thumbnails = Gallery(backend=self.backend,
+        self.metadata_backend = field.metadata_backend
+        self.thumbnails = Gallery(metadata_backend=self.metadata_backend,
                                   storage=self.storage,
                                   source_image=self)
 
     def save(self, name, content, save=True):
         thumbnail = super(ThumbnailedImageFile, self).save(name, content, save)
-        self.backend.add_source(self.name)
+        self.metadata_backend.add_source(self.name)
         return thumbnail
 
 
 class Gallery(object):
 
-    def __init__(self, backend, storage, source_image):
-        self.backend = backend
+    def __init__(self, metadata_backend, storage, source_image):
+        self.metadata_backend = metadata_backend
         self.storage = storage
         self.source_image = source_image
         self._thumbnails = {}
@@ -54,7 +54,7 @@ class Gallery(object):
         # 1. Get all available sizes
         # 2. Return all thumbnails as list
         if not hasattr(self, '_all_thumbnails'):
-            metadatas = self.backend.get_thumbnails(self.source_image.name)
+            metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
 
             thumbnails = {}
             for metadata in metadatas:
@@ -69,7 +69,7 @@ class Gallery(object):
         # 2. If it doesn't exist, create thumbnail and return it
         thumbnail = self._thumbnails.get(size)
         if thumbnail is None:
-            metadata = self.backend.get_thumbnail(self.source_image.name, size)
+            metadata = self.metadata_backend.get_thumbnail(self.source_image.name, size)
             if metadata is None:
                 thumbnail = self.create_thumbnail(size)
             else:
@@ -85,7 +85,7 @@ class Gallery(object):
         thumbnail_file = process(self.storage.open(self.source_image.name), size)
         name = self.storage.save(name, thumbnail_file)
 
-        metadata = self.backend.add_thumbnail(self.source_image.name, size, name)
+        metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
         thumbnail = Thumbnail(metadata=metadata, storage=self.storage)
         self._purge_all_thumbnails_cache()
         return thumbnail
@@ -94,7 +94,7 @@ class Gallery(object):
         # 1. Use Storage API to delete thumbnail
         # 2. Call metadata_storage.remove_thumbnail(self.name, size)
         self.storage.delete(self._get_thumbnail_name(size))
-        self.backend.delete_thumbnail(self.source_image.name, size)
+        self.metadata_backend.delete_thumbnail(self.source_image.name, size)
         self._purge_all_thumbnails_cache()
         del(self._thumbnails[size])
 

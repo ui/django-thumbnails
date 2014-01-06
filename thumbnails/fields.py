@@ -13,7 +13,7 @@ class ImageField(DjangoImageField):
         if kwargs.get('storage'):
             raise ValueError('Please define storage backend in settings.py instead on the field itself')
         kwargs['storage'] = storage.get_backend()
-        self.backend = metadata.get_backend()
+        self.metadata_backend = metadata.get_backend()
         super(ImageField, self).__init__(self, *args, **kwargs)
 
     def __unicode__(self):
