@@ -3,7 +3,8 @@ import os
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
-from .backends import metadata, storage
+from .backends import metadata
+from .backends import storage as backends_storage
 from .processors import process
 
 
@@ -123,26 +124,26 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
-def get_filename(source_name, size=None):
+def get_file_path(source_name, size=None):
     if size is None:
         instance = metadata.get_backend().get_source(source_name)
     else:
         instance = metadata.get_backend().get_thumbnail(source_name, size)
 
     if instance is None:
-        return None
+        return instance
     else:
         return instance.name
 
 
 def exists(source_name, size=None):
-    filename = get_filename(source_name, size)
-    if filename:
-        return storage.get_backend().exists(os.path.join(conf.BASEDIR, filename))
+    path = get_file_path(source_name, size)
+    if path:
+        return backends_storage.get_backend().exists(path)
     else:
         return False
 
 
 def delete(source_name, size=None):
-    filename = get_filename(source_name, size)
-    return storage.get_backend().delete(os.path.join(conf.BASEDIR, filename))
+    path = get_file_path(source_name, size)
+    return backends_storage.get_backend().delete(path)
