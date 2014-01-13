@@ -1,8 +1,10 @@
 import os
 
+from django.core.files.base import ContentFile
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
+from . import post_processors
 from .processors import process
 
 
@@ -83,6 +85,7 @@ class Gallery(object):
         name = self._get_thumbnail_name(size)
 
         thumbnail_file = process(self.storage.open(self.source_image.name), size)
+        thumbnail_file = post_processors.process(thumbnail_file)
         name = self.storage.save(name, thumbnail_file)
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
