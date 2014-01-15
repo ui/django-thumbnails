@@ -36,6 +36,8 @@ class Gallery(object):
         self._thumbnails = {}
 
     def __getattr__(self, name):
+        if self.source_image is None:
+            raise ValueError('The thumbnails has no source image')
         if name in conf.SIZES.keys():
             return self.get_thumbnail(name)
         else:
