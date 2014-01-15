@@ -4,7 +4,7 @@ from django.core.files import File
 from django.test import TestCase
 
 from thumbnails import conf
-from thumbnails.files import get_file_path
+from thumbnails.metadata import get_path
 
 from .models import TestModel
 
@@ -29,4 +29,4 @@ class FilesTest(TestCase):
         super(FilesTest, self).tearDown()
 
     def test_get_file_path(self):
-        self.assertEqual("thumbs/avatars/tests_small.png", get_file_path(self.instance.avatar.name, self.size))
+        self.assertEqual("thumbs/avatars/tests_small.png", get_path(self.instance.avatar.name, self.size))

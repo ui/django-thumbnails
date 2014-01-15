@@ -3,9 +3,9 @@ import os
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
-from .backends import metadata
 from .backends.storage import get_backend
 from .processors import process
+from .metadata import get_path
 
 
 class SourceImage(ImageFieldFile):
@@ -124,26 +124,14 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
-def get_file_path(source_name, size=None):
-    if size is None:
-        instance = metadata.get_backend().get_source(source_name)
-    else:
-        instance = metadata.get_backend().get_thumbnail(source_name, size)
-
-    if instance is None:
-        return instance
-    else:
-        return instance.name
-
-
 def exists(source_name, size=None):
-    path = get_file_path(source_name, size)
-    if path:
+    path = get_path(source_name, size)
+    if path is not None:
         return get_backend().exists(path)
     else:
         return False
 
 
 def delete(source_name, size=None):
-    path = get_file_path(source_name, size)
+    path = get_path(source_name, size)
     return get_backend().delete(path)
