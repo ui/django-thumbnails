@@ -2,31 +2,37 @@ import imghdr
 import os
 from subprocess import call, PIPE
 import tempfile
+import uuid
+
+from django.core.files import File
+
+
+def get_or_create_temporary_folder():
+    temp_dir = tempfile.gettempdir()
+    workdir = os.path.join(temp_dir, 'workfile')
+    if not os.path.exists(workdir):
+        os.mkdir(workdir)
+    return workdir
 
 
 def process(thumbnail_file, **kwargs):
     """
     Post processors are functions that receive file objects,
     performs necessary operations and the results as file objects.
-
-    TODO: This method will leave processed files on /tmp,
-          we need to figure out the cleanup method
-    TODO: Possible race condition on writing to the same file
     """
-    temp_dir = tempfile.gettempdir()
-    workdir = os.path.join(temp_dir, 'workfile')
-    thumbnails = os.path.join(workdir, 'thumbnails')
-    if not os.path.exists(workdir):
-        os.mkdir(workdir)
+    workdir = get_or_create_temporary_folder()
+    random_file_name = 'thumbnails%s' % uuid.uuid4().hex
+    thumbnails = os.path.join(workdir, random_file_name)
 
-    # Write to thumbnails file
     f = open(thumbnails, 'wb')
     f.write(thumbnail_file.read())
     f.close()
 
-    #Optimize image
     optimized_path = optimize_image(thumbnails)
-    return open(optimized_path, 'r')
+    optimized_file = File(open(optimized_path, 'r'))
+
+    os.remove(optimized_path)
+    return optimized_file
 
 
 def optimize_image(thumbnail_path):
@@ -41,14 +47,14 @@ def optimize_image(thumbnail_path):
     # Construct command to optimize image based on filetype
     commands = []
     if filetype == "jpeg":
-        commands.append(u"jpegoptim -f --strip-all '%(file)s'")
+        commands.append("jpegoptim -f --strip-all '%(file)s'")
     elif filetype == "png":
-        #commands.append(u"optipng -force -o7 '%(file)s'")
-        commands.append(
-            (u"pngcrush -rem gAMA -rem alla -rem cHRM -rem iCCP -rem sRGB "
-             u"-rem time '%(file)s' '%(file)s.diet' "
-             u"&& mv '%(file)s.diet' '%(file)s'")
-        )
+        commands.append("optipng -force -o7 '%(file)s'")
+        #commands.append(
+            #("pngcrush -rem gAMA -rem alla -rem cHRM -rem iCCP -rem sRGB "
+             #u"-rem time '%(file)s' '%(file)s.diet' "
+             #u"&& mv '%(file)s.diet' '%(file)s'")
+        #)
 
     # Run Command
     if commands:
