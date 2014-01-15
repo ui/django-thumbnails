@@ -8,11 +8,10 @@ from django.core.files import File
 
 
 def get_or_create_temporary_folder():
-    temp_dir = tempfile.gettempdir()
-    workdir = os.path.join(temp_dir, 'workfile')
-    if not os.path.exists(workdir):
-        os.mkdir(workdir)
-    return workdir
+    temp_dir = os.path.join(tempfile.gettempdir(), 'thumbnails')
+    if not os.path.exists(temp_dir):
+        os.mkdir(temp_dir)
+    return temp_dir
 
 
 def process(thumbnail_file, **kwargs):
@@ -20,18 +19,21 @@ def process(thumbnail_file, **kwargs):
     Post processors are functions that receive file objects,
     performs necessary operations and the results as file objects.
     """
-    workdir = get_or_create_temporary_folder()
-    random_file_name = 'thumbnails%s' % uuid.uuid4().hex
-    thumbnails = os.path.join(workdir, random_file_name)
+    temp_dir = get_or_create_temporary_folder()
+    thumbnail_filename = os.path.join(temp_dir, uuid.uuid4().hex)
 
-    f = open(thumbnails, 'wb')
+    f = open(thumbnail_filename, 'wb')
     f.write(thumbnail_file.read())
     f.close()
 
-    optimized_path = optimize_image(thumbnails)
-    optimized_file = File(open(optimized_path, 'r'))
+    optimize_image(thumbnail_filename)
+    optimized_file = File(open(thumbnail_filename, 'rb'))
+    # _get_size() is needed to prevent Django < 1.5 from throwing an AttributeError.
+    # This is fixed in https://github.com/django/django/commit/5c954136eaef3d98d532368deec4c19cf892f664
+    # and can be removed when we stop supporting Django 1.4
+    optimized_file._get_size()
 
-    os.remove(optimized_path)
+    os.remove(thumbnail_filename)
     return optimized_file
 
 
@@ -52,8 +54,8 @@ def optimize_image(thumbnail_path):
         commands.append("optipng -force -o7 '%(file)s'")
         #commands.append(
             #("pngcrush -rem gAMA -rem alla -rem cHRM -rem iCCP -rem sRGB "
-             #u"-rem time '%(file)s' '%(file)s.diet' "
-             #u"&& mv '%(file)s.diet' '%(file)s'")
+             #"-rem time '%(file)s' '%(file)s.diet' "
+             #"&& mv '%(file)s.diet' '%(file)s'")
         #)
 
     # Run Command

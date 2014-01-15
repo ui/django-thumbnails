@@ -1,6 +1,5 @@
 import os
 
-from django.core.files.base import ContentFile
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
