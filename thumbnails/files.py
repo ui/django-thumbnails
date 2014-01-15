@@ -4,7 +4,7 @@ from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
 from .backends import metadata
-from .backends import storage as backends_storage
+from .backends.storage import get_backend
 from .processors import process
 
 
@@ -139,11 +139,11 @@ def get_file_path(source_name, size=None):
 def exists(source_name, size=None):
     path = get_file_path(source_name, size)
     if path:
-        return backends_storage.get_backend().exists(path)
+        return get_backend().exists(path)
     else:
         return False
 
 
 def delete(source_name, size=None):
     path = get_file_path(source_name, size)
-    return backends_storage.get_backend().delete(path)
+    return get_backend().delete(path)
