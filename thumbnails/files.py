@@ -1,6 +1,7 @@
 import os
 
 from django.db.models.fields.files import ImageFieldFile
+from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 from . import conf
 from .processors import process
@@ -36,12 +37,12 @@ class Gallery(object):
         self._thumbnails = {}
 
     def __getattr__(self, name):
-        if self.source_image is None:
-            raise ValueError('The thumbnails has no source image')
         if name in conf.SIZES.keys():
+            if not self.source_image:
+                return Thumbnail(metadata=None, storage=self.storage)
             return self.get_thumbnail(name)
         else:
-            return super(Gallery, self).__getattr__(name)
+            raise AttributeError("'%s' has no attribute '%s'" % (self, name))
 
     def _get_thumbnail_name(self, size):
         name, extension = os.path.splitext(self.source_image.name)
@@ -101,24 +102,34 @@ class Gallery(object):
         del(self._thumbnails[size])
 
 
+@python_2_unicode_compatible
 class Thumbnail(object):
     def __init__(self, metadata, storage):
         self.metadata = metadata
         self.storage = storage
+        name = getattr(metadata, 'name', None)
+        self.name = name
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return smart_text(self.name or '')
+
+    def __repr__(self):
+        return "<%s: %s>" % (self.__class__.__name__, self.name or "None")
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-    @property
-    def name(self):
-        return self.metadata.name
+    def _require_metadata(self):
+        if self.metadata is None:
+            error = ValueError('No Source File')
+            error.silent_variable_failure = True
+            raise error
 
     @property
     def size(self):
+        self._require_metadata()
         return self.metadata.size
 
     def url(self):
+        self._require_metadata()
         return self.storage.url(self.name)

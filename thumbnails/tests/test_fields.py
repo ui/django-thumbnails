@@ -2,6 +2,7 @@ import os
 
 from django.core.files import File
 from django.db import connection
+from django.template import Context, Template
 from django.test import TestCase
 
 from thumbnails import conf
@@ -86,3 +87,34 @@ class ImageFieldTest(TestCase):
         self.instance.avatar.thumbnails.all()['default']
         self.instance.avatar.thumbnails.get_thumbnail('default')
         self.assertEqual(backend_hit, len(connection.queries))
+
+    def test_django_template(self):
+        """
+        This test was added to make sure that thumbnails query will result in
+        an error, but will be surpressed by django template
+        """
+        template = Template("Test render {{ image.thumbnails.large.url }} ")
+        context = Context({"image": self.instance.avatar})
+        result = template.render(context)
+        self.assertIn('thumbs/avatars/tests_large.png', result)
+
+        # When source_image is falsy, silently drop errors
+        test_model = TestModel.objects.create()
+        test_model.avatar = None
+        test_model.save()
+        context = Context({"image": test_model.avatar})
+        result = template.render(context)
+        self.assertNotIn('thumbs', result)
+
+        test_model = TestModel.objects.create()
+        test_model.avatar = ''
+        test_model.save()
+        context = Context({"image": test_model.avatar})
+        result = template.render(context)
+        self.assertNotIn('thumbs', result)
+
+        # If source_image is Falsy, it should raise a ValueError
+        # when functions are called. AttributeError must be raised if
+        # Gallery is called with non existent attribute
+        self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
+        self.assertRaises(AttributeError, test_model.avatar.thumbnails.lrge.url)
