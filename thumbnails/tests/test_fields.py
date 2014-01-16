@@ -89,14 +89,13 @@ class ImageFieldTest(TestCase):
         self.assertEqual(backend_hit, len(connection.queries))
 
     def test_django_template(self):
-        """
-        This test was added to make sure that thumbnails query will result in
-        an error, but will be surpressed by django template
-        """
         template = Template("Test render {{ image.thumbnails.large.url }} ")
         context = Context({"image": self.instance.avatar})
         result = template.render(context)
         self.assertIn('thumbs/avatars/tests_large.png', result)
+
+    def test_thumbnails_without_source(self):
+        template = Template("Test render {{ image.thumbnails.large.url }} ")
 
         # When source_image is falsy, silently drop errors
         test_model = TestModel.objects.create()
