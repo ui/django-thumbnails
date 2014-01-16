@@ -117,4 +117,4 @@ class ImageFieldTest(TestCase):
         # when functions are called. AttributeError must be raised if
         # Gallery is called with non existent attribute
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
-        self.assertRaises(AttributeError, test_model.avatar.thumbnails.lrge.url)
+        self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
