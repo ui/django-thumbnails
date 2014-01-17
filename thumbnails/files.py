@@ -123,7 +123,7 @@ class Thumbnail(object):
 
     def check_metadata(self):
         if self.metadata is None:
-            raise ValueError('Thumbnails has no Source File')
+            raise ValueError('Thumbnail has no source file')
 
     @property
     def size(self):
