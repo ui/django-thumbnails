@@ -18,9 +18,13 @@ STORAGE = THUMBNAILS.get('STORAGE', default_storage)
 SIZES = THUMBNAILS.get('SIZES', {})
 BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')
 
+DEFAULT_PROCESSORS = THUMBNAILS.get('DEFAULT_PROCESSORS', [])
+if not isinstance(DEFAULT_PROCESSORS, (list, tuple)):
+    raise ValueError('Default processors must be in list format')
+
 # import the processors as a functions and replace the import string
 for size in SIZES:
-    processors = SIZES[size].get('processors', [])
+    processors = SIZES[size].get('processors', DEFAULT_PROCESSORS)
     if not isinstance(processors, (list, tuple)):
         raise ValueError('%s processors must be in list format' % size)
     if processors:

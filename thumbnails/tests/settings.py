@@ -24,11 +24,11 @@ THUMBNAILS = {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASEDIR': 'thumbs',
+    'DEFAULT_PROCESSORS': ['thumbnails.processors.resize'],
     'SIZES': {
         'small': {
             'width': 10,
             'height': 10,
-            'processors': ['thumbnails.processors.resize'],
         },
         'default': {
             'width': 20,
