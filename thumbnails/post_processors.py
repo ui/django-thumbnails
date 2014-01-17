@@ -7,7 +7,7 @@ import uuid
 from django.core.files import File
 
 
-def get_or_create_temporary_folder():
+def get_or_create_temp_dir():
     temp_dir = os.path.join(tempfile.gettempdir(), 'thumbnails')
     if not os.path.exists(temp_dir):
         os.mkdir(temp_dir)
@@ -34,7 +34,7 @@ def optimize_image(thumbnail_file):
     """
     from . import conf
 
-    temp_dir = get_or_create_temporary_folder()
+    temp_dir = get_or_create_temp_dir()
     thumbnail_filename = os.path.join(temp_dir, "%s.png" % uuid.uuid4().hex)
 
     f = open(thumbnail_filename, 'wb')
