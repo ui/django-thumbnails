@@ -22,7 +22,7 @@ def process(thumbnail_file, **kwargs):
     from . import conf
 
     for post_processor in conf.POST_PROCESSORS:
-        post_processor['processor'](thumbnail_file, **post_processor)
+        post_processor['processor'](thumbnail_file, **post_processor['kwargs'])
 
     return thumbnail_file
 
@@ -55,12 +55,7 @@ def optimize(thumbnail_file, **kwargs):
     # Run Command
     if command:
         command = command % {'filename': thumbnail_filename}
-        try:
-            status_code = call(command, shell=True, stdout=PIPE)
-        except OSError:
-            raise ValueError('Cannot optimize image with parameters %s', command)
-        if status_code != 0:
-            raise ValueError('Cannot optimize image. Missing utilities')
+        call(command, shell=True, stdout=PIPE)
 
     optimized_file = File(open(thumbnail_filename, 'rb'))
     # _get_size() is needed to prevent Django < 1.5 from throwing an AttributeError.

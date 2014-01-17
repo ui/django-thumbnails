@@ -34,3 +34,5 @@ if not isinstance(POST_PROCESSORS, (list, tuple)):
 
 for post_processor in POST_PROCESSORS:
     post_processor['processor'] = import_attribute(post_processor.get('processor'))
+    post_processor['kwargs'] = post_processor.copy()
+    post_processor['kwargs'].pop('processor')
