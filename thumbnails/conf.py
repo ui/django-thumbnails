@@ -30,7 +30,7 @@ for size in SIZES:
         SIZES[size]['processors'] = processors
 
 if not isinstance(POST_PROCESSORS, (list, tuple)):
-    raise ValueError('POST_PROCESSORS must be in dictionary format')
+    raise ValueError('POST_PROCESSORS must be in list format')
 
 for post_processor in POST_PROCESSORS:
     post_processor['processor'] = import_attribute(post_processor.get('processor'))
