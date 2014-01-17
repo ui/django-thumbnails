@@ -6,21 +6,33 @@ from da_vinci import images
 
 
 def resize(image, **kwargs):
+    """
+    Resized an image based on given width and height
+    """
     image.resize(width=kwargs['width'], height=kwargs['height'])
     return image
 
 
 def rotate(image, **kwargs):
+    """
+    Rotates an argument by X degrees.
+    """
     image.rotate(degrees=kwargs['degrees'])
     return image
 
 
 def flip(image, **kwargs):
+    """
+    Flips an image. Expects "horizontal" or "vertical" as argument.
+    """
     image.flip(direction=kwargs['direction'])
     return image
 
 
 def crop(image, **kwargs):
+    """
+    Crops an image based on given width or height
+    """
     params = {
         'width': kwargs['width'],
         'height': kwargs['height']
@@ -28,6 +40,14 @@ def crop(image, **kwargs):
     if kwargs.get('center'):
         params['center'] = kwargs['center']
     image.crop(**params)
+    return image
+
+
+def set_quality(image, **kwargs):
+    """
+    Sets JPG images' quality.
+    """
+    image.quality = kwargs['quality']
     return image
 
 
