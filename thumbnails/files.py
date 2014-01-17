@@ -1,11 +1,11 @@
 import os
 
-from django.core.files.base import ContentFile
 from django.db.models.fields.files import ImageFieldFile
 
-from . import conf
-from . import post_processors
+from . import conf, post_processors
+from .backends.storage import get_backend
 from .processors import process
+from .metadata import get_path
 
 
 class SourceImage(ImageFieldFile):
@@ -39,6 +39,8 @@ class Gallery(object):
 
     def __getattr__(self, name):
         if name in conf.SIZES.keys():
+            if not self.source_image:
+                raise ValueError('The thumbnails has no source image')
             return self.get_thumbnail(name)
         else:
             return super(Gallery, self).__getattr__(name)
@@ -123,3 +125,16 @@ class Thumbnail(object):
 
     def url(self):
         return self.storage.url(self.name)
+
+
+def exists(source_name, size=None):
+    path = get_path(source_name, size)
+    if path is not None:
+        return get_backend().exists(path)
+    else:
+        return False
+
+
+def delete(source_name, size=None):
+    path = get_path(source_name, size)
+    return get_backend().delete(path)
