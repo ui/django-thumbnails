@@ -21,21 +21,26 @@ def process(thumbnail_file, **kwargs):
     """
     from . import conf
 
-    for post_processor in conf.POST_PROCESSORS['processors']:
-        post_processor(thumbnail_file)
+    for post_processor in conf.POST_PROCESSORS:
+        processor_function = post_processor['processor']
+
+        processor_function(
+            thumbnail_file,
+            jpg_optimize_command=post_processor.get('jpg_optimize_command'),
+            png_optimize_command=post_processor.get('png_optimize_command'),
+            gif_optimize_command=post_processor.get('gif_optimize_command'),
+        )
 
     return thumbnail_file
 
 
-def optimize_image(thumbnail_file):
+def optimize(thumbnail_file, jpg_optimize_command=None, png_optimize_command=None, gif_optimize_command=None):
     """
     Method to optimize image using tools that are available.
     Logic is taken from image-diet https://github.com/samastur/image-diet/blob/master/image_diet/diet.py
     """
-    from . import conf
-
     temp_dir = get_or_create_temp_dir()
-    thumbnail_filename = os.path.join(temp_dir, "%s.png" % uuid.uuid4().hex)
+    thumbnail_filename = os.path.join(temp_dir, "%s" % uuid.uuid4().hex)
 
     f = open(thumbnail_filename, 'wb')
     f.write(thumbnail_file.read())
@@ -45,17 +50,22 @@ def optimize_image(thumbnail_file):
     filetype = imghdr.what(thumbnail_filename)
 
     # Construct command to optimize image based on filetype
-    command = conf.POST_PROCESSORS.get("%s_command" % filetype)
+    command = None
+    if filetype == "jpg" or filetype == "jpeg":
+        command = jpg_optimize_command
+    elif filetype == "png":
+        command = png_optimize_command
+    elif filetype == "gif":
+        command = gif_optimize_command
 
     # Run Command
     if command:
         command = command % {'filename': thumbnail_filename}
         try:
             status_code = call(command, shell=True, stdout=PIPE)
-        except:
+        except OSError:
             raise ValueError('Cannot optimize image with parameters %s', command)
         if status_code != 0:
-            # Failed.
             raise ValueError('Cannot optimize image. Missing utilities')
 
     optimized_file = File(open(thumbnail_filename, 'rb'))
