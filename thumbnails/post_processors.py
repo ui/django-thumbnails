@@ -17,27 +17,21 @@ def get_or_create_temp_dir():
 def process(thumbnail_file, **kwargs):
     """
     Post processors are functions that receive file objects,
-    performs necessary operations and the results as file objects.
+    performs necessary operations and return the results as file objects.
     """
     from . import conf
 
     for post_processor in conf.POST_PROCESSORS:
-        processor_function = post_processor['processor']
-
-        processor_function(
-            thumbnail_file,
-            jpg_optimize_command=post_processor.get('jpg_optimize_command'),
-            png_optimize_command=post_processor.get('png_optimize_command'),
-            gif_optimize_command=post_processor.get('gif_optimize_command'),
-        )
+        post_processor['processor'](thumbnail_file, **post_processor)
 
     return thumbnail_file
 
 
-def optimize(thumbnail_file, jpg_optimize_command=None, png_optimize_command=None, gif_optimize_command=None):
+def optimize(thumbnail_file, **kwargs):
     """
-    Method to optimize image using tools that are available.
-    Logic is taken from image-diet https://github.com/samastur/image-diet/blob/master/image_diet/diet.py
+    Method to optimize image using tools that are specified in settings.
+    Logic is taken from samastur's image_diet
+    https://github.com/samastur/image-diet/blob/master/image_diet/diet.py
     """
     temp_dir = get_or_create_temp_dir()
     thumbnail_filename = os.path.join(temp_dir, "%s" % uuid.uuid4().hex)
@@ -52,11 +46,11 @@ def optimize(thumbnail_file, jpg_optimize_command=None, png_optimize_command=Non
     # Construct command to optimize image based on filetype
     command = None
     if filetype == "jpg" or filetype == "jpeg":
-        command = jpg_optimize_command
+        command = kwargs.pop('jpg_optimize_command')
     elif filetype == "png":
-        command = png_optimize_command
+        command = kwargs.pop('png_optimize_command')
     elif filetype == "gif":
-        command = gif_optimize_command
+        command = kwargs.pop('gif_optimize_command')
 
     # Run Command
     if command:
