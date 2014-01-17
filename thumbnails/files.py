@@ -107,8 +107,7 @@ class Thumbnail(object):
     def __init__(self, metadata, storage):
         self.metadata = metadata
         self.storage = storage
-        name = getattr(metadata, 'name', None)
-        self.name = name
+        self.name = getattr(metadata, 'name', None)
 
     def __str__(self):
         return smart_text(self.name or '')
@@ -119,17 +118,18 @@ class Thumbnail(object):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-    def _require_metadata(self):
+    def __bool__(self):
+        return bool(self.name)
+
+    def check_metadata(self):
         if self.metadata is None:
-            error = ValueError('No Source File')
-            error.silent_variable_failure = True
-            raise error
+            raise ValueError('Thumbnails has no Source File')
 
     @property
     def size(self):
-        self._require_metadata()
+        self.check_metadata()
         return self.metadata.size
 
     def url(self):
-        self._require_metadata()
+        self.check_metadata()
         return self.storage.url(self.name)

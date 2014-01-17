@@ -97,23 +97,21 @@ class ImageFieldTest(TestCase):
     def test_thumbnails_without_source(self):
         template = Template("Test render {{ image.thumbnails.large.url }} ")
 
-        # When source_image is falsy, silently drop errors
         test_model = TestModel.objects.create()
         test_model.avatar = None
         test_model.save()
         context = Context({"image": test_model.avatar})
-        result = template.render(context)
-        self.assertNotIn('thumbs', result)
+        self.assertRaises(ValueError, template.render, context)
 
         test_model = TestModel.objects.create()
         test_model.avatar = ''
         test_model.save()
         context = Context({"image": test_model.avatar})
-        result = template.render(context)
-        self.assertNotIn('thumbs', result)
+        self.assertRaises(ValueError, template.render, context)
 
         # If source_image is Falsy, it should raise a ValueError
         # when functions are called. AttributeError must be raised if
         # Gallery is called with non existent attribute
+        self.assertFalse(test_model.avatar)
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
         self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
