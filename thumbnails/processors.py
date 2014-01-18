@@ -71,5 +71,6 @@ def process(file, size):
     image_io = io.BytesIO()
     raw_image.save(file=image_io)
     image_file = ContentFile(image_io.getvalue())
+    #print dir(image_file)
 
     return image_file

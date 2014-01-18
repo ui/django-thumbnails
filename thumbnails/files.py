@@ -3,7 +3,7 @@ import os
 from django.db.models.fields.files import ImageFieldFile
 from django.utils.encoding import smart_text, python_2_unicode_compatible
 
-from . import conf
+from . import conf, post_processors
 from .backends.storage import get_backend
 from .processors import process
 from .metadata import get_path
@@ -88,6 +88,7 @@ class Gallery(object):
         name = self._get_thumbnail_name(size)
 
         thumbnail_file = process(self.storage.open(self.source_image.name), size)
+        thumbnail_file = post_processors.process(thumbnail_file)
         name = self.storage.save(name, thumbnail_file)
 
         metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)

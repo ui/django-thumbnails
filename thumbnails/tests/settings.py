@@ -24,6 +24,10 @@ THUMBNAILS = {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASEDIR': 'thumbs',
+    'POST_PROCESSORS': [{
+        'processor': 'thumbnails.post_processors.optimize',
+        'png_optimize_command': "optipng -force -o7 '%(filename)s'"
+    }],
     'SIZES': {
         'small': {
             'width': 10,
