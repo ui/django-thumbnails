@@ -1,10 +1,11 @@
 import os
 
 from django.db.models.fields.files import ImageFieldFile
-from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 from . import conf, post_processors
 from .backends.storage import get_backend
+from .images import Thumbnail
+from . import images
 from .processors import process
 from .metadata import get_path
 
@@ -70,72 +71,44 @@ class Gallery(object):
         return self._all_thumbnails
 
     def get_thumbnail(self, size, create=True):
-        # 1. Get thumbnail metdata from meta store
-        # 2. If it doesn't exist, create thumbnail and return it
+        """
+        Returns a Thumbnail instance.
+        First check whether thumbnail is already cached. If it doesn't:
+        1. Try to fetch the thumbnail
+        2. Create thumbnail if it's not present
+        3. Cache the thumbnail for future use
+        """
         thumbnail = self._thumbnails.get(size)
+        
         if thumbnail is None:
-            metadata = self.metadata_backend.get_thumbnail(self.source_image.name, size)
-            if metadata is None:
+            thumbnail = images.get(self.source_image.name, size,
+                                   self.metadata_backend, self.storage)
+
+            if thumbnail is None:
                 thumbnail = self.create_thumbnail(size)
-            else:
-                thumbnail = Thumbnail(metadata=metadata, storage=self.storage)
+            
             self._thumbnails[size] = thumbnail
+        
         return thumbnail
 
     def create_thumbnail(self, size):
-        # 1. Use Storage API to create a thumbnail (and get its filename)
-        # 2. Call metadata_storage.add_thumbnail(self.name, size, filename)
-        name = self._get_thumbnail_name(size)
+        """
+        Creates and return a thumbnail of a given size.
+        """
 
-        thumbnail_file = process(self.storage.open(self.source_image.name), size)
-        thumbnail_file = post_processors.process(thumbnail_file)
-        name = self.storage.save(name, thumbnail_file)
-
-        metadata = self.metadata_backend.add_thumbnail(self.source_image.name, size, name)
-        thumbnail = Thumbnail(metadata=metadata, storage=self.storage)
+        thumbnail = images.create(self.source_image.name, size,
+                                  self.metadata_backend, self.storage)
         self._purge_all_thumbnails_cache()
         return thumbnail
 
     def delete_thumbnail(self, size):
-        # 1. Use Storage API to delete thumbnail
-        # 2. Call metadata_storage.remove_thumbnail(self.name, size)
-        self.storage.delete(self._get_thumbnail_name(size))
-        self.metadata_backend.delete_thumbnail(self.source_image.name, size)
+        """
+        Deletes a thumbnail of a given size
+        """
+        images.delete(self.source_image.name, size,
+                      self.metadata_backend, self.storage)
         self._purge_all_thumbnails_cache()
         del(self._thumbnails[size])
-
-
-@python_2_unicode_compatible
-class Thumbnail(object):
-    def __init__(self, metadata, storage):
-        self.metadata = metadata
-        self.storage = storage
-        self.name = getattr(metadata, 'name', None)
-
-    def __str__(self):
-        return smart_text(self.name or '')
-
-    def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.name or "None")
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-
-    def __bool__(self):
-        return bool(self.name)
-
-    def check_metadata(self):
-        if self.metadata is None:
-            raise ValueError('Thumbnail has no source file')
-
-    @property
-    def size(self):
-        self.check_metadata()
-        return self.metadata.size
-
-    def url(self):
-        self.check_metadata()
-        return self.storage.url(self.name)
 
 
 def exists(source_name, size=None):
