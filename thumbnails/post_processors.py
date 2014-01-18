@@ -66,10 +66,7 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
     # Run Command
     if command:
         command = command % {'filename': thumbnail_filename}
-        try:
-            call(command)
-        except OSError:
-            raise OSError('Error while optimizing %s image' % filetype)
+        call(command, shell=True)
 
     optimized_file = File(open(thumbnail_filename, 'rb'))
     # Call _get_size() to prevent Django < 1.5 from throwing an AttributeError.
