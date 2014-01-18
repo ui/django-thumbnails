@@ -47,11 +47,6 @@ class Gallery(object):
         else:
             raise AttributeError("'%s' has no attribute '%s'" % (self, name))
 
-    def _get_thumbnail_name(self, size):
-        name, extension = os.path.splitext(self.source_image.name)
-        filename = "%s_%s%s" % (name, size, extension)
-        return os.path.join(conf.BASEDIR, filename)
-
     def _purge_all_thumbnails_cache(self):
         if hasattr(self, '_all_thumbnails'):
             del self._all_thumbnails
