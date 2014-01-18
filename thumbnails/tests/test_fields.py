@@ -1,7 +1,6 @@
 import os
 
 from django.core.files import File
-from django.db import connection
 from django.template import Context, Template
 from django.test import TestCase
 
@@ -77,16 +76,15 @@ class ImageFieldTest(TestCase):
 
         # Should also work on deletion
         self.instance.avatar.thumbnails.delete_thumbnail('large')
-        self.assertRaises(AttributeError, getattr, self.instance.avatar.thumbnails, '_all_thumbnails')  # cache for all_thumbnails is purged
         self.assertEqual(self.instance.avatar.thumbnails.all().get('large'), None)
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
 
         # Once cached, it should not hit backend on other call.
-        backend_hit = len(connection.queries)
-        self.instance.avatar.thumbnails.default
-        self.instance.avatar.thumbnails.all()['default']
-        self.instance.avatar.thumbnails.get_thumbnail('default')
-        self.assertEqual(backend_hit, len(connection.queries))
+        with self.assertNumQueries(1):
+            self.instance.avatar.thumbnails.default
+            self.instance.avatar.thumbnails.all()['default']
+            self.instance.avatar.thumbnails.get_thumbnail('default')
+            self.instance.avatar.thumbnails.get_thumbnail('default')
 
     def test_django_template(self):
         template = Template("Test render {{ image.thumbnails.large.url }} ")

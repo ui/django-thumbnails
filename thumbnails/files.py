@@ -47,23 +47,14 @@ class Gallery(object):
         else:
             raise AttributeError("'%s' has no attribute '%s'" % (self, name))
 
-    def _purge_all_thumbnails_cache(self):
-        if hasattr(self, '_all_thumbnails'):
-            del self._all_thumbnails
-
     def all(self):
-        # 1. Get all available sizes
-        # 2. Return all thumbnails as list
-        if not hasattr(self, '_all_thumbnails'):
-            metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
-
-            thumbnails = {}
-            for metadata in metadatas:
-                thumbnails[metadata.size] = Thumbnail(metadata=metadata, storage=self.storage)
-
-            self._thumbnails = thumbnails
-            self._all_thumbnails = thumbnails
-        return self._all_thumbnails
+        """
+        Return all thumbnails in a dict format.
+        """
+        metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
+        for metadata in metadatas:
+            self._thumbnails[metadata.size] = Thumbnail(metadata=metadata, storage=self.storage)
+        return self._thumbnails
 
     def get_thumbnail(self, size, create=True):
         """
@@ -93,7 +84,6 @@ class Gallery(object):
 
         thumbnail = images.create(self.source_image.name, size,
                                   self.metadata_backend, self.storage)
-        self._purge_all_thumbnails_cache()
         return thumbnail
 
     def delete_thumbnail(self, size):
@@ -102,7 +92,6 @@ class Gallery(object):
         """
         images.delete(self.source_image.name, size,
                       self.metadata_backend, self.storage)
-        self._purge_all_thumbnails_cache()
         del(self._thumbnails[size])
 
 
