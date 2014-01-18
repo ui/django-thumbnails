@@ -1,5 +1,6 @@
-import tempfile
+import os
 import shutil
+import tempfile
 
 from django.core.files.storage import FileSystemStorage
 
@@ -14,14 +15,13 @@ class TemporaryStorage(FileSystemStorage):
     with.
     """
 
-    def __init__(self, location=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         Create the temporary location.
         """
-        if location is None:
-            location = tempfile.mkdtemp()
-            self.temporary_location = location
-        super(TemporaryStorage, self).__init__(location=location, *args,
+        self.temporary_location = os.path.join(tempfile.gettempdir(), 'thumbs_test')
+        
+        super(TemporaryStorage, self).__init__(location=self.temporary_location, *args,
                                                **kwargs)
 
     def delete_temporary_storage(self):
