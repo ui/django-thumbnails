@@ -21,17 +21,27 @@ def process(thumbnail_file, **kwargs):
     """
     from . import conf
 
-    for post_processor in conf.POST_PROCESSORS:
-        post_processor['processor'](thumbnail_file, **post_processor['kwargs'])
+    for processor in conf.POST_PROCESSORS:
+        processor['processor'](thumbnail_file, **processor['kwargs'])
 
     return thumbnail_file
 
 
-def optimize(thumbnail_file, **kwargs):
+def optimize(thumbnail_file, jpg_command=None, png_command=None, gif_command=None):
     """
-    Method to optimize image using tools that are specified in settings.
-    Logic is taken from samastur's image_diet
-    https://github.com/samastur/image-diet/blob/master/image_diet/diet.py
+    A post processing function to optimize file size. Accepts commands
+    to optimize JPG, PNG and GIF images as arguments. Example:
+
+    THUMBNAILS = {
+        # Other options...
+        'POST_PROCESSORS': [
+            {
+                'processor': 'thumbnails.post_processors.optimize',
+                'png_command': 'optipng -force -o7 "%(filename)s"',
+                'jpg_command': 'jpegoptim -f --strip-all "%(filename)s"',
+            },
+        ],
+    }
     """
     temp_dir = get_or_create_temp_dir()
     thumbnail_filename = os.path.join(temp_dir, "%s" % uuid.uuid4().hex)
@@ -46,11 +56,11 @@ def optimize(thumbnail_file, **kwargs):
     # Construct command to optimize image based on filetype
     command = None
     if filetype == "jpg" or filetype == "jpeg":
-        command = kwargs.pop('jpg_optimize_command')
+        command = jpg_command
     elif filetype == "png":
-        command = kwargs.pop('png_optimize_command')
+        command = png_command
     elif filetype == "gif":
-        command = kwargs.pop('gif_optimize_command')
+        command = gif_command
 
     # Run Command
     if command:
