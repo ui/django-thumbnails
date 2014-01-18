@@ -1,6 +1,6 @@
 import imghdr
 import os
-from subprocess import call, PIPE
+from subprocess import call
 import tempfile
 import uuid
 
@@ -27,7 +27,8 @@ def process(thumbnail_file, **kwargs):
     return thumbnail_file
 
 
-def optimize(thumbnail_file, jpg_command=None, png_command=None, gif_command=None):
+def optimize(thumbnail_file, jpg_command=None, png_command=None,
+             gif_command=None):
     """
     A post processing function to optimize file size. Accepts commands
     to optimize JPG, PNG and GIF images as arguments. Example:
@@ -65,10 +66,13 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None, gif_command=Non
     # Run Command
     if command:
         command = command % {'filename': thumbnail_filename}
-        call(command, shell=True, stdout=PIPE)
+        try:
+            call(command)
+        except OSError:
+            raise OSError('Error while optimizing %s image' % filetype)
 
     optimized_file = File(open(thumbnail_filename, 'rb'))
-    # _get_size() is needed to prevent Django < 1.5 from throwing an AttributeError.
+    # Call _get_size() to prevent Django < 1.5 from throwing an AttributeError.
     # This is fixed in https://github.com/django/django/commit/5c954136eaef3d98d532368deec4c19cf892f664
     # and can be removed when we stop supporting Django 1.4
     optimized_file._get_size()
