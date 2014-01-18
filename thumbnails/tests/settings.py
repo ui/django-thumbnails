@@ -26,7 +26,7 @@ THUMBNAILS = {
     'BASEDIR': 'thumbs',
     'POST_PROCESSORS': [{
         'processor': 'thumbnails.post_processors.optimize',
-        'png_command': "optipng -force -o7 '%(filename)s'"
+        'png_command': "/usr/local/bin/optipng -force -o7 &> /dev/null '%(filename)s'"
     }],
     'SIZES': {
         'small': {
