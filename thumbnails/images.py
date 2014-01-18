@@ -27,7 +27,10 @@ class Thumbnail(object):
         return "<%s: %s>" % (self.__class__.__name__, self.name or "None")
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        try:
+            return self.__dict__ == other.__dict__
+        except AttributeError:
+            return False
 
     def __bool__(self):
         return bool(self.name)
