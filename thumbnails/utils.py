@@ -11,3 +11,32 @@ def import_attribute(name):
     module_name, attribute = name.rsplit('.', 1)
     module = importlib.import_module(module_name)
     return getattr(module, attribute)
+
+
+def parse_processors(processor_definition):
+    """
+    Returns a dictionary that contains the imported processors and
+    kwargs. For example, passing in:
+
+    processors = [
+        {'processor': 'thumbnails.processors.resize', 'width': 10, 'height': 10},
+        {'processor': 'thumbnails.processors.crop', 'width': 10, 'height': 10},
+    ]
+
+    Would return:
+
+    [
+        {'processor': resize_function, kwargs: {'width': 10, 'height': 10}}
+        {'processor': crop_function, kwargs: {'width': 10, 'height': 10}}
+    ]
+    """
+    parsed_processors = []
+    for processor in processor_definition:
+        processor_function = import_attribute(processor['processor'])
+        processor.pop('processor')
+        kwargs = processor
+        parsed_processors.append({
+            'processor': processor_function,
+            'kwargs': kwargs
+        })
+    return parsed_processors

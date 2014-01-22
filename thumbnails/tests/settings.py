@@ -30,29 +30,27 @@ THUMBNAILS = {
     }],
     'SIZES': {
         'small': {
-            'width': 10,
-            'height': 10,
-            'processors': ['thumbnails.processors.resize'],
+            'processors': [
+                {'processor': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
+            ],
         },
         'default': {
-            'width': 20,
-            'height': 20,
-            'direction': 'horizontal',
-            'processors': ['thumbnails.processors.resize', 'thumbnails.processors.flip'],
+            'processors': [
+                {'processor': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
+                {'processor': 'thumbnails.processors.flip', 'direction': 'horizontal'}
+            ],
         },
         'large': {
-            'width': 80,
-            'height': 80,
-            'degrees': 45,
-            'center': '50%,50%',
-            'processors': ('thumbnails.processors.resize',
-                           'thumbnails.processors.rotate',
-                           'thumbnails.processors.crop'),
+            'processors':[
+                {'processor': 'thumbnails.processors.resize', 'width': 80, 'height': 80},
+                {'processor': 'thumbnails.processors.rotate', 'degrees': 45},
+                {'processor': 'thumbnails.processors.crop', 'width': 80, 'height': 80, 'center': ('50%,50%')}
+            ]
         },
         'source': {
-            'width': 90,
-            'height': 90,
-            'processors': ['thumbnails.processors.resize']
+            'processors': [
+                {'processor': 'thumbnails.processors.resize', 'width': 90, 'height': 90}
+            ]
         }
     }
 }

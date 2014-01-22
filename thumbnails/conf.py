@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .utils import import_attribute
+from .utils import parse_processors
 
 THUMBNAILS = getattr(settings, 'THUMBNAILS', {})
 
@@ -19,20 +19,14 @@ SIZES = THUMBNAILS.get('SIZES', {})
 BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')
 POST_PROCESSORS = THUMBNAILS.get('POST_PROCESSORS', [])
 
+
 # import the processors as a functions and replace the import string
 for size in SIZES:
-    processors = SIZES[size].get('processors', [])
-    if not isinstance(processors, (list, tuple)):
-        raise ValueError('%s processors must be in list format' % size)
-    if processors:
-        SIZES[size]['processors'] = [import_attribute(processor) for processor in processors]
-    else:
-        SIZES[size]['processors'] = processors
+    SIZES[size]['processors'] = parse_processors(SIZES[size]['processors'])
+
 
 if not isinstance(POST_PROCESSORS, (list, tuple)):
     raise ValueError('POST_PROCESSORS must be in list format')
 
-for post_processor in POST_PROCESSORS:
-    post_processor['processor'] = import_attribute(post_processor.get('processor'))
-    post_processor['kwargs'] = post_processor.copy()
-    post_processor['kwargs'].pop('processor')
+
+POST_PROCESSORS = parse_processors(POST_PROCESSORS)
