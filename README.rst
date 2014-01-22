@@ -20,17 +20,22 @@ settings.py::
         }
         'SIZES': {
             'small': {
-                'width': 10,
-                'height': 10,
+                'processors': [
+                    {'processor': 'thumbnails.processors.resize', 'width': 10, 'height': 10},
+                    {'processor': 'thumbnails.processors.crop', 'width': 80, 'height': 80}
+                ],
             },
             'default': {
-                'width': 20,
-                'height': 20,
-                'processors': ['thumbnails.processors.resize', 'thumbnails.processors.grayscale', 'your.own.processor'],
+                'processors':[
+                    {'processor': 'thumbnails.processors.resize', 'width': 80, 'height': 80},
+                    {'processor': 'thumbnails.processors.rotate', 'degrees': 45},
+                ]
             },
             'large': {
-                'width': 30,
-                'height': 30,
+                'processors': [
+                    {'processor': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
+                    {'processor': 'thumbnails.processors.flip', 'direction': 'horizontal'}
+                ],
             }
         }
     }
