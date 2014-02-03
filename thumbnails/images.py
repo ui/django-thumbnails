@@ -4,7 +4,6 @@ from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 from . import conf
 from . import backends
-from . import metadata
 from . import post_processors
 from . import processors
 

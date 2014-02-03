@@ -65,16 +65,16 @@ class Gallery(object):
         3. Cache the thumbnail for future use
         """
         thumbnail = self._thumbnails.get(size)
-        
+
         if thumbnail is None:
             thumbnail = images.get(self.source_image.name, size,
                                    self.metadata_backend, self.storage)
 
             if thumbnail is None:
                 thumbnail = self.create_thumbnail(size)
-            
+
             self._thumbnails[size] = thumbnail
-        
+
         return thumbnail
 
     def create_thumbnail(self, size):
