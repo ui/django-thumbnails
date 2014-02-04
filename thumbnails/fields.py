@@ -2,7 +2,7 @@ from django.db.models import ImageField as DjangoImageField
 
 from .backends import metadata, storage
 from .files import ThumbnailedImageFile
-from .processors import process
+from . import processors, post_processors
 
 
 class ImageField(DjangoImageField):
@@ -28,7 +28,8 @@ class ImageField(DjangoImageField):
         if file and not file._committed:
             image_file = file
             if self.resize_source_to:
-                image_file = process(file, self.resize_source_to)
+                image_file = processors.process(file, self.resize_source_to)
+            image_file = post_processors.process(image_file)
             file.save(file.name, image_file, save=False)
         return file
 
