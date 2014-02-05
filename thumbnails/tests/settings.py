@@ -24,10 +24,10 @@ THUMBNAILS = {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASEDIR': 'thumbs',
-    'POST_PROCESSORS': [{
-        'processor': 'thumbnails.post_processors.optimize',
-        'png_command': "/usr/local/bin/optipng -force -o7 &> /dev/null '%(filename)s'"
-    }],
+    #'POST_PROCESSORS': [{
+        #'processor': 'thumbnails.post_processors.optimize',
+        #'png_command': "/usr/local/bin/optipng -force -o7 &> /dev/null '%(filename)s'"
+    #}],
     'SIZES': {
         'small': {
             'processors': [
