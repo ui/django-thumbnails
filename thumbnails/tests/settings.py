@@ -24,10 +24,6 @@ THUMBNAILS = {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASEDIR': 'thumbs',
-    #'POST_PROCESSORS': [{
-        #'processor': 'thumbnails.post_processors.optimize',
-        #'png_command': "/usr/local/bin/optipng -force -o7 &> /dev/null '%(filename)s'"
-    #}],
     'SIZES': {
         'small': {
             'processors': [
@@ -41,7 +37,7 @@ THUMBNAILS = {
             ],
         },
         'large': {
-            'processors':[
+            'processors': [
                 {'processor': 'thumbnails.processors.resize', 'width': 80, 'height': 80},
                 {'processor': 'thumbnails.processors.rotate', 'degrees': 45},
                 {'processor': 'thumbnails.processors.crop', 'width': 80, 'height': 80, 'center': ('50%,50%')}

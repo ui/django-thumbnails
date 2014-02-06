@@ -43,6 +43,11 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
             },
         ],
     }
+
+    Note: Do not use output redirection in commands. Something strange going
+          on with output redirection and subprocess.call function. Command
+          seemed to run asychronously and fail because code continues before command finish.
+    Bad example: 'optipng -force -o7 "%(filename)s" &> /dev/null'
     """
     temp_dir = get_or_create_temp_dir()
     thumbnail_filename = os.path.join(temp_dir, "%s" % uuid.uuid4().hex)
