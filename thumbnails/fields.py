@@ -1,3 +1,6 @@
+import uuid
+import os
+
 from django.db.models import ImageField as DjangoImageField
 
 from .backends import metadata, storage
@@ -30,7 +33,8 @@ class ImageField(DjangoImageField):
             if self.resize_source_to:
                 image_file = processors.process(file, self.resize_source_to)
             image_file = post_processors.process(image_file)
-            file.save(file.name, image_file, save=False)
+            filename = str(uuid.uuid4()) + os.path.splitext(file.name)[1]
+            file.save(filename, image_file, save=False)
         return file
 
     def south_field_triple(self):

@@ -1,10 +1,8 @@
 import os
-import shutil
 
 from django.core.files import File
 from django.test import TestCase
 
-from thumbnails import backends
 from thumbnails import images
 
 from .models import TestModel
@@ -18,7 +16,10 @@ class ImageTest(TestCase):
             self.instance.avatar = File(image_file)
             self.instance.save()
 
-        self.source_name = 'avatars/tests.png'
+        self.basename = os.path.basename(self.instance.avatar.path)
+        self.filename, self.ext = os.path.splitext(self.basename)
+        self.source_name = os.path.join('avatars', self.filename + self.ext)
+
         self.storage_backend = self.instance.avatar.storage
         self.metadata_backend = self.instance.avatar.metadata_backend
 
@@ -38,7 +39,7 @@ class ImageTest(TestCase):
             None
         )
         self.assertFalse(self.storage_backend.exists(thumbnail_name))
-        
+
         thumbnail = images.create(self.source_name, 'small',
                                   self.metadata_backend, self.storage_backend)
         self.assertTrue(self.storage_backend.exists(thumbnail.name))
@@ -58,7 +59,7 @@ class ImageTest(TestCase):
         )
         thumbnail = images.create(self.source_name, 'default',
                                   self.metadata_backend, self.storage_backend)
-        
+
         self.assertEqual(
             images.get(self.source_name, 'default',
                        self.metadata_backend, self.storage_backend),
@@ -71,7 +72,7 @@ class ImageTest(TestCase):
         """
         thumbnail = images.create(self.source_name, 'small',
                                   self.metadata_backend, self.storage_backend)
-        
+
         images.delete(self.source_name, 'small',
                       self.metadata_backend, self.storage_backend)
         self.assertFalse(self.storage_backend.exists(thumbnail.name))
