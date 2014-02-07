@@ -23,10 +23,13 @@ class FilesTest(TestCase):
             os.path.join(self.instance.avatar.storage.temporary_location, conf.BASEDIR, 'avatars')
 
         self.instance.avatar.thumbnails.small
+        self.basename = os.path.basename(self.instance.avatar.path)
+        self.filename, self.ext = os.path.splitext(self.basename)
 
     def tearDown(self):
         self.instance.avatar.storage.delete_temporary_storage()
         super(FilesTest, self).tearDown()
 
     def test_get_file_path(self):
-        self.assertEqual("thumbs/avatars/tests_small.png", get_path(self.instance.avatar.name, self.size))
+        expected_path = os.path.join('thumbs', 'avatars', self.filename + "_small" + self.ext)
+        self.assertEqual(expected_path, get_path(self.instance.avatar.name, self.size))
