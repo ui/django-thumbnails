@@ -39,4 +39,5 @@ def parse_processors(processor_definition):
             'processor': processor_function,
             'kwargs': kwargs
         })
+
     return parsed_processors

@@ -43,6 +43,10 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
             },
         ],
     }
+
+    Note: using output redirection in commands may cause unpredictable results.
+    For example 'optipng -force -o7 "%(filename)s" &> /dev/null' may cause
+    optimize command to fail on some systems.
     """
     temp_dir = get_or_create_temp_dir()
     thumbnail_filename = os.path.join(temp_dir, "%s" % uuid.uuid4().hex)
