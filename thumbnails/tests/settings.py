@@ -26,26 +26,38 @@ THUMBNAILS = {
     'BASEDIR': 'thumbs',
     'SIZES': {
         'small': {
-            'processors': [
-                {'processor': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
+            'PROCESSORS': [
+                {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
             ],
+            'POST_PROCESSORS': [
+                {
+                    'PATH': 'thumbnails.post_processors.optimize',
+                    'png_command': "optipng -force -o7 '%(filename)s'"
+                }
+            ]
         },
         'default': {
-            'processors': [
-                {'processor': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
-                {'processor': 'thumbnails.processors.flip', 'direction': 'horizontal'}
+            'PROCESSORS': [
+                {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
+                {'PATH': 'thumbnails.processors.flip', 'direction': 'horizontal'}
             ],
+            'POST_PROCESSORS': [
+                {
+                    'PATH': 'thumbnails.post_processors.optimize',
+                    'png_command': "optipng '%(filename)s'"
+                }
+            ]
         },
         'large': {
-            'processors': [
-                {'processor': 'thumbnails.processors.resize', 'width': 80, 'height': 80},
-                {'processor': 'thumbnails.processors.rotate', 'degrees': 45},
-                {'processor': 'thumbnails.processors.crop', 'width': 80, 'height': 80, 'center': ('50%,50%')}
+            'PROCESSORS': [
+                {'PATH': 'thumbnails.processors.resize', 'width': 80, 'height': 80},
+                {'PATH': 'thumbnails.processors.rotate', 'degrees': 45},
+                {'PATH': 'thumbnails.processors.crop', 'width': 80, 'height': 80, 'center': ('50%,50%')}
             ]
         },
         'source': {
-            'processors': [
-                {'processor': 'thumbnails.processors.resize', 'width': 90, 'height': 90}
+            'PROCESSORS': [
+                {'PATH': 'thumbnails.processors.resize', 'width': 90, 'height': 90}
             ]
         }
     }

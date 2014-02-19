@@ -64,8 +64,8 @@ def process(file, size):
 
     # run through all processors, if defined
     size_dict = conf.SIZES[size]
-    for processor in size_dict['processors']:
-        raw_image = processor['processor'](raw_image, **processor['kwargs'])
+    for processor in size_dict['PROCESSORS']:
+        raw_image = processor['PATH'](raw_image, **processor['kwargs'])
 
     # write to Content File
     image_io = io.BytesIO()
