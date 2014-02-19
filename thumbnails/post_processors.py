@@ -14,15 +14,16 @@ def get_or_create_temp_dir():
     return temp_dir
 
 
-def process(thumbnail_file, **kwargs):
+def process(thumbnail_file, size, **kwargs):
     """
     Post processors are functions that receive file objects,
     performs necessary operations and return the results as file objects.
     """
     from . import conf
 
-    for processor in conf.POST_PROCESSORS:
-        processor['processor'](thumbnail_file, **processor['kwargs'])
+    size_dict = conf.SIZES[size]
+    for processor in size_dict['POST_PROCESSORS']:
+        processor['PATH'](thumbnail_file, **processor['kwargs'])
 
     return thumbnail_file
 

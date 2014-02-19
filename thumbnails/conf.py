@@ -17,16 +17,30 @@ METADATA = THUMBNAILS.get('METADATA', default_metadata)
 STORAGE = THUMBNAILS.get('STORAGE', default_storage)
 SIZES = THUMBNAILS.get('SIZES', {})
 BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')
-POST_PROCESSORS = THUMBNAILS.get('POST_PROCESSORS', [])
+
+
+# import default first
+DEFAULT_SIZE = SIZES.pop('default')
+DEFAULT_PROCESSORS = None
+DEFAULT_POSTPROCESSORS = None
+
+if DEFAULT_SIZE:
+    DEFAULT_PROCESSORS = parse_processors(DEFAULT_SIZE['PROCESSORS'])
+    DEFAULT_POSTPROCESSORS = parse_processors(DEFAULT_SIZE['POST_PROCESSORS'])
 
 
 # import the processors as a functions and replace the import string
 for size in SIZES:
-    SIZES[size]['processors'] = parse_processors(SIZES[size]['processors'])
+    if SIZES[size].get('PROCESSORS'):
+        SIZES[size]['PROCESSORS'] = parse_processors(SIZES[size]['PROCESSORS'])
+    elif DEFAULT_PROCESSORS:
+        SIZES[size]['PROCESSORS'] = DEFAULT_PROCESSORS
 
+    if SIZES[size].get('POST_PROCESSORS'):
+        SIZES[size]['POST_PROCESSORS'] = parse_processors(SIZES[size]['POST_PROCESSORS'])
+    elif DEFAULT_POSTPROCESSORS:
+        SIZES[size]['POST_PROCESSORS'] = DEFAULT_POSTPROCESSORS
 
-if not isinstance(POST_PROCESSORS, (list, tuple)):
-    raise ValueError('POST_PROCESSORS must be in list format')
-
-
-POST_PROCESSORS = parse_processors(POST_PROCESSORS)
+SIZES['default'] = {}
+SIZES['default']['PROCESSORS'] = DEFAULT_PROCESSORS
+SIZES['default']['POST_PROCESSORS'] = DEFAULT_POSTPROCESSORS
