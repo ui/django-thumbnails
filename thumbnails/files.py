@@ -1,12 +1,9 @@
-import os
-
 from django.db.models.fields.files import ImageFieldFile
 
-from . import conf, post_processors
+from . import conf
 from .backends.storage import get_backend
-from .images import Thumbnail
+from .images import Thumbnail, DefaultThumbnail
 from . import images
-from .processors import process
 from .metadata import get_path
 
 
@@ -42,7 +39,11 @@ class Gallery(object):
     def __getattr__(self, name):
         if name in conf.SIZES.keys():
             if not self.source_image:
-                return Thumbnail(metadata=None, storage=self.storage)
+                DEFAULT = conf.SIZES[name].get('DEFAULT')
+                if DEFAULT:
+                    return DefaultThumbnail(DEFAULT)
+                else:
+                    return Thumbnail(metadata=None, storage=self.storage)
             return self.get_thumbnail(name)
         else:
             raise AttributeError("'%s' has no attribute '%s'" % (self, name))

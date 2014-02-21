@@ -31,6 +31,7 @@ THUMBNAILS = {
             ],
         },
         'default': {
+            'DEFAULT': 'thumbnails/tests/tests.png',
             'processors': [
                 {'processor': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
                 {'processor': 'thumbnails.processors.flip', 'direction': 'horizontal'}

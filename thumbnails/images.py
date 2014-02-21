@@ -48,6 +48,19 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
+class DefaultThumbnail(Thumbnail):
+
+    def __init__(self, name):
+        self.name = name
+
+    @property
+    def size(self):
+        return "Default"
+
+    def url(self):
+        return self.name
+
+
 def get_thumbnail_name(source_name, size):
     name, extension = os.path.splitext(source_name)
     filename = "%s_%s%s" % (name, size, extension)

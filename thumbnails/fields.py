@@ -27,7 +27,6 @@ class ImageField(DjangoImageField):
         Process the source image through the defined processors.
         """
         file = getattr(model_instance, self.attname)
-
         if file and not file._committed:
             image_file = file
             if self.resize_source_to:
