@@ -124,7 +124,6 @@ class ImageFieldTest(TestCase):
 
         # `default` size have defined DEFAULT in settings
         self.assertFalse(self.instance.profile_picture)
-        self.assertEqual(self.instance.profile_picture.thumbnails.default.size, 'Default')
         self.assertEqual(self.instance.profile_picture.thumbnails.default.__class__.__name__, 'DefaultThumbnail')
 
         # if using its method, it should not raise error

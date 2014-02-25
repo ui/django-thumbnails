@@ -53,10 +53,6 @@ class DefaultThumbnail(Thumbnail):
     def __init__(self, name):
         self.name = name
 
-    @property
-    def size(self):
-        return "Default"
-
     def url(self):
         return self.name
 
