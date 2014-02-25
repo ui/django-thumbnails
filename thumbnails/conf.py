@@ -21,12 +21,12 @@ BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')
 
 # import the processors as a functions and replace the import string
 for size in SIZES:
-    if SIZES[size].get('PROCESSORS'):
+    if SIZES[size].get('PROCESSORS') is not None:
         SIZES[size]['PROCESSORS'] = parse_processors(SIZES[size]['PROCESSORS'])
     else:
-        SIZES[size]['PROCESSORS'] = {}
+        SIZES[size]['PROCESSORS'] = []
 
-    if SIZES[size].get('POST_PROCESSORS'):
+    if SIZES[size].get('POST_PROCESSORS') is not None:
         SIZES[size]['POST_PROCESSORS'] = parse_processors(SIZES[size]['POST_PROCESSORS'])
     else:
-        SIZES[size]['POST_PROCESSORS'] = {}
+        SIZES[size]['POST_PROCESSORS'] = []
