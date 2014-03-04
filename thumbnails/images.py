@@ -71,7 +71,7 @@ def create(source_name, size, metadata_backend=None, storage_backend=None):
         metadata_backend = backends.metadata.get_backend()
 
     thumbnail_file = processors.process(storage_backend.open(source_name), size)
-    thumbnail_file = post_processors.process(thumbnail_file)
+    thumbnail_file = post_processors.process(thumbnail_file, size)
     name = get_thumbnail_name(source_name, size)
     name = storage_backend.save(name, thumbnail_file)
 

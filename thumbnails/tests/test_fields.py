@@ -113,14 +113,15 @@ class ImageFieldTest(TestCase):
         context = Context({"image": test_model.avatar})
         self.assertRaises(ValueError, template.render, context)
 
-        # If source_image is Falsy, it should raise a ValueError
-        # when functions are called. AttributeError must be raised if
-        # Gallery is called with non existent attribute
+        # If source_image is None, ValueError should be raised when calling functions
+        # AttributeError must be raised if Gallery is called with non existent size
+        # This applies when no default picture is defined
         self.assertFalse(test_model.avatar)
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
         self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
 
-        # Default size default picture defined, should not raise any error
+        # When default picture is defined, default picture will become fallback
+        # preventing errors
         self.assertFalse(test_model.avatar)
         test_model.avatar.thumbnails.default.url()
         test_model.avatar.thumbnails, 'default'

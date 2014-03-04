@@ -17,16 +17,16 @@ METADATA = THUMBNAILS.get('METADATA', default_metadata)
 STORAGE = THUMBNAILS.get('STORAGE', default_storage)
 SIZES = THUMBNAILS.get('SIZES', {})
 BASEDIR = THUMBNAILS.get('BASEDIR', 'thumbnails')
-POST_PROCESSORS = THUMBNAILS.get('POST_PROCESSORS', [])
 
 
 # import the processors as a functions and replace the import string
 for size in SIZES:
-    SIZES[size]['processors'] = parse_processors(SIZES[size]['processors'])
+    if SIZES[size].get('PROCESSORS') is not None:
+        SIZES[size]['PROCESSORS'] = parse_processors(SIZES[size]['PROCESSORS'])
+    else:
+        SIZES[size]['PROCESSORS'] = []
 
-
-if not isinstance(POST_PROCESSORS, (list, tuple)):
-    raise ValueError('POST_PROCESSORS must be in list format')
-
-
-POST_PROCESSORS = parse_processors(POST_PROCESSORS)
+    if SIZES[size].get('POST_PROCESSORS') is not None:
+        SIZES[size]['POST_PROCESSORS'] = parse_processors(SIZES[size]['POST_PROCESSORS'])
+    else:
+        SIZES[size]['POST_PROCESSORS'] = []
