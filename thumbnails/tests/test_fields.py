@@ -120,19 +120,7 @@ class ImageFieldTest(TestCase):
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
         self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
 
-    def test_default_image(self):
-
-        # `default` size have defined DEFAULT in settings
-        self.assertFalse(self.instance.profile_picture)
-        self.assertEqual(self.instance.profile_picture.thumbnails.default.__class__.__name__, 'DefaultThumbnail')
-
-        # if using its method, it should not raise error
-        self.instance.profile_picture.thumbnails.default.url()
-
-        # Tests for no DEFAULT in settings
-        self.assertFalse(self.instance.profile_picture)
-        self.assertEqual(self.instance.profile_picture.thumbnails.large.__class__.__name__, 'Thumbnail')
-
-        # if using its method, it should raise error
-        self.assertRaises(ValueError, self.instance.profile_picture.thumbnails.large.url)
-        self.assertRaises(ValueError, getattr, self.instance.profile_picture.thumbnails.large, 'size')
+        # Default size default picture defined, should not raise any error
+        self.assertFalse(test_model.avatar)
+        test_model.avatar.thumbnails.default.url()
+        test_model.avatar.thumbnails, 'default'
