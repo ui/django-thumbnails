@@ -36,7 +36,7 @@ def parse_processors(processor_definition):
         processor.pop('PATH')
         kwargs = processor
         parsed_processors.append({
-            'processors': processor_function,
+            'processor': processor_function,
             'kwargs': kwargs
         })
 
