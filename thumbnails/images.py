@@ -14,10 +14,9 @@ class Thumbnail(object):
     An object that contains relevant information about a thumbnailed image.
     """
 
-    def __init__(self, metadata, storage, default=None):
+    def __init__(self, metadata, storage):
         self.metadata = metadata
         self.storage = storage
-        self.default = default
         self.name = getattr(metadata, 'name', None)
 
     def __str__(self):
@@ -41,16 +40,21 @@ class Thumbnail(object):
 
     @property
     def size(self):
-        if self.default:
-            return None
         self.check_metadata()
         return self.metadata.size
 
     def url(self):
-        if self.default:
-            return self.default
         self.check_metadata()
         return self.storage.url(self.name)
+
+
+class DefaultThumbnail(Thumbnail):
+
+    def __init__(self, name):
+        self.name = name
+
+    def url(self):
+        return self.name
 
 
 def get_thumbnail_name(source_name, size):
