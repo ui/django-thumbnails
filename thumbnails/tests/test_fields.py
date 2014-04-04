@@ -122,17 +122,17 @@ class ImageFieldTest(TestCase):
 
     def test_default_image(self):
 
-        # `default` size have defined DEFAULT in settings
+        # We have defined FALLBACK_IMAGE_URL for size ``default``
         self.assertFalse(self.instance.profile_picture)
         self.assertEqual(self.instance.profile_picture.thumbnails.default.__class__.__name__, 'DefaultThumbnail')
 
-        # if using its method, it should not raise error
+        # No errors should be raised when calling url function
         self.instance.profile_picture.thumbnails.default.url()
 
-        # Tests for no DEFAULT in settings
+        # No FALLBACK_IMAGE_URL defined for size ``large``
         self.assertFalse(self.instance.profile_picture)
         self.assertEqual(self.instance.profile_picture.thumbnails.large.__class__.__name__, 'Thumbnail')
 
-        # if using its method, it should raise error
+        # Error should be raised when calling url function
         self.assertRaises(ValueError, self.instance.profile_picture.thumbnails.large.url)
         self.assertRaises(ValueError, getattr, self.instance.profile_picture.thumbnails.large, 'size')
