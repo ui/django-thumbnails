@@ -39,9 +39,9 @@ class Gallery(object):
     def __getattr__(self, name):
         if name in conf.SIZES.keys():
             if not self.source_image:
-                DEFAULT = conf.SIZES[name].get('DEFAULT')
-                if DEFAULT:
-                    return DefaultThumbnail(DEFAULT)
+                FALLBACK_IMAGE_URL = conf.SIZES[name].get('FALLBACK_IMAGE_URL')
+                if FALLBACK_IMAGE_URL:
+                    return DefaultThumbnail(FALLBACK_IMAGE_URL)
                 else:
                     return Thumbnail(metadata=None, storage=self.storage)
             return self.get_thumbnail(name)

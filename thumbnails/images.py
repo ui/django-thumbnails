@@ -48,13 +48,13 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
-class DefaultThumbnail(Thumbnail):
+class DefaultThumbnail(object):
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, image_url):
+        self.image_url = image_url
 
     def url(self):
-        return self.name
+        return self.image_url
 
 
 def get_thumbnail_name(source_name, size):

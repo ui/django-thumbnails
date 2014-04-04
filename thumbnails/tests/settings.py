@@ -31,7 +31,7 @@ THUMBNAILS = {
             ],
         },
         'default': {
-            'DEFAULT': 'thumbnails/tests/tests.png',
+            'FALLBACK_IMAGE_URL': 'thumbnails/tests/tests.png',
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
                 {'PATH': 'thumbnails.processors.flip', 'direction': 'horizontal'}
