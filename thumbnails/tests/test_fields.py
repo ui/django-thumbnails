@@ -120,11 +120,11 @@ class ImageFieldTest(TestCase):
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
         self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
 
-    def test_default_image(self):
+    def test_fallback_image(self):
 
         # We have defined FALLBACK_IMAGE_URL for size ``default``
         self.assertFalse(self.instance.profile_picture)
-        self.assertEqual(self.instance.profile_picture.thumbnails.default.__class__.__name__, 'DefaultThumbnail')
+        self.assertEqual(self.instance.profile_picture.thumbnails.default.__class__.__name__, 'FallbackImage')
 
         # No errors should be raised when calling url function
         self.instance.profile_picture.thumbnails.default.url()

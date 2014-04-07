@@ -48,7 +48,7 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
-class DefaultThumbnail(object):
+class FallbackImage(object):
 
     def __init__(self, image_url):
         self.image_url = image_url

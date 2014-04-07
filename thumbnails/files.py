@@ -2,7 +2,7 @@ from django.db.models.fields.files import ImageFieldFile
 
 from . import conf
 from .backends.storage import get_backend
-from .images import Thumbnail, DefaultThumbnail
+from .images import Thumbnail, FallbackImage
 from . import images
 from .metadata import get_path
 
@@ -39,9 +39,9 @@ class Gallery(object):
     def __getattr__(self, name):
         if name in conf.SIZES.keys():
             if not self.source_image:
-                FALLBACK_IMAGE_URL = conf.SIZES[name].get('FALLBACK_IMAGE_URL')
-                if FALLBACK_IMAGE_URL:
-                    return DefaultThumbnail(FALLBACK_IMAGE_URL)
+                fallback_image_url = conf.SIZES[name].get('FALLBACK_IMAGE_URL')
+                if fallback_image_url:
+                    return FallbackImage(fallback_image_url)
                 else:
                     return Thumbnail(metadata=None, storage=self.storage)
             return self.get_thumbnail(name)
