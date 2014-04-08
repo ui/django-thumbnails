@@ -43,6 +43,7 @@ class Thumbnail(object):
         self.check_metadata()
         return self.metadata.size
 
+    @property
     def url(self):
         self.check_metadata()
         return self.storage.url(self.name)
@@ -53,6 +54,7 @@ class FallbackImage(object):
     def __init__(self, image_url):
         self.image_url = image_url
 
+    @property
     def url(self):
         return self.image_url
 
