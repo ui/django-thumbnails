@@ -136,3 +136,9 @@ class ImageFieldTest(TestCase):
         # Error should be raised when calling url function
         self.assertRaises(ValueError, self.instance.profile_picture.thumbnails.large.url)
         self.assertRaises(ValueError, getattr, self.instance.profile_picture.thumbnails.large, 'size')
+
+    def test_resize_source_to_none(self):
+        # Make sure that fields without resize_source_to does not raise error on save
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.profile_picture = File(image_file)
+            self.instance.save()
