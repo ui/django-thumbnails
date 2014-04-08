@@ -32,7 +32,7 @@ class ImageField(DjangoImageField):
             image_file = file
             if self.resize_source_to:
                 image_file = processors.process(file, self.resize_source_to)
-            image_file = post_processors.process(image_file, self.resize_source_to)
+                image_file = post_processors.process(image_file, self.resize_source_to)
             filename = str(uuid.uuid4()) + os.path.splitext(file.name)[1]
             file.save(filename, image_file, save=False)
         return file
