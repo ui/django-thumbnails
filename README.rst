@@ -1,5 +1,6 @@
 # This is a work in progress and is not ready for use
 
+|Build Status|
 
 Design:
 
@@ -70,3 +71,7 @@ Builtin processors::
 Running tests::
 
     `which django-admin.py` test thumbnails --settings=thumbnails.tests.settings --pythonpath=.
+
+
+.. |Build Status| image:: https://travis-ci.org/ui/django-thumbnails.png?branch=master
+   :target: https://travis-ci.org/ui/django-thumbnails
