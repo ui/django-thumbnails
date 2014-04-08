@@ -5,7 +5,7 @@ from django.template import Context, Template
 from django.test import TestCase
 
 from thumbnails import conf
-from thumbnails.files import Thumbnail
+from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel
 
@@ -124,14 +124,14 @@ class ImageFieldTest(TestCase):
 
         # We have defined FALLBACK_IMAGE_URL for size ``default``
         self.assertFalse(self.instance.profile_picture)
-        self.assertEqual(self.instance.profile_picture.thumbnails.default.__class__.__name__, 'FallbackImage')
+        self.assertTrue(isinstance(self.instance.profile_picture.thumbnails.default, FallbackImage))
 
         # No errors should be raised when calling url function
         self.instance.profile_picture.thumbnails.default.url()
 
         # No FALLBACK_IMAGE_URL defined for size ``large``
         self.assertFalse(self.instance.profile_picture)
-        self.assertEqual(self.instance.profile_picture.thumbnails.large.__class__.__name__, 'Thumbnail')
+        self.assertTrue(isinstance(self.instance.profile_picture.thumbnails.large, Thumbnail))
 
         # Error should be raised when calling url function
         self.assertRaises(ValueError, self.instance.profile_picture.thumbnails.large.url)
