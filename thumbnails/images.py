@@ -48,6 +48,15 @@ class Thumbnail(object):
         return self.storage.url(self.name)
 
 
+class FallbackImage(object):
+
+    def __init__(self, image_url):
+        self.image_url = image_url
+
+    def url(self):
+        return self.image_url
+
+
 def get_thumbnail_name(source_name, size):
     name, extension = os.path.splitext(source_name)
     filename = "%s_%s%s" % (name, size, extension)

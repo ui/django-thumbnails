@@ -1,12 +1,9 @@
-import os
-
 from django.db.models.fields.files import ImageFieldFile
 
-from . import conf, post_processors
+from . import conf
 from .backends.storage import get_backend
-from .images import Thumbnail
+from .images import Thumbnail, FallbackImage
 from . import images
-from .processors import process
 from .metadata import get_path
 
 
@@ -42,7 +39,11 @@ class Gallery(object):
     def __getattr__(self, name):
         if name in conf.SIZES.keys():
             if not self.source_image:
-                return Thumbnail(metadata=None, storage=self.storage)
+                fallback_image_url = conf.SIZES[name].get('FALLBACK_IMAGE_URL')
+                if fallback_image_url:
+                    return FallbackImage(fallback_image_url)
+                else:
+                    return Thumbnail(metadata=None, storage=self.storage)
             return self.get_thumbnail(name)
         else:
             raise AttributeError("'%s' has no attribute '%s'" % (self, name))

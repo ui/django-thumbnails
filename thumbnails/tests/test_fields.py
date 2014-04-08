@@ -5,7 +5,7 @@ from django.template import Context, Template
 from django.test import TestCase
 
 from thumbnails import conf
-from thumbnails.files import Thumbnail
+from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel
 
@@ -113,9 +113,26 @@ class ImageFieldTest(TestCase):
         context = Context({"image": test_model.avatar})
         self.assertRaises(ValueError, template.render, context)
 
-        # If source_image is Falsy, it should raise a ValueError
-        # when functions are called. AttributeError must be raised if
-        # Gallery is called with non existent attribute
+        # If source_image is None, ValueError should be raised when calling functions
+        # AttributeError must be raised if Gallery is called with non existent size
+        # This applies when no default picture is defined
         self.assertFalse(test_model.avatar)
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
         self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
+
+    def test_fallback_image(self):
+
+        # We have defined FALLBACK_IMAGE_URL for size ``default``
+        self.assertFalse(self.instance.profile_picture)
+        self.assertTrue(isinstance(self.instance.profile_picture.thumbnails.default, FallbackImage))
+
+        # No errors should be raised when calling url function
+        self.instance.profile_picture.thumbnails.default.url()
+
+        # No FALLBACK_IMAGE_URL defined for size ``large``
+        self.assertFalse(self.instance.profile_picture)
+        self.assertTrue(isinstance(self.instance.profile_picture.thumbnails.large, Thumbnail))
+
+        # Error should be raised when calling url function
+        self.assertRaises(ValueError, self.instance.profile_picture.thumbnails.large.url)
+        self.assertRaises(ValueError, getattr, self.instance.profile_picture.thumbnails.large, 'size')
