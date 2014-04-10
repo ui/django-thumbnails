@@ -14,28 +14,29 @@ settings.py::
 
     THUMBNAILS = {
         'METADATA': {
-            'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
+            'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend', # Redis backend also supported
         },
         'STORAGE': {
             'BACKEND': 'django.core.files.storage.FileSystemStorage',
         }
         'SIZES': {
             'small': {
-                'processors': [
-                    {'processor': 'thumbnails.processors.resize', 'width': 10, 'height': 10},
-                    {'processor': 'thumbnails.processors.crop', 'width': 80, 'height': 80}
+                'PROCESSORS': [
+                    {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10},
+                    {'PATH': 'thumbnails.processors.crop', 'width': 80, 'height': 80}
+                ],
+                'POST_PROCESSORS': [
+                    {
+                        'processor': 'thumbnails.post_processors.optimize',
+                        'png_command': 'optipng -force -o7 "%(filename)s"',
+                        'jpg_command': 'jpegoptim -f --strip-all "%(filename)s"',
+                    },
                 ],
             },
-            'default': {
-                'processors':[
-                    {'processor': 'thumbnails.processors.resize', 'width': 80, 'height': 80},
-                    {'processor': 'thumbnails.processors.rotate', 'degrees': 45},
-                ]
-            },
             'large': {
-                'processors': [
-                    {'processor': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
-                    {'processor': 'thumbnails.processors.flip', 'direction': 'horizontal'}
+                'PROCESSORS': [
+                    {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
+                    {'PATH': 'thumbnails.processors.flip', 'direction': 'horizontal'}
                 ],
             }
         }
@@ -52,7 +53,6 @@ In python::
 
     food = Food.objects.latest('id')
     food.image.thumbnails.all()
-    food.image.thumbnails.create('default')
     food.image.thumbnails.default.url
 
 
@@ -65,7 +65,7 @@ Builtin processors::
     thumbnails.processors.flip(direction)
     thumbnails.processors.crop(width, height, center)
 
-    Processors will be applied to the image sequentially with the order of definition
+    Processors are applied sequentially in the same order of definition.
 
 
 Running tests::
