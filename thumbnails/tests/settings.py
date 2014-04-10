@@ -23,7 +23,7 @@ THUMBNAILS = {
     'STORAGE': {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
-    'BASEDIR': 'thumbs',
+    'BASE_DIR': 'thumbs',
     'SIZES': {
         'small': {
             'PROCESSORS': [
