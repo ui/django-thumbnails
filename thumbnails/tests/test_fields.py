@@ -117,7 +117,7 @@ class ImageFieldTest(TestCase):
         # AttributeError must be raised if ThumbnailManager is called with non existent size
         # This applies when no default picture is defined
         self.assertFalse(test_model.avatar)
-        self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
+        self.assertRaises(ValueError, getattr, test_model.avatar.thumbnails.large, 'url')
         self.assertRaises(AttributeError, getattr, test_model.avatar.thumbnails, 'lrge')
 
     def test_fallback_image(self):
@@ -126,15 +126,15 @@ class ImageFieldTest(TestCase):
         self.assertFalse(self.instance.profile_picture)
         self.assertTrue(isinstance(self.instance.profile_picture.thumbnails.default, FallbackImage))
 
-        # No errors should be raised when calling url function
-        self.instance.profile_picture.thumbnails.default.url()
+        # No errors should be raised when url attribute
+        self.instance.profile_picture.thumbnails.default.url
 
         # No FALLBACK_IMAGE_URL defined for size ``large``
         self.assertFalse(self.instance.profile_picture)
         self.assertTrue(isinstance(self.instance.profile_picture.thumbnails.large, Thumbnail))
 
-        # Error should be raised when calling url function
-        self.assertRaises(ValueError, self.instance.profile_picture.thumbnails.large.url)
+        # Error should be raised when calling url attribute
+        self.assertRaises(ValueError, getattr, self.instance.profile_picture.thumbnails.large, 'url')
         self.assertRaises(ValueError, getattr, self.instance.profile_picture.thumbnails.large, 'size')
 
     def test_resize_source_to_none(self):
