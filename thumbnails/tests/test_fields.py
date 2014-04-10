@@ -18,7 +18,7 @@ class ImageFieldTest(TestCase):
             self.instance.avatar = File(image_file)
             self.instance.save()
         self.avatar_folder = \
-            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASEDIR, 'avatars')
+            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASE_DIR, 'avatars')
         self.basename = os.path.basename(self.instance.avatar.path)
         self.filename, self.ext = os.path.splitext(self.basename)
 
