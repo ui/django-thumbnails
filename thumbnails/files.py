@@ -18,7 +18,7 @@ class ThumbnailedImageFile(ImageFieldFile):
     def __init__(self, instance, field, name, **kwargs):
         super(ThumbnailedImageFile, self).__init__(instance, field, name, **kwargs)
         self.metadata_backend = field.metadata_backend
-        self.thumbnails = Gallery(metadata_backend=self.metadata_backend,
+        self.thumbnails = ThumbnailManager(metadata_backend=self.metadata_backend,
                                   storage=self.storage,
                                   source_image=self)
 
@@ -28,7 +28,7 @@ class ThumbnailedImageFile(ImageFieldFile):
         return thumbnail
 
 
-class Gallery(object):
+class ThumbnailManager(object):
 
     def __init__(self, metadata_backend, storage, source_image):
         self.metadata_backend = metadata_backend

@@ -44,7 +44,7 @@ class ImageFieldTest(TestCase):
         self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
 
     def test_thumbnail_field(self):
-        # Make sure gallery return the correct thumbnail
+        # Make sure ThumbnailManager return the correct thumbnail
         self.assertTrue(self.instance.avatar.thumbnails.small, Thumbnail)
 
         self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.small.name),
@@ -114,7 +114,7 @@ class ImageFieldTest(TestCase):
         self.assertRaises(ValueError, template.render, context)
 
         # If source_image is None, ValueError should be raised when calling functions
-        # AttributeError must be raised if Gallery is called with non existent size
+        # AttributeError must be raised if ThumbnailManager is called with non existent size
         # This applies when no default picture is defined
         self.assertFalse(test_model.avatar)
         self.assertRaises(ValueError, test_model.avatar.thumbnails.large.url)
