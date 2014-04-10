@@ -18,6 +18,7 @@ settings.py::
         },
         'STORAGE': {
             'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            # You can also use Amazon S3 or any other Django storage backends
         }
         'SIZES': {
             'small': {
@@ -68,9 +69,26 @@ Builtin processors::
     Processors are applied sequentially in the same order of definition.
 
 
-Running tests::
+Management Commands
+-------------------
+If you changed your size definition and want to regenerate the thumbnails, use::
+
+    python manage.py delete_thumbnails --model=app.Model --size=thumbnail_size_to_delete
+
+
+Running Tests
+-------------
 
     `which django-admin.py` test thumbnails --settings=thumbnails.tests.settings --pythonpath=.
+
+
+=========
+Changelog
+=========
+
+Version 0.1.0
+-------------
+* First public release
 
 
 .. |Build Status| image:: https://travis-ci.org/ui/django-thumbnails.png?branch=master
