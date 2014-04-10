@@ -54,7 +54,9 @@ In python::
 
     food = Food.objects.latest('id')
     food.image.thumbnails.all()
-    food.image.thumbnails.default.url
+    food.image.thumbnails.small  # Generates "small" sized thumbnail
+    food.image.thumbnails.large  # Generates "large" sized thumbnail
+    food.image.thumbnails.small.url  # Returns "small" sized thumbnail URL 
 
 
 
