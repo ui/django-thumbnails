@@ -1,9 +1,8 @@
 from django.db.models.fields.files import ImageFieldFile
 
-from . import conf
+from . import conf, images
 from .backends.storage import get_backend
 from .images import Thumbnail, FallbackImage
-from . import images
 from .metadata import get_path
 
 
@@ -18,9 +17,11 @@ class ThumbnailedImageFile(ImageFieldFile):
     def __init__(self, instance, field, name, **kwargs):
         super(ThumbnailedImageFile, self).__init__(instance, field, name, **kwargs)
         self.metadata_backend = field.metadata_backend
-        self.thumbnails = ThumbnailManager(metadata_backend=self.metadata_backend,
-                                  storage=self.storage,
-                                  source_image=self)
+        self.thumbnails = ThumbnailManager(
+            metadata_backend=self.metadata_backend,
+            storage=self.storage,
+            source_image=self
+        )
 
     def save(self, name, content, save=True):
         thumbnail = super(ThumbnailedImageFile, self).save(name, content, save)
@@ -29,6 +30,7 @@ class ThumbnailedImageFile(ImageFieldFile):
 
 
 class ThumbnailManager(object):
+    """A class that manages creation and retrieval of thumbnails."""
 
     def __init__(self, metadata_backend, storage, source_image):
         self.metadata_backend = metadata_backend
@@ -82,7 +84,6 @@ class ThumbnailManager(object):
         """
         Creates and return a thumbnail of a given size.
         """
-
         thumbnail = images.create(self.source_image.name, size,
                                   self.metadata_backend, self.storage)
         return thumbnail
