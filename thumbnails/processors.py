@@ -9,7 +9,7 @@ def resize(image, **kwargs):
     """
     Resized an image based on given width and height
     """
-    image.resize(width=kwargs['width'], height=kwargs['height'])
+    image.resize(**kwargs)
     return image
 
 
@@ -17,7 +17,7 @@ def rotate(image, **kwargs):
     """
     Rotates an argument by X degrees.
     """
-    image.rotate(degrees=kwargs['degrees'])
+    image.rotate(**kwargs)
     return image
 
 
@@ -25,7 +25,7 @@ def flip(image, **kwargs):
     """
     Flips an image. Expects "horizontal" or "vertical" as argument.
     """
-    image.flip(direction=kwargs['direction'])
+    image.flip(**kwargs)
     return image
 
 
@@ -33,13 +33,7 @@ def crop(image, **kwargs):
     """
     Crops an image based on given width or height
     """
-    params = {
-        'width': kwargs['width'],
-        'height': kwargs['height']
-    }
-    if kwargs.get('center'):
-        params['center'] = kwargs['center']
-    image.crop(**params)
+    image.crop(**kwargs)
     return image
 
 
