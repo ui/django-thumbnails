@@ -46,7 +46,7 @@ class ThumbnailManager(object):
                     return FallbackImage(fallback_image_url)
                 else:
                     return Thumbnail(metadata=None, storage=self.storage)
-            return self.get_thumbnail(name)
+            return self.get(name)
         else:
             raise AttributeError("'%s' has no attribute '%s'" % (self, name))
 
@@ -59,7 +59,7 @@ class ThumbnailManager(object):
             self._thumbnails[metadata.size] = Thumbnail(metadata=metadata, storage=self.storage)
         return self._thumbnails
 
-    def get_thumbnail(self, size, create=True):
+    def get(self, size, create=True):
         """
         Returns a Thumbnail instance.
         First check whether thumbnail is already cached. If it doesn't:

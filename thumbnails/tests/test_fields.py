@@ -36,7 +36,7 @@ class ImageFieldTest(TestCase):
         # Make sure the returned thumbnail is of thumbnail class, not metadata
         self.assertTrue(isinstance(thumb, Thumbnail))
         # 2. Test for getting thumbnail
-        self.assertEqual(thumb, self.instance.avatar.thumbnails.get_thumbnail(size='small'))
+        self.assertEqual(thumb, self.instance.avatar.thumbnails.get(size='small'))
 
         # 3. Test for thumbnail deletion
         self.assertTrue(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
@@ -88,8 +88,8 @@ class ImageFieldTest(TestCase):
         with self.assertNumQueries(1):
             self.instance.avatar.thumbnails.default
             self.instance.avatar.thumbnails.all()['default']
-            self.instance.avatar.thumbnails.get_thumbnail('default')
-            self.instance.avatar.thumbnails.get_thumbnail('default')
+            self.instance.avatar.thumbnails.get('default')
+            self.instance.avatar.thumbnails.get('default')
 
     def test_django_template(self):
         template = Template("Test render {{ image.thumbnails.large.url }} ")
