@@ -80,6 +80,7 @@ If you changed your size definition and want to regenerate the thumbnails, use::
 
 Running Tests
 -------------
+To run tests::
 
     `which django-admin.py` test thumbnails --settings=thumbnails.tests.settings --pythonpath=.
 
