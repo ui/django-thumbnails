@@ -22,10 +22,10 @@ class CommandTest(TestCase):
             instance.save()
 
         instance = TestModel.objects.get(id=instance.id)
-        instance.avatar.thumbnails.create_thumbnail(size='small')
-        instance.avatar.thumbnails.create_thumbnail(size='large')
-        instance.profile_picture.thumbnails.create_thumbnail(size='small')
-        instance.profile_picture.thumbnails.create_thumbnail(size='large')
+        instance.avatar.thumbnails.create(size='small')
+        instance.avatar.thumbnails.create(size='large')
+        instance.profile_picture.thumbnails.create(size='small')
+        instance.profile_picture.thumbnails.create(size='large')
 
         self.assertTrue(get_thumbnail(instance.avatar.name, 'small'))
         self.assertTrue(get_thumbnail(instance.avatar.name, 'large'))

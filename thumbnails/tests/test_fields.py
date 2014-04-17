@@ -30,7 +30,7 @@ class ImageFieldTest(TestCase):
 
         # 1. Test for thumbnail creation
         self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
-        thumb = self.instance.avatar.thumbnails.create_thumbnail(size='small')
+        thumb = self.instance.avatar.thumbnails.create(size='small')
         self.assertTrue(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
 
         # Make sure the returned thumbnail is of thumbnail class, not metadata
@@ -59,7 +59,7 @@ class ImageFieldTest(TestCase):
         # Test for name clashing with another file with the same name
         self.instance.avatar.thumbnails.delete('large')
         open(os.path.join(self.avatar_folder, 'tests_large.png'), 'w').close()
-        self.instance.avatar.thumbnails.create_thumbnail('large')
+        self.instance.avatar.thumbnails.create('large')
 
         # Due to uuid4 for file name, this should not clash
         self.assertNotEqual(os.path.basename(self.instance.avatar.thumbnails.large.name),

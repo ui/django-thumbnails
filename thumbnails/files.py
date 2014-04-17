@@ -74,13 +74,13 @@ class ThumbnailManager(object):
                                    self.metadata_backend, self.storage)
 
             if thumbnail is None:
-                thumbnail = self.create_thumbnail(size)
+                thumbnail = self.create(size)
 
             self._thumbnails[size] = thumbnail
 
         return thumbnail
 
-    def create_thumbnail(self, size):
+    def create(self, size):
         """
         Creates and return a thumbnail of a given size.
         """
