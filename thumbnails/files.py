@@ -88,7 +88,7 @@ class ThumbnailManager(object):
                                   self.metadata_backend, self.storage)
         return thumbnail
 
-    def delete_thumbnail(self, size):
+    def delete(self, size):
         """
         Deletes a thumbnail of a given size
         """

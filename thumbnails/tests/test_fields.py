@@ -40,7 +40,7 @@ class ImageFieldTest(TestCase):
 
         # 3. Test for thumbnail deletion
         self.assertTrue(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
-        self.instance.avatar.thumbnails.delete_thumbnail(size='small')
+        self.instance.avatar.thumbnails.delete(size='small')
         self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
 
     def test_thumbnail_field(self):
@@ -57,7 +57,7 @@ class ImageFieldTest(TestCase):
                          self.filename + '_large' + self.ext)
 
         # Test for name clashing with another file with the same name
-        self.instance.avatar.thumbnails.delete_thumbnail('large')
+        self.instance.avatar.thumbnails.delete('large')
         open(os.path.join(self.avatar_folder, 'tests_large.png'), 'w').close()
         self.instance.avatar.thumbnails.create_thumbnail('large')
 
@@ -80,7 +80,7 @@ class ImageFieldTest(TestCase):
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 2)
 
         # Should also work on deletion
-        self.instance.avatar.thumbnails.delete_thumbnail('large')
+        self.instance.avatar.thumbnails.delete('large')
         self.assertEqual(self.instance.avatar.thumbnails.all().get('large'), None)
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
 
