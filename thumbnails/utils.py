@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.utils import importlib
 
 
@@ -33,8 +35,8 @@ def parse_processors(processor_definition):
     parsed_processors = []
     for processor in processor_definition:
         processor_function = import_attribute(processor['PATH'])
-        processor.pop('PATH')
-        kwargs = processor
+        kwargs = deepcopy(processor)
+        kwargs.pop('PATH')
         parsed_processors.append({
             'processor': processor_function,
             'kwargs': kwargs
