@@ -31,6 +31,7 @@ class ImageField(DjangoImageField):
         if file and not file._committed:
             image_file = file
             if self.resize_source_to:
+                file.seek(0)
                 image_file = processors.process(file, self.resize_source_to)
                 image_file = post_processors.process(image_file, self.resize_source_to)
             filename = str(uuid.uuid4()) + os.path.splitext(file.name)[1]
