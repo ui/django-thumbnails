@@ -39,14 +39,14 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
         'POST_PROCESSORS': [
             {
                 'processor': 'thumbnails.post_processors.optimize',
-                'png_command': 'optipng -force -o7 "%(filename)s"',
+                'png_command': 'optipng -force -o3 "%(filename)s"',
                 'jpg_command': 'jpegoptim -f --strip-all "%(filename)s"',
             },
         ],
     }
 
     Note: using output redirection in commands may cause unpredictable results.
-    For example 'optipng -force -o7 "%(filename)s" &> /dev/null' may cause
+    For example 'optipng -force -o3 "%(filename)s" &> /dev/null' may cause
     optimize command to fail on some systems.
     """
     temp_dir = get_or_create_temp_dir()
