@@ -19,6 +19,11 @@ class ImageField(DjangoImageField):
         self.metadata_backend = metadata.get_backend()
         super(ImageField, self).__init__(*args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(ImageField, self).deconstruct()
+        del kwargs['storage']
+        return name, path, args, kwargs
+
     def __unicode__(self):
         return self.attname
 
