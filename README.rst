@@ -71,6 +71,12 @@ Builtin processors::
     Processors are applied sequentially in the same order of definition.
 
 
+Migration note
+
+Please use internal django migration command. If for some reason this is not a viable
+options, only use South 1.0
+
+
 Management Commands
 -------------------
 If you changed your size definition and want to regenerate the thumbnails, use::
