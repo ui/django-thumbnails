@@ -1,4 +1,4 @@
-import uuid
+import shortuuid
 import os
 
 from django.db.models import ImageField as DjangoImageField
@@ -39,7 +39,7 @@ class ImageField(DjangoImageField):
                 file.seek(0)
                 image_file = processors.process(file, self.resize_source_to)
                 image_file = post_processors.process(image_file, self.resize_source_to)
-            filename = str(uuid.uuid4()) + os.path.splitext(file.name)[1]
+            filename = str(shortuuid.uuid()) + os.path.splitext(file.name)[1]
             file.save(filename, image_file, save=False)
         return file
 
