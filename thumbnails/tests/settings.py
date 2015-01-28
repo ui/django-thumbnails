@@ -54,3 +54,5 @@ THUMBNAILS = {
         }
     }
 }
+
+MIDDLEWARE_CLASSES = ()
