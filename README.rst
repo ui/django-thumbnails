@@ -114,14 +114,14 @@ Changelog
 
 Version 0.1.1
 -------------
-* Use [shortuuid](https://github.com/stochastic-technologies/shortuuid) instead of `uuid4()` to be more space efficient
+* Use `shortuuid <https://github.com/stochastic-technologies/shortuuid>`_ instead of `uuid4()` to be more space efficient
 
 Version 0.1.0
 -------------
 * First public release
 
 
-As of February 2015, this library is suitable for production use and has been used for more than a year in [Stamps](http://stamps.co.id) (Indonesian based CRM/loyalty system).
+As of February 2015, this library is suitable for production use and has been used for more than a year in `Stamps <http://stamps.co.id>`_, an Indonesian based CRM/loyalty system.
 
 
 .. |Build Status| image:: https://travis-ci.org/ui/django-thumbnails.png?branch=master
