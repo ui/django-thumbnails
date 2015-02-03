@@ -1,20 +1,27 @@
-# This is a work in progress and is not ready for use
-
 |Build Status|
 
 Design:
 
 * Uses Django Storage API
-* Uses flexible meta data store
+* Uses flexible meta data store. Database and Redis metadata backend supported at the moment.
+
+Installation
+------------
+
+* Add `thumbnails` to `INSTALLED_APPS` in `settings.py`.
+* Run `python manage.py migrate` to create database metadata backend.
 
 
 Usage
+-----
 
-settings.py::
+settings.py:
+
+.. code-block:: python
 
     THUMBNAILS = {
         'METADATA': {
-            'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend', # Redis backend also supported
+            'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
         },
         'STORAGE': {
             'BACKEND': 'django.core.files.storage.FileSystemStorage',
@@ -43,8 +50,24 @@ settings.py::
         }
     }
 
+If you prefer to use Redis as your metadata storage backend (like I do :):
 
-In python::
+.. code-block:: python
+
+    THUMBNAILS = {
+        'METADATA': {
+            'PREFIX': 'thumbs',
+            'BACKEND': 'thumbnails.backends.metadata.RedisBackend',
+            'db': 2,
+            'port': 6379,
+            'host': 'localhost',
+        },
+    }
+
+
+In python:
+
+.. code-block:: python
 
     import thumbnails
 
@@ -60,7 +83,7 @@ In python::
 
 
 
-Builtin processors::
+`django-thumbnails` comes with a few builtin image processors::
 
     # To use the following processors, put the arguments of processors in SIZES definition
     thumbnails.processors.resize(width, height)
@@ -69,12 +92,6 @@ Builtin processors::
     thumbnails.processors.crop(width, height, center)
 
     Processors are applied sequentially in the same order of definition.
-
-
-Migration note
-
-Please use internal django migration command. If for some reason this is not a viable
-options, only use South 1.0
 
 
 Management Commands
@@ -95,9 +112,16 @@ To run tests::
 Changelog
 =========
 
+Version 0.1.1
+-------------
+* Use [shortuuid](https://github.com/stochastic-technologies/shortuuid) instead of `uuid4()` to be more space efficient
+
 Version 0.1.0
 -------------
 * First public release
+
+
+As of February 2015, this library is suitable for production use and has been used for more than a year in [Stamps](http://stamps.co.id) (Indonesian based CRM/loyalty system).
 
 
 .. |Build Status| image:: https://travis-ci.org/ui/django-thumbnails.png?branch=master
