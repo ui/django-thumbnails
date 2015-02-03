@@ -23,6 +23,7 @@ install:
   - pip install da-vinci
   - pip install pillow
   - pip install redis
+  - pip install shortuuid
   - sudo apt-get install -qq optipng
 
 script: make test
