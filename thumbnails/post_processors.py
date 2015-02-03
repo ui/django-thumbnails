@@ -2,7 +2,7 @@ import imghdr
 import os
 from subprocess import call
 import tempfile
-import uuid
+import shortuuid
 
 from django.core.files import File
 
@@ -50,7 +50,7 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
     optimize command to fail on some systems.
     """
     temp_dir = get_or_create_temp_dir()
-    thumbnail_filename = os.path.join(temp_dir, "%s" % uuid.uuid4().hex)
+    thumbnail_filename = os.path.join(temp_dir, "%s" % shortuuid.uuid())
 
     f = open(thumbnail_filename, 'wb')
     f.write(thumbnail_file.read())
