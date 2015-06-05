@@ -1,6 +1,9 @@
 from copy import deepcopy
 
-from django.utils import importlib
+try:
+    import importlib
+except ImportError:
+    from django.utils import importlib
 
 
 def import_attribute(name):
