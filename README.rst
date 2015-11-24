@@ -112,6 +112,10 @@ To run tests::
 Changelog
 =========
 
+Version 0.1.3
+-------------
+* Fixes deprecation warning in Django 1.8
+
 Version 0.1.2
 -------------
 * Fixes deprecation warning in Django 1.8

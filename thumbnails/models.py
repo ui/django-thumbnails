@@ -4,6 +4,9 @@ from django.db import models
 class Source(models.Model):
     name = models.CharField(unique=True, max_length=255)
 
+    class Meta:
+        app_label = 'thumbnails'
+
 
 class ThumbnailMeta(models.Model):
     source = models.ForeignKey(Source, related_name='thumbnails')
@@ -12,3 +15,4 @@ class ThumbnailMeta(models.Model):
 
     class Meta:
         unique_together = ('source', 'size')
+        app_label = 'thumbnails'
