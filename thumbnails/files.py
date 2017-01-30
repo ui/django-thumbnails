@@ -36,7 +36,7 @@ class ThumbnailManager(object):
         self.metadata_backend = metadata_backend
         self.storage = storage
         self.source_image = source_image
-        self._thumbnails = {}
+        self._thumbnails = None
 
     def __getattr__(self, name):
         if name in conf.SIZES.keys():
@@ -50,13 +50,20 @@ class ThumbnailManager(object):
         else:
             raise AttributeError("'%s' has no attribute '%s'" % (self, name))
 
+    def _refresh_cache(self):
+        """Populate self._thumbnails."""
+        self._thumbnails = {}
+        metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
+        for metadata in metadatas:
+            self._thumbnails[metadata.size] = Thumbnail(metadata=metadata, storage=self.storage)
+
     def all(self):
         """
         Return all thumbnails in a dict format.
         """
-        metadatas = self.metadata_backend.get_thumbnails(self.source_image.name)
-        for metadata in metadatas:
-            self._thumbnails[metadata.size] = Thumbnail(metadata=metadata, storage=self.storage)
+        if self._thumbnails is not None:
+            return self._thumbnails
+        self._refresh_cache()
         return self._thumbnails
 
     def get(self, size, create=True):
@@ -67,6 +74,9 @@ class ThumbnailManager(object):
         2. Create thumbnail if it's not present
         3. Cache the thumbnail for future use
         """
+        if self._thumbnails is None:
+            self._refresh_cache()
+
         thumbnail = self._thumbnails.get(size)
 
         if thumbnail is None:

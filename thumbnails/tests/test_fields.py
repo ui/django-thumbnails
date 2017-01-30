@@ -68,7 +68,7 @@ class ImageFieldTest(TestCase):
     def test_thumbnails_cache(self):
 
         # No thumbnails should be cached
-        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 0)
+        self.assertEqual(self.instance.avatar.thumbnails._thumbnails, None)
 
         # Thumbnail with size `default` created and populated to the cache
         self.assertEqual(self.instance.avatar.thumbnails.default, self.instance.avatar.thumbnails.all().get('default'))
@@ -85,7 +85,7 @@ class ImageFieldTest(TestCase):
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
 
         # Once cached, it should not hit backend on other call.
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             self.instance.avatar.thumbnails.default
             self.instance.avatar.thumbnails.all()['default']
             self.instance.avatar.thumbnails.get('default')

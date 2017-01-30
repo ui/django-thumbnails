@@ -1,7 +1,5 @@
-from optparse import make_option
-
+from django.apps import apps
 from django.core.management.base import BaseCommand
-from django.db.models import get_model
 
 from thumbnails import images
 from thumbnails.backends import metadata, storage
@@ -12,14 +10,14 @@ class Command(BaseCommand):
     Delete all thumbnails from a field. For example:
     python manage.py delete_thumbnails --model='accounts.Profile' --field='picture' --size='small'
     """
-    option_list = BaseCommand.option_list + (
-        make_option('--model', dest='path_to_model',
-                    help='Dotted path to model (e.g "polls.Poll" )'),
-        make_option('--field', dest='field_name',
-                    help='Thumbnail field name (e.g "picture"'),
-        make_option('--size', dest='size',
-                    help='Thumbnail size to delete (e.g "small"'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--model', dest='path_to_model',
+                            help='Dotted path to model (e.g "polls.Poll" )')
+        parser.add_argument('--field', dest='field_name',
+                            help='Thumbnail field name (e.g "picture"')
+        parser.add_argument('--size', dest='size',
+                            help='Thumbnail size to delete (e.g "small"')
 
     def handle(self, path_to_model, field_name, size, *args, **kwargs):
         if not path_to_model:
@@ -30,7 +28,7 @@ class Command(BaseCommand):
             raise ValueError('--size argument is required')
 
         app_label, model_name = path_to_model.rsplit('.', 1)
-        model = get_model(app_label, model_name)
+        model = apps.get_model(app_label, model_name)
 
         # Get model instances which has non empty fields
         exclude_args = {

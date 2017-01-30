@@ -1,25 +1,15 @@
 language: python
 
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
+  - "3.4"
+  - "3.5"
 
 env:
-  - DJANGO=1.8.2
-  - DJANGO=1.7.8
-  - DJANGO=1.6.10
-  - DJANGO=1.5.12
-  - DJANGO=1.4.19
-
-matrix:
-  exclude:
-    - python: "3.3"
-      env: DJANGO=1.4.19
-    - python: "2.6"
-      env: DJANGO=1.7.8
-    - python: "2.6"
-      env: DJANGO=1.8.2
+  - DJANGO=1.8.17
+  - DJANGO=1.9.12
+  - DJANGO=1.10.5
 
 install:
   - pip install Django==$DJANGO times da-vinci pillow redis shortuuid
