@@ -112,6 +112,11 @@ To run tests::
 Changelog
 =========
 
+Version 0.2.0
+-------------
+* Improves performance on fields that have a large number of thumbnails
+* Add support for Django 1.8, 1.9 and 1.10
+
 Version 0.1.3
 -------------
 * Fixes deprecation warning in Django 1.8
