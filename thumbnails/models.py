@@ -9,7 +9,8 @@ class Source(models.Model):
 
 
 class ThumbnailMeta(models.Model):
-    source = models.ForeignKey(Source, related_name='thumbnails')
+    source = models.ForeignKey(Source, related_name='thumbnails',
+                               on_delete=models.CASCADE)
     size = models.CharField(max_length=64)
     name = models.CharField(unique=True, max_length=255)
 
