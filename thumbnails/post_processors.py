@@ -74,11 +74,6 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
         call(command, shell=True)
 
     optimized_file = File(open(thumbnail_filename, 'rb'))
-    # Call _get_size() to prevent Django < 1.5 from throwing an AttributeError.
-    # This is fixed in https://github.com/django/django/commit/5c954136eaef3d98d532368deec4c19cf892f664
-    # and can be removed when we stop supporting Django 1.4
-    optimized_file._get_size()
-
     os.remove(thumbnail_filename)
 
     return optimized_file
