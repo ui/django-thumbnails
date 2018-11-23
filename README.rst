@@ -79,7 +79,7 @@ In python:
     food.image.thumbnails.all()
     food.image.thumbnails.small  # Generates "small" sized thumbnail
     food.image.thumbnails.large  # Generates "large" sized thumbnail
-    food.image.thumbnails.small.url  # Returns "small" sized thumbnail URL 
+    food.image.thumbnails.small.url  # Returns "small" sized thumbnail URL
 
 
 
@@ -111,6 +111,10 @@ To run tests::
 =========
 Changelog
 =========
+
+Version 0.2.1
+-------------
+* Add support for Django 1.11, 2.0 and 2.1
 
 Version 0.2.0
 -------------
