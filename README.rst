@@ -69,10 +69,10 @@ In python:
 
 .. code-block:: python
 
-    import thumbnails
+    from thumbnails.fields import ImageField
 
     class Food(models.Model):
-        image = thumbnails.Field()
+        image = ImageField()
 
 
     food = Food.objects.latest('id')
