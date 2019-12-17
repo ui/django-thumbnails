@@ -16,8 +16,8 @@ class ImageMeta:
 
     def __init__(self, source_name, name, size):
         self.source_name = source_name
-        self.name = name
-        self.size = size
+        self.name = compat.as_text(name)
+        self.size = compat.as_text(size)
 
     def __eq__(self, other):
         try:
@@ -110,7 +110,7 @@ class RedisBackend(BaseBackend):
         return [ImageMeta(name, thumbnail_name, size) for size, thumbnail_name in metas.items()]
 
     def get_thumbnail(self, source_name, size):
-        name = compat.as_text(self.redis.hget(self.get_thumbnail_key(source_name), size))
+        name = self.redis.hget(self.get_thumbnail_key(source_name), size)
         if name:
             return ImageMeta(source_name, name, size)
         return None

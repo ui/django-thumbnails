@@ -107,7 +107,10 @@ class RedisBackendTest(TestCase):
 
         expected = ['test-thumbnail_large.jpg', 'test-thumbnail_small.jpg']
         result = [image_meta.name for image_meta in self.backend.get_thumbnails(source_name)]
-        self.assertEqual(result.sort(), expected.sort())
+        # sort is replacing the variable in place, not returning new value, it will always return None
+        result.sort()
+        expected.sort()
+        self.assertEqual(result, expected)
 
         # Delete Source & Thumbnails
         thumbnail_key = self.backend.get_thumbnail_key(source_name)
