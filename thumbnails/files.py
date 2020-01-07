@@ -1,6 +1,7 @@
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf, images
+from .backends.metadata import ImageMeta
 from .backends.storage import get_backend
 from .images import Thumbnail, FallbackImage
 from .metadata import get_path
@@ -118,3 +119,26 @@ def exists(source_name, size=None):
 def delete(source_name, size=None):
     path = get_path(source_name, size)
     return get_backend().delete(path)
+
+
+def populate(thumbnails):
+    """
+    Regenerate thumnails, so we don't need to use images.get_thumbnail
+    when using thumbnails.get().
+    """
+    # NOTE: This is just working for redis based backend
+    if not thumbnails:
+        return
+
+    backend = thumbnails[0].metadata_backend
+    pipeline = backend.redis.pipeline()
+
+    data = dict()
+    for thumbnail in thumbnails:
+        pipeline.hgetall(thumbnail.source_image.name)
+
+    thumbnails_dict = pipeline.execute()
+    for thumbnail, data in zip(thumbnail, thumbnails_dict):
+        source_name = thumbnail.source_image.name
+        for size, name in data.items():
+            thumbnail._thumbnails[size] = ImageMeta(source_name, name, size)
