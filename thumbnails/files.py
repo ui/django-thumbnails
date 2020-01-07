@@ -121,33 +121,24 @@ def delete(source_name, size=None):
     return get_backend().delete(path)
 
 
-def populate(thumbnails):
+def populate(model, field_name):
     """
     Regenerate thumnails, so we don't need to use images.get_thumbnail
-    when using thumbnails.get().
+    when using thumbnails.get(). Currently only support redis backend.
+    Thumbnail will be skipped if can't be populated.
     """
     # NOTE: This is just working for redis based backend
-    if not thumbnails:
+    datas = eval("model.objects.exclude(%s=None)" % field_name) # noqa
+
+    try:
+        pipeline = eval("datas[0].%s.metadata_backend.redis.pipeline()" % field_name)
+    except AttributeError:
         return
 
-    backend = thumbnails[0].metadata_backend
-    pipeline = backend.redis.pipeline()
+    thumbnails = eval("[data.%s.thumbnails for data in datas]" % field_name)
 
-    data = dict()
     for thumbnail in thumbnails:
         source_name = thumbnail.source_image.name
-        meta = thumbnail.metadata_backend
-
-        try:
-            thumbnail.metadata_backend.redis
-        except AttributeError:
-            print("Backend for %s is not supported. Only redis based backend is supported. Skipped...")
-            continue
-
-        if meta != backend:
-            print("Only supports one backend at the moment. Skipped...")
-            continue
-
         pipeline.hgetall(source_name)
 
     thumbnails_dict = pipeline.execute()

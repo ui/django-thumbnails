@@ -2,6 +2,7 @@ from django.conf import settings
 
 from .utils import parse_processors
 
+print(settings.THUMBNAILS["METADATA"])
 THUMBNAILS = getattr(settings, 'THUMBNAILS', {})
 
 
