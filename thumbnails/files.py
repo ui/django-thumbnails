@@ -135,7 +135,20 @@ def populate(thumbnails):
 
     data = dict()
     for thumbnail in thumbnails:
-        pipeline.hgetall(thumbnail.source_image.name)
+        source_name = thumbnail.source_image.name
+        meta = thumbnail.metadata_backend
+
+        try:
+            thumbnail.metadata_backend.redis
+        except AttributeError:
+            print("Backend for %s is not supported. Only redis based backend is supported. Skipped...")
+            continue
+
+        if meta != backend:
+            print("Only supports one backend at the moment. Skipped...")
+            continue
+
+        pipeline.hgetall(source_name)
 
     thumbnails_dict = pipeline.execute()
     for thumbnail, data in zip(thumbnail, thumbnails_dict):
