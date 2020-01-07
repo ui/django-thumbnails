@@ -112,6 +112,11 @@ To run tests::
 Changelog
 =========
 
+Version 0.2.2
+-------------
+* Fixed a `RedisBackend.get_thumbnail()` bug that may cause excessive trips to Redis. Thanks @marsha97!
+
+
 Version 0.2.1
 -------------
 * Add support for Django 1.11, 2.0 and 2.1
