@@ -16,6 +16,7 @@ class ImageField(DjangoImageField):
         if kwargs.get('storage'):
             raise ValueError('Please define storage backend in settings.py instead on the field itself')
         kwargs['storage'] = storage.get_backend()
+        self.delete_on_update = kwargs.pop('delete_on_update', False)
         self.metadata_backend = metadata.get_backend()
         super(ImageField, self).__init__(*args, **kwargs)
 
@@ -33,7 +34,18 @@ class ImageField(DjangoImageField):
         """
         file = getattr(model_instance, self.attname)
 
+        # new file is assigned
         if file and not file._committed:
+            # detect if there are old file needs to be cleaned
+            old_file = getattr(type(model_instance).objects.get(id=model_instance.id),
+                               self.attname)
+
+            if old_file:
+                all_thumbs = [thumb for thumb in old_file.thumbnails.all()]
+                for thumb_size in all_thumbs:
+                    old_file.thumbnails.delete(thumb_size)
+                old_file.delete()
+
             image_file = file
             if self.resize_source_to:
                 file.seek(0)

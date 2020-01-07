@@ -28,6 +28,9 @@ class ThumbnailedImageFile(ImageFieldFile):
         self.metadata_backend.add_source(self.name)
         return thumbnail
 
+    def delete(self, save=True):
+        super(ThumbnailedImageFile, self).delete(save)
+
 
 class ThumbnailManager(object):
     """A class that manages creation and retrieval of thumbnails."""

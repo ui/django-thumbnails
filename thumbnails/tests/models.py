@@ -4,5 +4,5 @@ from thumbnails.fields import ImageField
 
 
 class TestModel(models.Model):
-    avatar = ImageField(upload_to='avatars', resize_source_to='source')
+    avatar = ImageField(upload_to='avatars', resize_source_to='source', delete_on_update=True)
     profile_picture = ImageField(upload_to='avatars', blank=True, null=True, resize_source_to='source')
