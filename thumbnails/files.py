@@ -129,20 +129,22 @@ def populate(model, field_name):
     """
     # NOTE: This is just working for redis based backend
     datas = eval("model.objects.exclude(%s=None)" % field_name) # noqa
-
     try:
         pipeline = eval("datas[0].%s.metadata_backend.redis.pipeline()" % field_name)
     except AttributeError:
         return
 
     thumbnails = eval("[data.%s.thumbnails for data in datas]" % field_name)
-
     for thumbnail in thumbnails:
-        source_name = thumbnail.source_image.name
-        pipeline.hgetall(source_name)
+        key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
+        pipeline.hgetall(key)
 
     thumbnails_dict = pipeline.execute()
-    for thumbnail, data in zip(thumbnail, thumbnails_dict):
+
+    for thumbnail, data in zip(thumbnails, thumbnails_dict):
         source_name = thumbnail.source_image.name
+        thumbnail._thumbnails = {}
         for size, name in data.items():
             thumbnail._thumbnails[size] = ImageMeta(source_name, name, size)
+
+    return thumbnails

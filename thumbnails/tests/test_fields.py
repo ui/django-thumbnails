@@ -6,10 +6,34 @@ from django.test import TestCase, override_settings
 
 from thumbnails import conf
 from thumbnails.files import Thumbnail, FallbackImage, populate
+from thumbnails.backends.metadata import RedisBackend
 
 from .models import TestModel
 
 
+# @override_settings(THUMBNAILS={
+#         'METADATA': {
+#             'PREFIX': 'djthumbs-test',
+#             'BACKEND': 'thumbnails.backends.metadata.RedisBackend',
+#         },
+#         'STORAGE': {
+#             'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
+#         },
+#         'BASE_DIR': 'thumbs',
+#         'SIZES': {
+#             'small': {
+#                 'PROCESSORS': [
+#                     {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
+#                 ],
+#             },
+#             'medium': {
+#                 'PROCESSORS': [
+#                     {'PATH': 'thumbnails.processors.resize', 'width': 50, 'height': 50}
+#                 ],
+#             },
+#         }
+#     }
+# )
 class ImageFieldTest(TestCase):
 
     def setUp(self):
@@ -163,35 +187,14 @@ class ImageFieldTest(TestCase):
 
         # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
         # skipped all
-        populate(TestModel, "avatar")
-        for thumbnail in thumbnails:
+        thumbs = populate(TestModel, "avatar")
+        for thumbnail in thumbs:
             self.assertEqual(thumbnail._thumbnails, {})
 
-    @override_settings(THUMBNAILS={
-            'METADATA': {
-                'PREFIX': 'djthumbs-test',
-                'BACKEND': 'thumbnails.backends.metadata.RedisBackend',
-            },
-            'STORAGE': {
-                'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
-            },
-            'BASE_DIR': 'thumbs',
-            'SIZES': {
-                'small': {
-                    'PROCESSORS': [
-                        {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
-                    ],
-                },
-                'medium': {
-                    'PROCESSORS': [
-                        {'PATH': 'thumbnails.processors.resize', 'width': 50, 'height': 50}
-                    ],
-                },
-            }
-        }
-    )
     def test_populate_redis_backend(self):
+        TestModel.objects.all().delete()
         test_objc = TestModel.objects.create()
+
         with open('thumbnails/tests/tests.png', 'rb') as image_file:
             test_objc.avatar = File(image_file)
             test_objc.save()
@@ -208,8 +211,7 @@ class ImageFieldTest(TestCase):
         for thumbnail in thumbnails:
             thumbnail._thumbnails = {}
 
-        # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
-        # skipped all
-        populate(TestModel, "avatar")
-        for thumbnail in thumbnails:
-            self.assertEqual(set(thumbnail._thumbnails.keys()), set(conf.SIZES))
+        thumbs = populate(TestModel, "avatar")
+        for thumbnail in thumbs:
+            sizes = [key.decode() for key in thumbnail._thumbnails.keys()]
+            self.assertEqual(set(sizes), set(conf.SIZES))
