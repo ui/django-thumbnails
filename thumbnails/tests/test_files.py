@@ -1,13 +1,14 @@
 import os
 
+from django.conf import settings
 from django.core.files import File
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from thumbnails import conf
-from thumbnails.backends.metadata import RedisBackend
 from thumbnails.files import populate
 from thumbnails.metadata import get_path
 
+from . import REDIS_BACKEND
 from .models import TestModel
 
 
@@ -56,16 +57,16 @@ class FilesTest(TestCase):
 
         # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
         # skipped all
-        populate(TestModel, thumbnails)
+        populate(thumbnails)
         for thumbnail in thumbnails:
             self.assertEqual(thumbnail._thumbnails, {})
 
+    @override_settings(THUMBNAILS=REDIS_BACKEND)
     def test_populate_redis_backend(self):
         TestModel.objects.all().delete()
         test_objc = TestModel.objects.create()
 
         with open('thumbnails/tests/tests.png', 'rb') as image_file:
-            test_objc.avatar.metadata_backend = RedisBackend
             test_objc.avatar = File(image_file)
             test_objc.save()
 
@@ -81,7 +82,7 @@ class FilesTest(TestCase):
         for thumbnail in thumbnails:
             thumbnail._thumbnails = {}
 
-        populate(TestModel, thumbnails)
+        populate(thumbnails)
         for thumbnail in thumbnails:
             sizes = [key.decode() for key in thumbnail._thumbnails.keys()]
             self.assertEqual(set(sizes), set(conf.SIZES))

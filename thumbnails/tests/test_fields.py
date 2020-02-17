@@ -10,29 +10,6 @@ from thumbnails.files import Thumbnail, FallbackImage
 from .models import TestModel
 
 
-# @override_settings(THUMBNAILS={
-#         'METADATA': {
-#             'PREFIX': 'djthumbs-test',
-#             'BACKEND': 'thumbnails.backends.metadata.RedisBackend',
-#         },
-#         'STORAGE': {
-#             'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
-#         },
-#         'BASE_DIR': 'thumbs',
-#         'SIZES': {
-#             'small': {
-#                 'PROCESSORS': [
-#                     {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
-#                 ],
-#             },
-#             'medium': {
-#                 'PROCESSORS': [
-#                     {'PATH': 'thumbnails.processors.resize', 'width': 50, 'height': 50}
-#                 ],
-#             },
-#         }
-#     }
-# )
 class ImageFieldTest(TestCase):
 
     def setUp(self):
