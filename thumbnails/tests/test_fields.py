@@ -2,11 +2,10 @@ import os
 
 from django.core.files import File
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from thumbnails import conf
-from thumbnails.files import Thumbnail, FallbackImage, populate
-from thumbnails.backends.metadata import RedisBackend
+from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel
 
@@ -166,52 +165,3 @@ class ImageFieldTest(TestCase):
         with open('thumbnails/tests/tests.png', 'rb') as image_file:
             self.instance.profile_picture = File(image_file)
             self.instance.save()
-
-    def test_populate_non_redis(self):
-        test_objc = TestModel.objects.create()
-        with open('thumbnails/tests/tests.png', 'rb') as image_file:
-            test_objc.avatar = File(image_file)
-            test_objc.save()
-
-        # create all thumbnails
-        objects = TestModel.objects.all()
-        thumbnails = []
-        for obj in objects:
-            for size in conf.SIZES:
-                obj.avatar.thumbnails.get(size)
-            thumbnails.append(obj.avatar.thumbnails)
-
-        # reset _thumbnails
-        for thumbnail in thumbnails:
-            thumbnail._thumbnails = {}
-
-        # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
-        # skipped all
-        thumbs = populate(TestModel, "avatar")
-        for thumbnail in thumbs:
-            self.assertEqual(thumbnail._thumbnails, {})
-
-    def test_populate_redis_backend(self):
-        TestModel.objects.all().delete()
-        test_objc = TestModel.objects.create()
-
-        with open('thumbnails/tests/tests.png', 'rb') as image_file:
-            test_objc.avatar = File(image_file)
-            test_objc.save()
-
-        # create all thumbnails
-        objects = TestModel.objects.all()
-        thumbnails = []
-        for obj in objects:
-            for size in conf.SIZES:
-                obj.avatar.thumbnails.get(size)
-            thumbnails.append(obj.avatar.thumbnails)
-
-        # reset _thumbnails
-        for thumbnail in thumbnails:
-            thumbnail._thumbnails = {}
-
-        thumbs = populate(TestModel, "avatar")
-        for thumbnail in thumbs:
-            sizes = [key.decode() for key in thumbnail._thumbnails.keys()]
-            self.assertEqual(set(sizes), set(conf.SIZES))

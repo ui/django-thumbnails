@@ -1,7 +1,7 @@
 from django.db.models.fields.files import ImageFieldFile
 
 from . import conf, images
-from .backends.metadata import ImageMeta
+from .backends.metadata import ImageMeta, RedisBackend
 from .backends.storage import get_backend
 from .images import Thumbnail, FallbackImage
 from .metadata import get_path
@@ -121,21 +121,21 @@ def delete(source_name, size=None):
     return get_backend().delete(path)
 
 
-def populate(model, field_name):
+def populate(model, thumbnails):
     """
     Regenerate thumnails, so we don't need to use images.get_thumbnail
     when using thumbnails.get(). Currently only support redis backend.
     Thumbnail will be skipped if can't be populated.
     """
     # NOTE: This is just working for redis based backend
-    datas = eval("model.objects.exclude(%s=None)" % field_name) # noqa
-    try:
-        pipeline = eval("datas[0].%s.metadata_backend.redis.pipeline()" % field_name)
-    except AttributeError:
-        return
 
-    thumbnails = eval("[data.%s.thumbnails for data in datas]" % field_name)
+    pipeline = RedisBackend().redis.pipeline()
     for thumbnail in thumbnails:
+        # skip thumbnail that does not have RedisBackend as their backend
+        if type(thumbnail.metadata_backend) is not RedisBackend:
+            thumbnails.remove(thumbnail)
+            continue
+
         key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
         pipeline.hgetall(key)
 
@@ -146,5 +146,3 @@ def populate(model, field_name):
         thumbnail._thumbnails = {}
         for size, name in data.items():
             thumbnail._thumbnails[size] = ImageMeta(source_name, name, size)
-
-    return thumbnails
