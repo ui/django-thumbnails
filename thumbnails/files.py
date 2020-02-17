@@ -121,22 +121,20 @@ def delete(source_name, size=None):
     return get_backend().delete(path)
 
 
-def populate(thumbnails):
+def populate(thumbnails, sizes=None):
     """
     Regenerate thumnails, so we don't need to use images.get_thumbnail
     when using thumbnails.get(). Currently only support redis backend.
-    Thumbnail will be ignored if can't be populated.
+    NotImeplementedError will be raised, if backend is not supported
     """
     # NOTE: This is just working for redis based backend
 
     pipeline = RedisBackend().redis.pipeline()
     for thumbnail in thumbnails:
-        # skip thumbnail that does not have RedisBackend as their backend
         try:
             key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
         except AttributeError:
-            # let hgetall results in empty dict
-            key = ""
+            raise NotImplementedError
 
         pipeline.hgetall(key)
 

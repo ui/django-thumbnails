@@ -7,9 +7,8 @@ from django.test import TestCase, override_settings
 from thumbnails import conf
 from thumbnails.files import populate
 from thumbnails.metadata import get_path
-from thumbnails.backends.metadata import get_backend
+from thumbnails.backends.metadata import RedisBackend
 
-from . import REDIS_BACKEND
 from .models import TestModel
 
 
@@ -58,13 +57,9 @@ class FilesTest(TestCase):
 
         # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
         # skipped all
-        populate(thumbnails)
-        for thumbnail in thumbnails:
-            self.assertEqual(thumbnail._thumbnails, {})
+        self.assertRaises(NotImplementedError, populate, thumbnails)
 
-    @override_settings(THUMBNAILS=REDIS_BACKEND)
     def test_populate_redis_backend(self):
-        print(get_backend())
         TestModel.objects.all().delete()
         test_objc = TestModel.objects.create()
 
@@ -76,6 +71,7 @@ class FilesTest(TestCase):
         objects = TestModel.objects.all()
         thumbnails = []
         for obj in objects:
+            obj.avatar.thumbnails.metadata_backend = RedisBackend()
             for size in conf.SIZES:
                 obj.avatar.thumbnails.get(size)
             thumbnails.append(obj.avatar.thumbnails)
