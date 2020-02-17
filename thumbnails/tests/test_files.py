@@ -7,6 +7,7 @@ from django.test import TestCase, override_settings
 from thumbnails import conf
 from thumbnails.files import populate
 from thumbnails.metadata import get_path
+from thumbnails.backends.metadata import get_backend
 
 from . import REDIS_BACKEND
 from .models import TestModel
@@ -63,6 +64,7 @@ class FilesTest(TestCase):
 
     @override_settings(THUMBNAILS=REDIS_BACKEND)
     def test_populate_redis_backend(self):
+        print(get_backend())
         TestModel.objects.all().delete()
         test_objc = TestModel.objects.create()
 
