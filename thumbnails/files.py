@@ -138,13 +138,13 @@ def populate(thumbnails, sizes=None):
     try:
         pipeline = backend.redis.pipeline()
     except AttributeError:
-        raise NotImplementedError
+        raise NotImplementedError('Only Redis metadata backend is implemented')
 
     for thumbnail in thumbnails:
         try:
             key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
         except AttributeError:
-            raise NotImplementedError
+            raise NotImplementedError('Only Redis metadata backend is implemented')
 
         if sizes:
             pipeline.hmget(key, sizes)
