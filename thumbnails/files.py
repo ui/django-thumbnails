@@ -1,7 +1,9 @@
 from django.db.models.fields.files import ImageFieldFile
 
+from thumbnails import compat
+
 from . import conf, images
-from .backends.metadata import ImageMeta, RedisBackend
+from .backends.metadata import ImageMeta
 from .backends.storage import get_backend
 from .images import Thumbnail, FallbackImage
 from .metadata import get_path
@@ -127,23 +129,40 @@ def populate(thumbnails, sizes=None):
     when using thumbnails.get(). Currently only support redis backend.
     NotImeplementedError will be raised, if backend is not supported
     """
-    # NOTE: This is just working for redis based backend
+    # NOTE: This is just working for redis based backend and same backend
+    # different backend among thumbnails may results in bugs
+    if not thumbnails:
+        return
 
-    pipeline = RedisBackend().redis.pipeline()
+    backend = thumbnails[0].metadata_backend
+    try:
+        pipeline = backend.redis.pipeline()
+    except AttributeError:
+        raise NotImplementedError
+
     for thumbnail in thumbnails:
         try:
             key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
         except AttributeError:
             raise NotImplementedError
 
-        pipeline.hgetall(key)
+        if sizes:
+            pipeline.hmget(key, sizes)
+        else:
+            pipeline.hgetall(key)
 
-    thumbnails_dict = pipeline.execute()
-
-    for thumbnail, data in zip(thumbnails, thumbnails_dict):
-        if not data:
-            continue
+    # if sizes is provided results will be list of lists, else it will be list of dicts
+    results = pipeline.execute()
+    for thumbnail, data in zip(thumbnails, results):
         source_name = thumbnail.source_image.name
         thumbnail._thumbnails = {}
-        for size, name in data.items():
-            thumbnail._thumbnails[size] = ImageMeta(source_name, name, size)
+
+        if sizes:
+            # data shold be list, thus group it with its size beforehand
+            items = zip(sizes, data)
+        else:
+            # data should be dict
+            items = data.items()
+
+        for size, name in items:
+            thumbnail._thumbnails[compat.as_text(size)] = ImageMeta(source_name, name, size)

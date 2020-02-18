@@ -82,5 +82,31 @@ class FilesTest(TestCase):
 
         populate(thumbnails)
         for thumbnail in thumbnails:
-            sizes = [key.decode() for key in thumbnail._thumbnails.keys()]
+            sizes = [size for size in thumbnail._thumbnails.keys()]
             self.assertEqual(set(sizes), set(conf.SIZES))
+
+    def test_populate_redis_backend_with_size(self):
+        TestModel.objects.all().delete()
+        test_objc = TestModel.objects.create()
+
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            test_objc.avatar = File(image_file)
+            test_objc.save()
+
+        # create all thumbnails
+        objects = TestModel.objects.all()
+        thumbnails = []
+        for obj in objects:
+            obj.avatar.thumbnails.metadata_backend = RedisBackend()
+            for size in conf.SIZES:
+                obj.avatar.thumbnails.get(size)
+            thumbnails.append(obj.avatar.thumbnails)
+
+        # reset _thumbnails
+        for thumbnail in thumbnails:
+            thumbnail._thumbnails = {}
+
+        populate(thumbnails, ['small', 'large'])
+        for thumbnail in thumbnails:
+            sizes = [size for size in thumbnail._thumbnails.keys()]
+            self.assertEqual(set(sizes), set(['small', 'large']))
