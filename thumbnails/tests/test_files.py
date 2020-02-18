@@ -61,11 +61,13 @@ class FilesTest(TestCase):
 
     def test_populate_redis_backend(self):
         TestModel.objects.all().delete()
-        test_objc = TestModel.objects.create()
 
-        with open('thumbnails/tests/tests.png', 'rb') as image_file:
-            test_objc.avatar = File(image_file)
-            test_objc.save()
+        for i in range(1, 10):
+            test_objc = TestModel.objects.create()
+
+            with open('thumbnails/tests/tests.png', 'rb') as image_file:
+                test_objc.avatar = File(image_file)
+                test_objc.save()
 
         # create all thumbnails
         objects = TestModel.objects.all()
@@ -83,15 +85,21 @@ class FilesTest(TestCase):
         populate(thumbnails)
         for thumbnail in thumbnails:
             sizes = [size for size in thumbnail._thumbnails.keys()]
+            for size in sizes:
+                # make sure it is in the correct order
+                self.assertEqual(thumbnail._thumbnails[size].source_name,
+                                 thumbnail.source_image.name)
             self.assertEqual(set(sizes), set(conf.SIZES))
 
     def test_populate_redis_backend_with_size(self):
         TestModel.objects.all().delete()
-        test_objc = TestModel.objects.create()
 
-        with open('thumbnails/tests/tests.png', 'rb') as image_file:
-            test_objc.avatar = File(image_file)
-            test_objc.save()
+        for i in range(1, 10):
+            test_objc = TestModel.objects.create()
+
+            with open('thumbnails/tests/tests.png', 'rb') as image_file:
+                test_objc.avatar = File(image_file)
+                test_objc.save()
 
         # create all thumbnails
         objects = TestModel.objects.all()
@@ -109,4 +117,8 @@ class FilesTest(TestCase):
         populate(thumbnails, ['small', 'large'])
         for thumbnail in thumbnails:
             sizes = [size for size in thumbnail._thumbnails.keys()]
+            for size in sizes:
+                # make sure it is in the correct order
+                self.assertEqual(thumbnail._thumbnails[size].source_name,
+                                 thumbnail.source_image.name)
             self.assertEqual(set(sizes), set(['small', 'large']))
