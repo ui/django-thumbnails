@@ -1,8 +1,7 @@
 import os
 
-from django.conf import settings
 from django.core.files import File
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from thumbnails import conf
 from thumbnails.files import populate
