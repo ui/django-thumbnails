@@ -56,7 +56,6 @@ class FilesTest(TestCase):
             thumbnail._thumbnails = {}
 
         # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
-        # skipped all
         self.assertRaises(NotImplementedError, populate, thumbnails)
 
     def test_populate_redis_backend(self):
