@@ -125,8 +125,8 @@ def delete(source_name, size=None):
 
 def populate(thumbnails, sizes=None):
     """
-    Regenerate thumnails, so we don't need to use images.get_thumbnail
-    when using thumbnails.get(). Currently only support redis backend.
+    Regenerate EXISTING thumbnails, so we don't need to call redis when using
+    thumbnails.get() or thumbnails.all(). Currently only support redis backend.
     NotImeplementedError will be raised, if backend is not supported
     """
     # NOTE: This is just working for redis based backend and same backend
@@ -141,10 +141,7 @@ def populate(thumbnails, sizes=None):
         raise NotImplementedError('Only Redis metadata backend is implemented')
 
     for thumbnail in thumbnails:
-        try:
-            key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
-        except AttributeError:
-            raise NotImplementedError('Only Redis metadata backend is implemented')
+        key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
 
         if sizes:
             pipeline.hmget(key, sizes)

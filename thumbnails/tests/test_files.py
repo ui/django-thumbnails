@@ -86,7 +86,7 @@ class FilesTest(TestCase):
         for thumbnail in thumbnails:
             sizes = [size for size in thumbnail._thumbnails.keys()]
             for size in sizes:
-                # make sure it is in the correct order
+                # Make sure all thumbnail sizes have the right value
                 self.assertEqual(thumbnail._thumbnails[size].source_name,
                                  thumbnail.source_image.name)
             self.assertEqual(set(sizes), set(conf.SIZES))
@@ -118,7 +118,7 @@ class FilesTest(TestCase):
         for thumbnail in thumbnails:
             sizes = [size for size in thumbnail._thumbnails.keys()]
             for size in sizes:
-                # make sure it is in the correct order
+                # Make sure all thumbnail sizes have the right value
                 self.assertEqual(thumbnail._thumbnails[size].source_name,
                                  thumbnail.source_image.name)
             self.assertEqual(set(sizes), set(['small', 'large']))
