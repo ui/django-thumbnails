@@ -3,7 +3,10 @@ import os
 
 from django.db.models import ImageField as DjangoImageField
 
+from thumbnails import compat
+
 from .backends import metadata, storage
+from .backends.metadata import ImageMeta
 from .files import ThumbnailedImageFile
 from . import processors, post_processors
 
@@ -52,3 +55,45 @@ class ImageField(DjangoImageField):
         field_class = 'django.db.models.fields.files.ImageField'
         args, kwargs = introspector(self)
         return (field_class, args, kwargs)
+
+
+def populate(thumbnails, sizes=None):
+    """
+    Regenerate EXISTING thumbnails, so we don't need to call redis when using
+    thumbnails.get() or thumbnails.all(). Currently only support redis backend.
+    NotImeplementedError will be raised, if backend is not supported
+    """
+    # NOTE: This is just working for redis based backend and same backend
+    # different backend among thumbnails may results in bugs
+    if not thumbnails:
+        return
+
+    backend = thumbnails[0].metadata_backend
+    try:
+        pipeline = backend.redis.pipeline()
+    except AttributeError:
+        raise NotImplementedError('Only Redis metadata backend is implemented')
+
+    for thumbnail in thumbnails:
+        key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
+
+        if sizes:
+            pipeline.hmget(key, sizes)
+        else:
+            pipeline.hgetall(key)
+
+    # if sizes is provided results will be list of lists, else it will be list of dicts
+    results = pipeline.execute()
+    for thumbnail, data in zip(thumbnails, results):
+        source_name = thumbnail.source_image.name
+        thumbnail._thumbnails = {}
+
+        if sizes:
+            # data shold be list, thus group it with its size beforehand
+            items = zip(sizes, data)
+        else:
+            # data should be dict
+            items = data.items()
+
+        for size, name in items:
+            thumbnail._thumbnails[compat.as_text(size)] = ImageMeta(source_name, name, size)
