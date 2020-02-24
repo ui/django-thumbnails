@@ -57,7 +57,7 @@ class ImageField(DjangoImageField):
         return (field_class, args, kwargs)
 
 
-def populate(thumbnails, sizes=None):
+def fetch(thumbnails, sizes=None):
     """
     Regenerate EXISTING thumbnails, so we don't need to call redis when using
     thumbnails.get() or thumbnails.all(). Currently only support redis backend.

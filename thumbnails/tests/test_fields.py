@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from thumbnails import conf
 from thumbnails.backends.metadata import RedisBackend
-from thumbnails.fields import populate
+from thumbnails.fields import fetch
 from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel
@@ -164,7 +164,7 @@ class ImageFieldTest(TestCase):
             thumbnail._thumbnails = {}
 
         # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
-        self.assertRaises(NotImplementedError, populate, thumbnails)
+        self.assertRaises(NotImplementedError, fetch, thumbnails)
 
     def test_populate_redis_backend(self):
         TestModel.objects.all().delete()
@@ -189,7 +189,7 @@ class ImageFieldTest(TestCase):
         for thumbnail in thumbnails:
             thumbnail._thumbnails = {}
 
-        populate(thumbnails)
+        fetch(thumbnails)
         for thumbnail in thumbnails:
             sizes = [size for size in thumbnail._thumbnails.keys()]
             for size in sizes:
@@ -221,7 +221,7 @@ class ImageFieldTest(TestCase):
         for thumbnail in thumbnails:
             thumbnail._thumbnails = {}
 
-        populate(thumbnails, ['small', 'large'])
+        fetch(thumbnails, ['small', 'large'])
         for thumbnail in thumbnails:
             sizes = [size for size in thumbnail._thumbnails.keys()]
             for size in sizes:
