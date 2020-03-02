@@ -5,6 +5,8 @@ from django.template import Context, Template
 from django.test import TestCase
 
 from thumbnails import conf
+from thumbnails.backends.metadata import RedisBackend
+from thumbnails.fields import fetch
 from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel
@@ -142,3 +144,88 @@ class ImageFieldTest(TestCase):
         with open('thumbnails/tests/tests.png', 'rb') as image_file:
             self.instance.profile_picture = File(image_file)
             self.instance.save()
+
+    def test_populate_non_redis(self):
+        test_objc = TestModel.objects.create()
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            test_objc.avatar = File(image_file)
+            test_objc.save()
+
+        # create all thumbnails
+        objects = TestModel.objects.all()
+        thumbnails = []
+        for obj in objects:
+            for size in conf.SIZES:
+                obj.avatar.thumbnails.get(size)
+            thumbnails.append(obj.avatar.thumbnails)
+
+        # reset _thumbnails
+        for thumbnail in thumbnails:
+            thumbnail._thumbnails = {}
+
+        # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
+        self.assertRaises(NotImplementedError, fetch, thumbnails)
+
+    def test_populate_redis_backend(self):
+        TestModel.objects.all().delete()
+
+        for i in range(1, 10):
+            test_objc = TestModel.objects.create()
+
+            with open('thumbnails/tests/tests.png', 'rb') as image_file:
+                test_objc.avatar = File(image_file)
+                test_objc.save()
+
+        # create all thumbnails
+        objects = TestModel.objects.all()
+        thumbnails = []
+        for obj in objects:
+            obj.avatar.thumbnails.metadata_backend = RedisBackend()
+            for size in conf.SIZES:
+                obj.avatar.thumbnails.get(size)
+            thumbnails.append(obj.avatar.thumbnails)
+
+        # reset _thumbnails
+        for thumbnail in thumbnails:
+            thumbnail._thumbnails = {}
+
+        fetch(thumbnails)
+        for thumbnail in thumbnails:
+            sizes = [size for size in thumbnail._thumbnails.keys()]
+            for size in sizes:
+                # Make sure all thumbnail sizes have the right value
+                self.assertEqual(thumbnail._thumbnails[size].source_name,
+                                 thumbnail.source_image.name)
+            self.assertEqual(set(sizes), set(conf.SIZES))
+
+    def test_populate_redis_backend_with_size(self):
+        TestModel.objects.all().delete()
+
+        for i in range(1, 10):
+            test_objc = TestModel.objects.create()
+
+            with open('thumbnails/tests/tests.png', 'rb') as image_file:
+                test_objc.avatar = File(image_file)
+                test_objc.save()
+
+        # create all thumbnails
+        objects = TestModel.objects.all()
+        thumbnails = []
+        for obj in objects:
+            obj.avatar.thumbnails.metadata_backend = RedisBackend()
+            for size in conf.SIZES:
+                obj.avatar.thumbnails.get(size)
+            thumbnails.append(obj.avatar.thumbnails)
+
+        # reset _thumbnails
+        for thumbnail in thumbnails:
+            thumbnail._thumbnails = {}
+
+        fetch(thumbnails, ['small', 'large'])
+        for thumbnail in thumbnails:
+            sizes = [size for size in thumbnail._thumbnails.keys()]
+            for size in sizes:
+                # Make sure all thumbnail sizes have the right value
+                self.assertEqual(thumbnail._thumbnails[size].source_name,
+                                 thumbnail.source_image.name)
+            self.assertEqual(set(sizes), set(['small', 'large']))

@@ -94,6 +94,17 @@ In python:
     Processors are applied sequentially in the same order of definition.
 
 
+
+We can use `fetch` feature to fetch created thumbnails. This feature use `redis' pipeline`, so we don't need to use `redis.hget..()` numerous times.
+.. code-block:: python
+    from thumbnails.field import fetch
+
+    fetch([thumbnail1, thumbnail2], ['size_small', 'size_medium', 'size_large'])
+
+This way, when we get thumbnails like `thumbnail1.size_small` or even `thumbnail1.all()` we won't query to `redis` anymore.
+But, please note this feature is currently only available for `RedisBackend`.
+
+
 Management Commands
 -------------------
 If you changed your size definition and want to regenerate the thumbnails, use::
@@ -111,6 +122,11 @@ To run tests::
 =========
 Changelog
 =========
+
+Version 0.2.2
+-------------
+* Fixed a `RedisBackend.get_thumbnail()` bug that may cause excessive trips to Redis. Thanks @marsha97!
+
 
 Version 0.2.1
 -------------
