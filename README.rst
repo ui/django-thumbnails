@@ -96,7 +96,9 @@ In python:
 
 
 We can use `fetch` feature to fetch created thumbnails. This feature use `redis' pipeline`, so we don't need to use `redis.hget..()` numerous times.
+
 .. code-block:: python
+
     from thumbnails.field import fetch
 
     fetch([thumbnail1, thumbnail2], ['size_small', 'size_medium', 'size_large'])
