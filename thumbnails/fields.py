@@ -57,7 +57,7 @@ class ImageField(DjangoImageField):
         return (field_class, args, kwargs)
 
 
-def fetch(thumbnails, sizes=None):
+def fetch_thumbnails(images, sizes=None):
     """
     Regenerate EXISTING thumbnails, so we don't need to call redis when using
     thumbnails.get() or thumbnails.all(). Currently only support redis backend.
@@ -65,17 +65,18 @@ def fetch(thumbnails, sizes=None):
     """
     # NOTE: This is just working for redis based backend and same backend
     # different backend among thumbnails may results in bugs
-    if not thumbnails:
+    if not images:
         return
 
-    backend = thumbnails[0].metadata_backend
+    backend = images[0].thumbnails.metadata_backend
     try:
         pipeline = backend.redis.pipeline()
     except AttributeError:
         raise NotImplementedError('Only Redis metadata backend is implemented')
 
-    for thumbnail in thumbnails:
-        key = thumbnail.metadata_backend.get_thumbnail_key(thumbnail.source_image.name)
+    for image in images:
+        thumbnails = image.thumbnails
+        key = thumbnails.metadata_backend.get_thumbnail_key(thumbnails.source_image.name)
 
         if sizes:
             pipeline.hmget(key, sizes)
@@ -84,9 +85,10 @@ def fetch(thumbnails, sizes=None):
 
     # if sizes is provided results will be list of lists, else it will be list of dicts
     results = pipeline.execute()
-    for thumbnail, data in zip(thumbnails, results):
-        source_name = thumbnail.source_image.name
-        thumbnail._thumbnails = {}
+    for image, data in zip(images, results):
+        thumbnails = image.thumbnails
+        source_name = thumbnails.source_image.name
+        thumbnails._thumbnails = {}
 
         if sizes:
             # data shold be list, thus group it with its size beforehand
@@ -96,4 +98,4 @@ def fetch(thumbnails, sizes=None):
             items = data.items()
 
         for size, name in items:
-            thumbnail._thumbnails[compat.as_text(size)] = ImageMeta(source_name, name, size)
+            thumbnails._thumbnails[compat.as_text(size)] = ImageMeta(source_name, name, size)

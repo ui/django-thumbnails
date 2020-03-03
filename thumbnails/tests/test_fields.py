@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from thumbnails import conf
 from thumbnails.backends.metadata import RedisBackend
-from thumbnails.fields import fetch
+from thumbnails.fields import fetch_thumbnails
 from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel
@@ -145,7 +145,7 @@ class ImageFieldTest(TestCase):
             self.instance.profile_picture = File(image_file)
             self.instance.save()
 
-    def test_populate_non_redis(self):
+    def test_fetch_non_redis(self):
         test_objc = TestModel.objects.create()
         with open('thumbnails/tests/tests.png', 'rb') as image_file:
             test_objc.avatar = File(image_file)
@@ -153,20 +153,20 @@ class ImageFieldTest(TestCase):
 
         # create all thumbnails
         objects = TestModel.objects.all()
-        thumbnails = []
+        images = []
         for obj in objects:
             for size in conf.SIZES:
                 obj.avatar.thumbnails.get(size)
-            thumbnails.append(obj.avatar.thumbnails)
+            images.append(obj.avatar)
 
         # reset _thumbnails
-        for thumbnail in thumbnails:
-            thumbnail._thumbnails = {}
+        for image in images:
+            image.thumbnails._thumbnails = {}
 
         # default backend(thumbnails.backends.metadata.DatabaseBackend) is not supported
-        self.assertRaises(NotImplementedError, fetch, thumbnails)
+        self.assertRaises(NotImplementedError, fetch_thumbnails, images)
 
-    def test_populate_redis_backend(self):
+    def test_fetch_redis_backend(self):
         TestModel.objects.all().delete()
 
         for i in range(1, 10):
@@ -178,24 +178,25 @@ class ImageFieldTest(TestCase):
 
         # create all thumbnails
         objects = TestModel.objects.all()
-        thumbnails = []
+        images = []
         for obj in objects:
             obj.avatar.thumbnails.metadata_backend = RedisBackend()
             for size in conf.SIZES:
                 obj.avatar.thumbnails.get(size)
-            thumbnails.append(obj.avatar.thumbnails)
+            images.append(obj.avatar)
 
         # reset _thumbnails
-        for thumbnail in thumbnails:
-            thumbnail._thumbnails = {}
+        for image in images:
+            image.thumbnails._thumbnails = {}
 
-        fetch(thumbnails)
-        for thumbnail in thumbnails:
-            sizes = [size for size in thumbnail._thumbnails.keys()]
+        fetch_thumbnails(images)
+        for image in images:
+            thumbnails = image.thumbnails
+            sizes = [size for size in thumbnails._thumbnails.keys()]
             for size in sizes:
                 # Make sure all thumbnail sizes have the right value
-                self.assertEqual(thumbnail._thumbnails[size].source_name,
-                                 thumbnail.source_image.name)
+                self.assertEqual(thumbnails._thumbnails[size].source_name,
+                                 thumbnails.source_image.name)
             self.assertEqual(set(sizes), set(conf.SIZES))
 
     def test_populate_redis_backend_with_size(self):
@@ -210,22 +211,23 @@ class ImageFieldTest(TestCase):
 
         # create all thumbnails
         objects = TestModel.objects.all()
-        thumbnails = []
+        images = []
         for obj in objects:
             obj.avatar.thumbnails.metadata_backend = RedisBackend()
             for size in conf.SIZES:
                 obj.avatar.thumbnails.get(size)
-            thumbnails.append(obj.avatar.thumbnails)
+            images.append(obj.avatar)
 
         # reset _thumbnails
-        for thumbnail in thumbnails:
-            thumbnail._thumbnails = {}
+        for image in images:
+            image.thumbnails._thumbnails = {}
 
-        fetch(thumbnails, ['small', 'large'])
-        for thumbnail in thumbnails:
-            sizes = [size for size in thumbnail._thumbnails.keys()]
+        fetch_thumbnails(images, ['small', 'large'])
+        for image in images:
+            thumbnails = image.thumbnails
+            sizes = [size for size in thumbnails._thumbnails.keys()]
             for size in sizes:
                 # Make sure all thumbnail sizes have the right value
-                self.assertEqual(thumbnail._thumbnails[size].source_name,
-                                 thumbnail.source_image.name)
+                self.assertEqual(thumbnails._thumbnails[size].source_name,
+                                 thumbnails.source_image.name)
             self.assertEqual(set(sizes), set(['small', 'large']))
