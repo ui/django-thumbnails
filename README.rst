@@ -94,18 +94,22 @@ In python:
     Processors are applied sequentially in the same order of definition.
 
 
+Performance
+-----------
 
-We can use `fetch` feature to fetch created thumbnails. This feature use `redis' pipeline`, so we don't need to use `redis.hget..()` numerous times.
+If you need to fetch multiple thumbnails at once, use ``fetch`` function for better performance. ``fetch`` uses Redis pipeline to retrieve thumbnail metadata in one go, avoiding multiple round trips to Redis.
 
 .. code-block:: python
 
     from thumbnails.field import fetch
 
-    fetch([thumbnail1, thumbnail2], ['size_small', 'size_medium', 'size_large'])
+    food_a = Food.objects.get(id=1)
+    food_b = Food.objects.get(id=2)
+
+    fetch([food_a.image, food_b.image], ['small', 'large'])
 
 This way, when we get thumbnails like `thumbnail1.size_small` or even `thumbnail1.all()` we won't query to `redis` anymore.
-But, please note this feature is currently only available for `RedisBackend`.
-
+This feature is currently only available for `RedisBackend`.
 
 Management Commands
 -------------------
