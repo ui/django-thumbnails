@@ -3,7 +3,7 @@
 Design:
 
 * Uses Django Storage API
-* Uses flexible meta data store. Database and Redis metadata backend supported at the moment.
+* Uses flexible meta data store. Supports DB and Redis backend.
 
 Installation
 ------------
@@ -129,10 +129,13 @@ To run tests::
 Changelog
 =========
 
+Version 0.3.0
+-------------
+* Added `fetch()` command to fetch multiple thumbnail metadata from Redis. Thanks @marsha97!
+
 Version 0.2.2
 -------------
-* Fixed a `RedisBackend.get_thumbnail()` bug that may cause excessive trips to Redis. Thanks @marsha97!
-
+* Fixed `RedisBackend.get_thumbnail()` bug that may cause excessive trips to Redis. Thanks @marsha97!
 
 Version 0.2.1
 -------------
