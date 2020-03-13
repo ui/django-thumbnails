@@ -195,8 +195,8 @@ class ImageFieldTest(TestCase):
             sizes = [size for size in thumbnails._thumbnails.keys()]
             for size in sizes:
                 # Make sure all thumbnail sizes have the right value
-                self.assertEqual(thumbnails._thumbnails[size].source_name,
-                                 thumbnails.source_image.name)
+                self.assertEqual(thumbnails._thumbnails[size].name,
+                                 thumbnails.get(size).name)
             self.assertEqual(set(sizes), set(conf.SIZES))
 
     def test_populate_redis_backend_with_size(self):
@@ -228,6 +228,6 @@ class ImageFieldTest(TestCase):
             sizes = [size for size in thumbnails._thumbnails.keys()]
             for size in sizes:
                 # Make sure all thumbnail sizes have the right value
-                self.assertEqual(thumbnails._thumbnails[size].source_name,
-                                 thumbnails.source_image.name)
+                self.assertEqual(thumbnails._thumbnails[size].name,
+                                 thumbnails.get(size).name)
             self.assertEqual(set(sizes), set(['small', 'large']))
