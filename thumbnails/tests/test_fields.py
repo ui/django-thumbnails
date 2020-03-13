@@ -176,14 +176,22 @@ class ImageFieldTest(TestCase):
                 test_objc.avatar = File(image_file)
                 test_objc.save()
 
-        # create all thumbnails
-        objects = TestModel.objects.all()
         images = []
+        objects = TestModel.objects.all()
+        # test pre-created thumbnails
         for obj in objects:
             obj.avatar.thumbnails.metadata_backend = RedisBackend()
-            for size in conf.SIZES:
-                obj.avatar.thumbnails.get(size)
             images.append(obj.avatar)
+
+        # make sure cache is still empty, so it can be generated freshly
+        fetch_thumbnails(images)
+        for image in images:
+            self.assertEqual(image.thumbnails._thumbnails, {})
+
+        # create all thumbnails
+        for image in images:
+            for size in conf.SIZES:
+                image.thumbnails.get(size)
 
         # reset _thumbnails
         for image in images:
