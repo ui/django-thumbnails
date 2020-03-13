@@ -8,6 +8,7 @@ from thumbnails import compat
 from .backends import metadata, storage
 from .backends.metadata import ImageMeta
 from .files import ThumbnailedImageFile
+from .images import Thumbnail
 from . import processors, post_processors
 
 
@@ -98,4 +99,5 @@ def fetch_thumbnails(images, sizes=None):
             items = data.items()
 
         for size, name in items:
-            thumbnails._thumbnails[compat.as_text(size)] = ImageMeta(source_name, name, size)
+            image_meta = ImageMeta(source_name, name, size)
+            thumbnails._thumbnails[compat.as_text(size)] = Thumbnail(image_meta, thumbnails.storage)
