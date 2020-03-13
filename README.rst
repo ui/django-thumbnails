@@ -101,12 +101,12 @@ If you need to fetch multiple thumbnails at once, use ``fetch`` function for bet
 
 .. code-block:: python
 
-    from thumbnails.field import fetch
+    from thumbnails.field import fetch_thumbnails
 
     food_a = Food.objects.get(id=1)
     food_b = Food.objects.get(id=2)
 
-    fetch([food_a.image, food_b.image], ['small', 'large'])
+    fetch_thumbnails([food_a.image, food_b.image], ['small', 'large'])
 
 This way, when we get thumbnails like `thumbnail1.size_small` or even `thumbnail1.all()` we won't query to `redis` anymore.
 This feature is currently only available for `RedisBackend`.
