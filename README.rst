@@ -3,7 +3,7 @@
 Design:
 
 * Uses Django Storage API
-* Uses flexible meta data store. Database and Redis metadata backend supported at the moment.
+* Uses flexible meta data store. Supports DB and Redis backend.
 
 Installation
 ------------
@@ -94,18 +94,22 @@ In python:
     Processors are applied sequentially in the same order of definition.
 
 
+Performance
+-----------
 
-We can use `fetch` feature to fetch created thumbnails. This feature use `redis' pipeline`, so we don't need to use `redis.hget..()` numerous times.
+If you need to fetch multiple thumbnails at once, use ``fetch`` function for better performance. ``fetch`` uses Redis pipeline to retrieve thumbnail metadata in one go, avoiding multiple round trips to Redis.
 
 .. code-block:: python
 
     from thumbnails.field import fetch
 
-    fetch([thumbnail1, thumbnail2], ['size_small', 'size_medium', 'size_large'])
+    food_a = Food.objects.get(id=1)
+    food_b = Food.objects.get(id=2)
+
+    fetch([food_a.image, food_b.image], ['small', 'large'])
 
 This way, when we get thumbnails like `thumbnail1.size_small` or even `thumbnail1.all()` we won't query to `redis` anymore.
-But, please note this feature is currently only available for `RedisBackend`.
-
+This feature is currently only available for `RedisBackend`.
 
 Management Commands
 -------------------
@@ -125,10 +129,13 @@ To run tests::
 Changelog
 =========
 
+Version 0.3.0
+-------------
+* Added `fetch()` command to fetch multiple thumbnail metadata from Redis. Thanks @marsha97!
+
 Version 0.2.2
 -------------
-* Fixed a `RedisBackend.get_thumbnail()` bug that may cause excessive trips to Redis. Thanks @marsha97!
-
+* Fixed `RedisBackend.get_thumbnail()` bug that may cause excessive trips to Redis. Thanks @marsha97!
 
 Version 0.2.1
 -------------
