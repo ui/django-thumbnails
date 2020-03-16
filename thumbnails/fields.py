@@ -99,5 +99,7 @@ def fetch_thumbnails(images, sizes=None):
             items = data.items()
 
         for size, name in items:
+            if not name:
+                continue
             image_meta = ImageMeta(source_name, name, size)
             thumbnails._thumbnails[compat.as_text(size)] = Thumbnail(image_meta, thumbnails.storage)
