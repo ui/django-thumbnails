@@ -5,6 +5,9 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
