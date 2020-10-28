@@ -68,3 +68,19 @@ def process(file, size):
     #print dir(image_file)
 
     return image_file
+
+
+def convert(file, extension):
+    """
+    Convert an image based on given extension parameter
+    """
+    raw_image = images.from_file(file)
+    # Format image
+    raw_image.format = extension
+
+    # write to Content File
+    image_io = io.BytesIO()
+    raw_image.save(file=image_io)
+    image_file = ContentFile(image_io.getvalue())
+
+    return image_file

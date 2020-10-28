@@ -45,6 +45,31 @@ class ImageFieldTest(TestCase):
         self.instance.avatar.thumbnails.delete(size='small')
         self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
 
+        # Test convert png image to webp image
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.card_identity_picture = File(image_file)
+            self.instance.save()
+
+        identity_card_folder = \
+            os.path.join(self.instance.card_identity_picture.storage.temporary_location, conf.BASE_DIR, 'identity_card')
+        identity_picture_basename = os.path.basename(self.instance.card_identity_picture.path)
+        identity_filename, identity_ext = os.path.splitext(identity_picture_basename)
+        self.assertEqual(identity_ext, '.webp')
+
+        # After convert to webp, make sure this should be running as normal
+        # 1. Test for thumbnail creation
+        self.assertFalse(os.path.isfile(os.path.join(identity_card_folder, identity_filename + '_small' + identity_ext)))
+        thumb = self.instance.card_identity_picture.thumbnails.create(size='small')
+        self.assertTrue(os.path.isfile(os.path.join(identity_card_folder, identity_filename + '_small' + identity_ext)))
+
+        # 2. Test for getting thumbnail
+        self.assertEqual(thumb, self.instance.card_identity_picture.thumbnails.get(size='small'))
+
+        # 3. Test for thumbnail deletion
+        self.assertTrue(os.path.isfile(os.path.join(identity_card_folder, identity_filename + '_small' + identity_ext)))
+        self.instance.card_identity_picture.thumbnails.delete(size='small')
+        self.assertFalse(os.path.isfile(os.path.join(identity_card_folder, identity_filename + '_small' + identity_ext)))
+
     def test_thumbnail_field(self):
         # Make sure ThumbnailManager return the correct thumbnail
         self.assertTrue(self.instance.avatar.thumbnails.small, Thumbnail)
