@@ -9,7 +9,7 @@ from .backends import metadata, storage
 from .backends.metadata import ImageMeta
 from .files import ThumbnailedImageFile
 from .images import Thumbnail
-from . import processors, post_processors
+from . import processors, post_processors, conf
 
 
 class ImageField(DjangoImageField):
@@ -17,6 +17,7 @@ class ImageField(DjangoImageField):
 
     def __init__(self, *args, **kwargs):
         self.resize_source_to = kwargs.pop('resize_source_to', None)
+        self.convert_to = kwargs.pop('convert_to', None)
         if kwargs.get('storage'):
             raise ValueError('Please define storage backend in settings.py instead on the field itself')
         kwargs['storage'] = storage.get_backend()
@@ -39,11 +40,20 @@ class ImageField(DjangoImageField):
 
         if file and not file._committed:
             image_file = file
+            file_name = file.name
+
             if self.resize_source_to:
                 file.seek(0)
                 image_file = processors.process(file, self.resize_source_to)
                 image_file = post_processors.process(image_file, self.resize_source_to)
-            filename = str(shortuuid.uuid()) + os.path.splitext(file.name)[1]
+
+            if self.convert_to:
+                file.seek(0)
+                image_file = processors.convert(image_file, self.convert_to)
+                file_type = conf.FORMAT[self.convert_to]
+                file_name = os.path.splitext(file.name)[0] + f".{file_type}"
+
+            filename = str(shortuuid.uuid()) + os.path.splitext(file_name)[1]
             file.save(filename, image_file, save=False)
         return file
 
