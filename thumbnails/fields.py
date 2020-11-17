@@ -50,7 +50,8 @@ class ImageField(DjangoImageField):
             if self.convert_to:
                 file.seek(0)
                 image_file = processors.convert(image_file, self.convert_to)
-                file_name = os.path.splitext(file.name)[0] + f'.{conf.FORMAT[self.convert_to]}'
+                file_type = conf.FORMAT[self.convert_to]
+                file_name = os.path.splitext(file.name)[0] + f".{file_type}"
 
             filename = str(shortuuid.uuid()) + os.path.splitext(file_name)[1]
             file.save(filename, image_file, save=False)
