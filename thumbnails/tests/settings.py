@@ -40,6 +40,15 @@ THUMBNAILS = {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASE_DIR': 'thumbs',
+    'FORMAT': {
+        'JPEG': 'jpg',
+        'GIF': 'gif',
+        'PNG': 'png',
+        'PDF': 'pdf',
+        'TIFF': 'tif',
+        'BMP': 'bmp',
+        'WEBP': 'webp'
+    },
     'SIZES': {
         'small': {
             'PROCESSORS': [
@@ -66,7 +75,7 @@ THUMBNAILS = {
         'source': {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 90, 'height': 90}
-            ]
+            ],
         }
     }
 }

@@ -73,9 +73,10 @@ def convert(file, extension):
     """
     Convert an image based on given extension parameter
     """
+    from . import conf
     raw_image = images.from_file(file)
     # Format image
-    raw_image.format = extension
+    raw_image.format = conf.FORMAT[extension]
 
     # write to Content File
     image_io = io.BytesIO()
