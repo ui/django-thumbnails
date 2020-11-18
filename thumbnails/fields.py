@@ -47,11 +47,9 @@ class ImageField(DjangoImageField):
                 image_file = processors.process(file, self.resize_source_to)
                 image_file = post_processors.process(image_file, self.resize_source_to)
 
-            if self.convert_to:
-                file.seek(0)
-                image_file = processors.convert(image_file, self.convert_to)
-                file_type = conf.FORMAT[self.convert_to]
-                file_name = os.path.splitext(file.name)[0] + ".{}".format(file_type)
+                if 'FORMAT' in conf.SIZES[self.resize_source_to]:
+                    file_type = conf.SIZES[self.resize_source_to]['FORMAT']
+                    file_name = os.path.splitext(file.name)[0] + ".{}".format(file_type)
 
             filename = str(shortuuid.uuid()) + os.path.splitext(file_name)[1]
             file.save(filename, image_file, save=False)

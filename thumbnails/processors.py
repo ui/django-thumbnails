@@ -58,25 +58,13 @@ def process(file, size):
 
     # run through all processors, if defined
     size_dict = conf.SIZES[size]
+
+    # Format image if FORMAT defined in settings
+    if 'FORMAT' in size_dict:
+        raw_image.format = conf.SIZES[size]['FORMAT']
+
     for processor in size_dict['PROCESSORS']:
         raw_image = processor['processor'](raw_image, **processor['kwargs'])
-
-    # write to Content File
-    image_io = io.BytesIO()
-    raw_image.save(file=image_io)
-    image_file = ContentFile(image_io.getvalue())
-
-    return image_file
-
-
-def convert(file, extension):
-    """
-    Convert an image based on given extension parameter
-    """
-    from . import conf
-    raw_image = images.from_file(file)
-    # Format image
-    raw_image.format = conf.FORMAT[extension]
 
     # write to Content File
     image_io = io.BytesIO()

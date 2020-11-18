@@ -73,17 +73,6 @@ class ImageFieldTest(TestCase):
         self.instance.card_identity_picture.thumbnails.delete(size='small')
         self.assertFalse(os.path.isfile(os.path.join(self.identity_card_folder, self.identity_filename + '_small' + self.identity_ext)))
 
-        # Test convert png image to webp image, ImageField without resize
-        with open('thumbnails/tests/tests.png', 'rb') as image_file:
-            self.instance.driving_license_card = File(image_file)
-            self.instance.save()
-
-        identity_card_folder = \
-            os.path.join(self.instance.driving_license_card.storage.temporary_location, conf.BASE_DIR, 'identity_card')
-        identity_picture_basename = os.path.basename(self.instance.driving_license_card.path)
-        identity_filename, identity_ext = os.path.splitext(identity_picture_basename)
-        self.assertEqual(identity_ext, '.webp')
-
     def test_thumbnail_field(self):
         # Make sure ThumbnailManager return the correct thumbnail
         self.assertTrue(self.instance.avatar.thumbnails.small, Thumbnail)
@@ -119,12 +108,12 @@ class ImageFieldTest(TestCase):
 
         # Test for name clashing with another file with the same name
         self.instance.card_identity_picture.thumbnails.delete('large')
-        open(os.path.join(self.identity_card_folder, 'tests_large.png'), 'w').close()
+        open(os.path.join(self.identity_card_folder, 'tests_large.webp'), 'w').close()
         self.instance.card_identity_picture.thumbnails.create('large')
 
         # Due to uuid4 for file name, this should not clash
         self.assertNotEqual(os.path.basename(self.instance.card_identity_picture.thumbnails.large.name),
-                            'tests_large.png')
+                            'tests_large.webp')
 
     def test_thumbnails_cache(self):
 

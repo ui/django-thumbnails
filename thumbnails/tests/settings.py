@@ -40,20 +40,12 @@ THUMBNAILS = {
         'BACKEND': 'thumbnails.tests.storage.TemporaryStorage'
     },
     'BASE_DIR': 'thumbs',
-    'FORMAT': {
-        'JPEG': 'jpg',
-        'GIF': 'gif',
-        'PNG': 'png',
-        'PDF': 'pdf',
-        'TIFF': 'tif',
-        'BMP': 'bmp',
-        'WEBP': 'webp'
-    },
     'SIZES': {
         'small': {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
             ],
+            'FORMAT': 'webp',
         },
         'default': {
             'FALLBACK_IMAGE_URL': 'thumbnails/tests/tests.png',
