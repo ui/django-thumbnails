@@ -40,6 +40,7 @@ class ImageField(DjangoImageField):
         if file and not file._committed:
             image_file = file
             original_filename = file.name
+            file_type = os.path.splitext(original_filename)[1]
 
             if self.resize_source_to:
                 file.seek(0)
@@ -48,8 +49,6 @@ class ImageField(DjangoImageField):
 
                 if 'FORMAT' in conf.SIZES[self.resize_source_to]:
                     file_type = ".{}".format(conf.SIZES[self.resize_source_to]['FORMAT'])
-                else:
-                    file_type = os.path.splitext(original_filename)[1]
 
             filename = str(shortuuid.uuid()) + file_type
             file.save(filename, image_file, save=False)
