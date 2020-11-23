@@ -95,6 +95,10 @@ class ImageFieldTest(TestCase):
         self.assertNotEqual(os.path.basename(self.instance.avatar.thumbnails.large.name),
                             'tests_large.png')
 
+        # Create Thumbnail with source_with_format, formated image with 'webp'
+        self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.source_with_format.name),
+                         self.filename + '_source_with_format' + '.webp')
+
         # Make sure ThumbnailManager return the correct thumbnail with Image Convert (webp)
         self.assertTrue(self.instance.card_identity_picture.thumbnails.small, Thumbnail)
         self.assertEqual(os.path.basename(self.instance.card_identity_picture.thumbnails.small.name),
@@ -280,6 +284,16 @@ class ImageFieldTest(TestCase):
                                  thumbnails.get(size).name)
             self.assertEqual(set(sizes), set(conf.SIZES))
 
+        fetch_thumbnails(images, ['source_with_format'])
+        for image in images:
+            thumbnails = image.thumbnails
+            sizes = [size for size in thumbnails._thumbnails.keys()]
+            self.assertEqual(thumbnails._thumbnails['source_with_format'].name,
+                             thumbnails.get('source_with_format').name)
+            self.assertEqual(sizes, ['source_with_format'])
+            self.assertEqual(os.path.splitext(thumbnails._thumbnails['source_with_format'].name)[1],
+                             '.webp')
+
     def test_populate_redis_backend_with_size(self):
         TestModel.objects.all().delete()
 
@@ -303,7 +317,7 @@ class ImageFieldTest(TestCase):
         for image in images:
             image.thumbnails._thumbnails = {}
 
-        fetch_thumbnails(images, ['small', 'large'])
+        fetch_thumbnails(images, ['small', 'large', 'source_with_format'])
         for image in images:
             thumbnails = image.thumbnails
             sizes = [size for size in thumbnails._thumbnails.keys()]
@@ -311,4 +325,4 @@ class ImageFieldTest(TestCase):
                 # Make sure all thumbnail sizes have the right value
                 self.assertEqual(thumbnails._thumbnails[size].name,
                                  thumbnails.get(size).name)
-            self.assertEqual(set(sizes), set(['small', 'large']))
+            self.assertEqual(set(sizes), set(['small', 'large', 'source_with_format']))

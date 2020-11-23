@@ -44,8 +44,7 @@ THUMBNAILS = {
         'small': {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10}
-            ],
-            'FORMAT': 'webp',
+            ]
         },
         'default': {
             'FALLBACK_IMAGE_URL': 'thumbnails/tests/tests.png',
@@ -68,6 +67,12 @@ THUMBNAILS = {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 90, 'height': 90}
             ]
+        },
+        'source_with_format': {
+            'PROCESSORS': [
+                {'PATH': 'thumbnails.processors.resize', 'width': 90, 'height': 90}
+            ],
+            'FORMAT': 'webp',
         }
     }
 }

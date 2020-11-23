@@ -39,7 +39,7 @@ class ImageField(DjangoImageField):
 
         if file and not file._committed:
             image_file = file
-            file_name = file.name
+            original_filename = file.name
 
             if self.resize_source_to:
                 file.seek(0)
@@ -47,10 +47,11 @@ class ImageField(DjangoImageField):
                 image_file = post_processors.process(image_file, self.resize_source_to)
 
                 if 'FORMAT' in conf.SIZES[self.resize_source_to]:
-                    file_type = conf.SIZES[self.resize_source_to]['FORMAT']
-                    file_name = os.path.splitext(file.name)[0] + ".{}".format(file_type)
+                    file_type = ".{}".format(conf.SIZES[self.resize_source_to]['FORMAT'])
+                else:
+                    file_type = os.path.splitext(original_filename)[1]
 
-            filename = str(shortuuid.uuid()) + os.path.splitext(file_name)[1]
+            filename = str(shortuuid.uuid()) + file_type
             file.save(filename, image_file, save=False)
         return file
 
@@ -85,7 +86,6 @@ def fetch_thumbnails(images, sizes=None):
     for image in images:
         thumbnails = image.thumbnails
         key = thumbnails.metadata_backend.get_thumbnail_key(thumbnails.source_image.name)
-
         if sizes:
             pipeline.hmget(key, sizes)
         else:
