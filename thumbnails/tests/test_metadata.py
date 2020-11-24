@@ -79,6 +79,7 @@ class RedisBackendTest(TestCase):
     def test_get_source(self):
         source_name = 'test-thumbnail.jpg'
         source_key = self.backend.get_source_key(source_name)
+
         self.redis.hset(source_key, source_name, source_name)
         self.assertEqual(self.backend.get_source(source_name), source_name)
 
