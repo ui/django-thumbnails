@@ -61,7 +61,7 @@ def process(file, size):
 
     # Format image if FORMAT defined in settings
     if 'FORMAT' in size_dict:
-        raw_image.format = conf.SIZES[size]['FORMAT']
+        raw_image.format = size_dict['FORMAT']
 
     for processor in size_dict['PROCESSORS']:
         raw_image = processor['processor'](raw_image, **processor['kwargs'])

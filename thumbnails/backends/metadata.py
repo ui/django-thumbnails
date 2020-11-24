@@ -1,4 +1,3 @@
-import os
 from redis import StrictRedis
 
 from thumbnails import compat, conf
