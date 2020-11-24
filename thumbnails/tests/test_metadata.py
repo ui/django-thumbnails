@@ -12,14 +12,15 @@ class DatabaseBackendTest(TestCase):
         self.backend = DatabaseBackend()
 
     def test_add_delete_source(self):
-        source_name = 'image'
+        source_name = 'image.jpg'
         self.backend.add_source(source_name)
         self.assertTrue(Source.objects.filter(name=source_name).exists())
         self.backend.delete_source(source_name)
         self.assertFalse(Source.objects.filter(name=source_name).exists())
 
     def test_get_source(self):
-        source_name = 'image'
+        source_name = 'image.jpg'
+
         self.backend.add_source(source_name)
         self.assertEqual(
             self.backend.get_source(source_name),
@@ -27,26 +28,29 @@ class DatabaseBackendTest(TestCase):
         )
 
     def test_add_delete_thumbnail(self):
-        source_name = 'image'
+        source_name = 'image.jpg'
         self.backend.add_source(source_name)
-        self.backend.add_thumbnail(source_name, 'small', 'image_small')
-        source = Source.objects.get(name=source_name)
+        self.backend.add_thumbnail(source_name, 'small', 'image_small.jpg')
+
+        source = self.backend.get_source(name=source_name)
         self.assertTrue(ThumbnailMeta.objects.filter(source=source, size='small').exists())
         self.backend.delete_thumbnail(source_name, 'small')
         self.assertFalse(ThumbnailMeta.objects.filter(source=source, size='small').exists())
 
     def test_get_thumbnail(self):
-        source_name = 'image'
+        source_name = 'image.jpg'
         self.backend.add_source(source_name)
-        self.backend.add_thumbnail(source_name, 'small', 'image_small')
-        self.assertEqual(self.backend.get_thumbnail(source_name, 'small'), ImageMeta(source_name, 'image_small', 'small'))
-        self.backend.add_thumbnail(source_name, 'large', 'image_large')
+        self.backend.add_thumbnail(source_name, 'small', 'image_small.jpg')
+        self.assertEqual(self.backend.get_thumbnail(source_name, 'small'), ImageMeta(source_name, 'image_small.jpg', 'small'))
+        self.backend.add_thumbnail(source_name, 'large', 'image_large.jpg')
+        self.backend.add_thumbnail(source_name, 'source_with_format', 'image_source_with_format.webp')
 
         self.assertEqual(
             self.backend.get_thumbnails(source_name),
             [
-                ImageMeta(source_name, 'image_small', 'small'),
-                ImageMeta(source_name, 'image_large', 'large')
+                ImageMeta(source_name, 'image_small.jpg', 'small'),
+                ImageMeta(source_name, 'image_large.jpg', 'large'),
+                ImageMeta(source_name, 'image_source_with_format.webp', 'source_with_format')
             ]
         )
 
