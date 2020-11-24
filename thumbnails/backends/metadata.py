@@ -51,31 +51,21 @@ class BaseBackend:
 class DatabaseBackend(BaseBackend):
 
     def add_source(self, name):
-        original_name = os.path.splitext(name)
-        file_name = original_name[0]
-        return Source.objects.create(name=file_name)
+        return Source.objects.create(name=name)
 
     def get_source(self, name):
-        original_name = os.path.splitext(name)
-        file_name = original_name[0]
-        return Source.objects.get(name=file_name)
+        return Source.objects.get(name=name)
 
     def delete_source(self, name):
-        original_name = os.path.splitext(name)
-        file_name = original_name[0]
-        return Source.objects.filter(name=file_name).delete()
+        return Source.objects.filter(name=name).delete()
 
     def get_thumbnails(self, name):
-        original_name = os.path.splitext(name)
-        file_name = original_name[0]
-        metas = ThumbnailMeta.objects.filter(source__name=file_name)
+        metas = ThumbnailMeta.objects.filter(source__name=name)
         return [ImageMeta(name, meta.name, meta.size) for meta in metas]
 
     def get_thumbnail(self, source_name, size):
         try:
-            original_name = os.path.splitext(source_name)
-            file_name = original_name[0]
-            meta = ThumbnailMeta.objects.get(source__name=file_name, size=size)
+            meta = ThumbnailMeta.objects.get(source__name=source_name, size=size)
             return ImageMeta(source_name, meta.name, meta.size)
         except ThumbnailMeta.DoesNotExist:
             return None
@@ -86,9 +76,7 @@ class DatabaseBackend(BaseBackend):
         return ImageMeta(source_name, meta.name, meta.size)
 
     def delete_thumbnail(self, source_name, size):
-        original_name = os.path.splitext(source_name)
-        file_name = original_name[0]
-        ThumbnailMeta.objects.filter(source__name=file_name, size=size).delete()
+        ThumbnailMeta.objects.filter(source__name=source_name, size=size).delete()
 
 
 class RedisBackend(BaseBackend):

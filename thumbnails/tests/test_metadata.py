@@ -14,11 +14,9 @@ class DatabaseBackendTest(TestCase):
     def test_add_delete_source(self):
         source_name = 'image.jpg'
         self.backend.add_source(source_name)
-
-        source = self.backend.get_source(source_name)
-        self.assertTrue(Source.objects.filter(name=source.name).exists())
+        self.assertTrue(Source.objects.filter(name=source_name).exists())
         self.backend.delete_source(source_name)
-        self.assertFalse(Source.objects.filter(name=source.name).exists())
+        self.assertFalse(Source.objects.filter(name=source_name).exists())
 
     def test_get_source(self):
         source_name = 'image.jpg'
@@ -26,7 +24,7 @@ class DatabaseBackendTest(TestCase):
         self.backend.add_source(source_name)
         self.assertEqual(
             self.backend.get_source(source_name),
-            Source.objects.get(name="image")
+            Source.objects.get(name=source_name)
         )
 
     def test_add_delete_thumbnail(self):
