@@ -129,9 +129,17 @@ To run tests::
 Changelog
 =========
 
+Version 0.3.2
+-------------
+* Fixed another bug in `fetch_thumbnails()` bug. Thanks @marsha97!
+
+Version 0.3.1
+-------------
+* Fixed `fetch_thumbnails()` bug. Thanks @marsha97!
+
 Version 0.3.0
 -------------
-* Added `fetch()` command to fetch multiple thumbnail metadata from Redis. Thanks @marsha97!
+* Added `fetch_thumbnails()` command to fetch multiple thumbnail metadata from Redis. Thanks @marsha97!
 
 Version 0.2.2
 -------------
