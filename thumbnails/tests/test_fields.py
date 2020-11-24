@@ -133,9 +133,22 @@ class ImageFieldTest(TestCase):
         self.assertEqual(large_thumb, self.instance.avatar.thumbnails.all().get('large'))
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 2)
 
+        # Creating thumbnail should populate the cache correctly (webp)
+        source_with_format_thumb = self.instance.avatar.thumbnails.source_with_format
+        self.assertEqual(source_with_format_thumb, self.instance.avatar.thumbnails.all().get('source_with_format'))
+        # Making sure the file format correctly
+        self.assertEqual(os.path.basename(self.instance.avatar.thumbnails.source_with_format.name),
+                         self.filename + '_source_with_format' + '.webp')
+        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 3)
+
         # Should also work on deletion
         self.instance.avatar.thumbnails.delete('large')
         self.assertEqual(self.instance.avatar.thumbnails.all().get('large'), None)
+        self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 2)
+
+        # Should also work on deletion (webp)
+        self.instance.avatar.thumbnails.delete('source_with_format')
+        self.assertEqual(self.instance.avatar.thumbnails.all().get('source_with_format'), None)
         self.assertEqual(len(self.instance.avatar.thumbnails._thumbnails), 1)
 
         # Once cached, it should not hit backend on other call.
@@ -284,6 +297,7 @@ class ImageFieldTest(TestCase):
                                  thumbnails.get(size).name)
             self.assertEqual(set(sizes), set(conf.SIZES))
 
+        # Fetch for format image run correctly
         fetch_thumbnails(images, ['source_with_format'])
         for image in images:
             thumbnails = image.thumbnails
@@ -317,6 +331,7 @@ class ImageFieldTest(TestCase):
         for image in images:
             image.thumbnails._thumbnails = {}
 
+        # Adding format image run correctly
         fetch_thumbnails(images, ['small', 'large', 'source_with_format'])
         for image in images:
             thumbnails = image.thumbnails
