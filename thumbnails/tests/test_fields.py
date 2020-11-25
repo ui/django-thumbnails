@@ -40,6 +40,9 @@ class ImageFieldTest(TestCase):
         self.instance.card_identity_picture.storage.delete_temporary_storage()
         if self.instance.logo:
             self.instance.logo.storage.delete_temporary_storage()
+        if self.instance.photo:
+            self.instance.photo.storage.delete_temporary_storage()
+
         super(ImageFieldTest, self).tearDown()
 
     def test_image_field(self):
@@ -65,7 +68,7 @@ class ImageFieldTest(TestCase):
             self.instance.save()
 
         logo_folder = \
-            os.path.join(self.instance.logo.storage.temporary_location, conf.BASE_DIR, 'logo')
+            os.path.join(self.instance.logo.storage.temporary_location, conf.BASE_DIR, 'logos')
         logo_basename = os.path.basename(self.instance.logo.path)
         logo_filename, logo_ext = os.path.splitext(logo_basename)
 
@@ -74,13 +77,23 @@ class ImageFieldTest(TestCase):
         for size in ['_large', '_small']:
             self.assertIn(logo_filename + size + logo_ext, pregenerated_files)
 
-        # Test convert png image to webp image, ImageField with resize and pregenerated sizes
-        self.assertEqual(self.identity_ext, '.webp')
+        # Test for thumbnails with resource to and pregenerated files
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.photo = File(image_file)
+            self.instance.save()
 
-        pregenerated_files = os.listdir(self.identity_card_folder)
+        photo_folder = \
+            os.path.join(self.instance.photo.storage.temporary_location, conf.BASE_DIR, 'photos')
+        photo_basename = os.path.basename(self.instance.photo.path)
+        photo_filename, photo_ext = os.path.splitext(photo_basename)
+
+        pregenerated_files = os.listdir(photo_folder)
         self.assertEqual(len(pregenerated_files), 3)
         for size in ['_large', '_default', '_source_with_format']:
-            self.assertIn(self.identity_filename + size + self.identity_ext, pregenerated_files)
+            self.assertIn(photo_filename + size + photo_ext, pregenerated_files)
+
+        # Test convert png image to webp image, ImageField with resize and pregenerated sizes
+        self.assertEqual(self.identity_ext, '.webp')
 
         # After convert to webp, make sure resize can be running as normal
         # 1. Test for thumbnail creation
