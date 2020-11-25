@@ -8,7 +8,7 @@ from thumbnails import compat
 from .backends import metadata, storage
 from .backends.metadata import ImageMeta
 from .files import ThumbnailedImageFile
-from .images import Thumbnail
+from .images import Thumbnail, save
 from . import processors, post_processors, conf
 
 
@@ -17,10 +17,12 @@ class ImageField(DjangoImageField):
 
     def __init__(self, *args, **kwargs):
         self.resize_source_to = kwargs.pop('resize_source_to', None)
+        self.pregenerated_sizes = kwargs.pop('pregenerated_sizes', [])
         if kwargs.get('storage'):
             raise ValueError('Please define storage backend in settings.py instead on the field itself')
-        kwargs['storage'] = storage.get_backend()
+        self.storage_backend = storage.get_backend()
         self.metadata_backend = metadata.get_backend()
+        kwargs['storage'] = self.storage_backend
         super(ImageField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
@@ -52,6 +54,17 @@ class ImageField(DjangoImageField):
 
             filename = str(shortuuid.uuid()) + file_type
             file.save(filename, image_file, save=False)
+
+            if self.pregenerated_sizes:
+                for size in self.pregenerated_sizes:
+                    if size == self.resize_source_to:
+                        # no need to process file if it is in resize_source_to,
+                        # since it had been processed right before this
+                        save(file.name, size, self.metadata_backend,
+                             self.storage_backend, image_file)
+                        continue
+                    file.thumbnails.create(size)
+
         return file
 
     def south_field_triple(self):

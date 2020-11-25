@@ -37,6 +37,9 @@ class ImageFieldTest(TestCase):
 
     def tearDown(self):
         self.instance.avatar.storage.delete_temporary_storage()
+        self.instance.card_identity_picture.storage.delete_temporary_storage()
+        if self.instance.logo:
+            self.instance.logo.storage.delete_temporary_storage()
         super(ImageFieldTest, self).tearDown()
 
     def test_image_field(self):
@@ -56,8 +59,28 @@ class ImageFieldTest(TestCase):
         self.instance.avatar.thumbnails.delete(size='small')
         self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
 
-        # Test convert png image to webp image, ImageField with resize
+        # Test for thumbanils with pregenerated sizes
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.logo = File(image_file)
+            self.instance.save()
+
+        logo_folder = \
+            os.path.join(self.instance.logo.storage.temporary_location, conf.BASE_DIR, 'logo')
+        logo_basename = os.path.basename(self.instance.logo.path)
+        logo_filename, logo_ext = os.path.splitext(logo_basename)
+
+        pregenerated_files = os.listdir(logo_folder)
+        self.assertEqual(len(pregenerated_files), 2)
+        for size in ['_large', '_small']:
+            self.assertIn(logo_filename + size + logo_ext, pregenerated_files)
+
+        # Test convert png image to webp image, ImageField with resize and pregenerated sizes
         self.assertEqual(self.identity_ext, '.webp')
+
+        pregenerated_files = os.listdir(self.identity_card_folder)
+        self.assertEqual(len(pregenerated_files), 3)
+        for size in ['_large', '_default', '_source_with_format']:
+            self.assertIn(self.identity_filename + size + self.identity_ext, pregenerated_files)
 
         # After convert to webp, make sure resize can be running as normal
         # 1. Test for thumbnail creation
