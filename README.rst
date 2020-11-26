@@ -81,6 +81,11 @@ In python:
     food.image.thumbnails.large  # Generates "large" sized thumbnail
     food.image.thumbnails.small.url  # Returns "small" sized thumbnail URL
 
+And here's how you'd use it in Django's template:
+
+.. code-block:: html
+
+    {{ food.image.thumbnails.small.url }}  # Returns "small" sized thumbnail URL
 
 
 `django-thumbnails` comes with a few builtin image processors::
