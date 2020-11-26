@@ -4,6 +4,13 @@ Design:
 
 * Uses Django Storage API
 * Uses flexible meta data store. Supports DB and Redis backend.
+* Supports creating thumbnails in different formats, for example from JPG to WEBP to reduce file size
+
+Supported image formats:
+* JPG/JPEG
+* GIF
+* PNG
+* WEBP
 
 Installation
 ------------
