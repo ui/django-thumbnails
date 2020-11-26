@@ -7,6 +7,7 @@ Design:
 * Supports creating thumbnails in different formats, for example from JPG to WEBP to reduce file size
 
 Supported image formats:
+
 * JPG/JPEG
 * GIF
 * PNG
