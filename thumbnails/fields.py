@@ -55,15 +55,14 @@ class ImageField(DjangoImageField):
             filename = str(shortuuid.uuid()) + file_type
             file.save(filename, image_file, save=False)
 
-            if self.pregenerated_sizes:
-                for size in self.pregenerated_sizes:
-                    if size == self.resize_source_to:
-                        # no need to process file if it is in resize_source_to,
-                        # since it had been processed right before this
-                        save(file.name, size, self.metadata_backend,
-                             self.storage_backend, image_file)
-                        continue
-                    file.thumbnails.create(size)
+            for size in self.pregenerated_sizes:
+                if size == self.resize_source_to:
+                    # no need to process file if it is in resize_source_to,
+                    # since it had been processed right before this
+                    save(file.name, size, self.metadata_backend,
+                         self.storage_backend, image_file)
+                    continue
+                file.thumbnails.create(size)
 
         return file
 
