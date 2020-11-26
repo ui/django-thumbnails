@@ -35,7 +35,7 @@ settings.py:
                 ],
                 'POST_PROCESSORS': [
                     {
-                        'processor': 'thumbnails.post_processors.optimize',
+                        'PATH': 'thumbnails.post_processors.optimize',
                         'png_command': 'optipng -force -o7 "%(filename)s"',
                         'jpg_command': 'jpegoptim -f --strip-all "%(filename)s"',
                     },
