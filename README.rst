@@ -4,6 +4,14 @@ Design:
 
 * Uses Django Storage API
 * Uses flexible meta data store. Supports DB and Redis backend.
+* Supports creating thumbnails in different formats, for example from JPG to WEBP to reduce file size
+
+Supported image formats:
+
+* JPG/JPEG
+* GIF
+* PNG
+* WEBP
 
 Installation
 ------------
@@ -35,7 +43,7 @@ settings.py:
                 ],
                 'POST_PROCESSORS': [
                     {
-                        'processor': 'thumbnails.post_processors.optimize',
+                        'PATH': 'thumbnails.post_processors.optimize',
                         'png_command': 'optipng -force -o7 "%(filename)s"',
                         'jpg_command': 'jpegoptim -f --strip-all "%(filename)s"',
                     },
@@ -81,6 +89,11 @@ In python:
     food.image.thumbnails.large  # Generates "large" sized thumbnail
     food.image.thumbnails.small.url  # Returns "small" sized thumbnail URL
 
+And here's how you'd use it in Django's template:
+
+.. code-block:: html
+
+    {{ food.image.thumbnails.small.url }}  # Returns "small" sized thumbnail URL
 
 
 `django-thumbnails` comes with a few builtin image processors::
