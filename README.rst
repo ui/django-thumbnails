@@ -95,6 +95,26 @@ And here's how you'd use it in Django's template:
 
     {{ food.image.thumbnails.small.url }}  # Returns "small" sized thumbnail URL
 
+Use `resize_source_to` to resize your image while saving it:
+
+.. code-block:: python
+
+    from thumbnails.fields import ImageField
+
+    class Food(models.Model):
+        image = ImageField(resize_source_to="medium")
+
+Assuming `medium` is the size that you define in the `settings`.
+By passing `medium` your saved image will be resized into `medium`'s size
+
+Use `pregenerated_sizes` to save your thumbnails into storage backend while saving it:
+
+.. code-block:: python
+
+    from thumbnails.fields import ImageField
+
+    class Food(models.Model):
+        image = ImageField(pregenerated_sizes=["small", "large", "medium")
 
 `django-thumbnails` comes with a few builtin image processors::
 
