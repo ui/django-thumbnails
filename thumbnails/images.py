@@ -1,6 +1,6 @@
 import os
 
-from django.utils.encoding import smart_text, python_2_unicode_compatible
+from django.utils.encoding import smart_text
 
 from . import conf
 from . import backends
@@ -8,7 +8,6 @@ from . import post_processors
 from . import processors
 
 
-@python_2_unicode_compatible
 class Thumbnail(object):
     """
     An object that contains relevant information about a thumbnailed image.
