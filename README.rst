@@ -162,6 +162,13 @@ To run tests::
 Changelog
 =========
 
+Version 0.4.0 (2021-01-08)
+--------------------------
+* Support for Django >= 3.0. Thanks @christianciu!
+* Added `pregenerated_sizes` to `ImageField` to allow thumbnails to be pregenerated on upload. Thanks @marsha97!
+* Thumbnails can be generated in different formats (e.g: JPG source image to WEBP thumbnail). Thanks @yosephbernandus!
+
+
 Version 0.3.2
 -------------
 * Fixed another bug in `fetch_thumbnails()` bug. Thanks @marsha97!
