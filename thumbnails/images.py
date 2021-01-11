@@ -1,6 +1,6 @@
 import os
 
-from django.utils.encoding import smart_text, python_2_unicode_compatible
+from django.utils.encoding import smart_text
 
 from . import conf
 from . import backends
@@ -8,7 +8,6 @@ from . import post_processors
 from . import processors
 
 
-@python_2_unicode_compatible
 class Thumbnail(object):
     """
     An object that contains relevant information about a thumbnailed image.
@@ -80,8 +79,13 @@ def create(source_name, size, metadata_backend=None, storage_backend=None):
 
     thumbnail_file = processors.process(storage_backend.open(source_name), size)
     thumbnail_file = post_processors.process(thumbnail_file, size)
+
+    return save(source_name, size, metadata_backend, storage_backend, thumbnail_file)
+
+
+def save(source_name, size, metadata_backend, storage_backend, image_file):
     name = get_thumbnail_name(source_name, size)
-    name = storage_backend.save(name, thumbnail_file)
+    name = storage_backend.save(name, image_file)
 
     metadata = metadata_backend.add_thumbnail(source_name, size, name)
     return Thumbnail(metadata=metadata, storage=storage_backend)

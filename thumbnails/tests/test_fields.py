@@ -9,7 +9,7 @@ from thumbnails.backends.metadata import RedisBackend
 from thumbnails.fields import fetch_thumbnails
 from thumbnails.files import Thumbnail, FallbackImage
 
-from .models import TestModel
+from .models import TestModel, TestPregeneratedSizesModel
 
 
 class ImageFieldTest(TestCase):
@@ -37,6 +37,8 @@ class ImageFieldTest(TestCase):
 
     def tearDown(self):
         self.instance.avatar.storage.delete_temporary_storage()
+        self.instance.card_identity_picture.storage.delete_temporary_storage()
+
         super(ImageFieldTest, self).tearDown()
 
     def test_image_field(self):
@@ -56,7 +58,7 @@ class ImageFieldTest(TestCase):
         self.instance.avatar.thumbnails.delete(size='small')
         self.assertFalse(os.path.isfile(os.path.join(self.avatar_folder, self.filename + '_small' + self.ext)))
 
-        # Test convert png image to webp image, ImageField with resize
+        # Test convert png image to webp image, ImageField with resize and pregenerated sizes
         self.assertEqual(self.identity_ext, '.webp')
 
         # After convert to webp, make sure resize can be running as normal
@@ -341,3 +343,47 @@ class ImageFieldTest(TestCase):
                 self.assertEqual(thumbnails._thumbnails[size].name,
                                  thumbnails.get(size).name)
             self.assertEqual(set(sizes), set(['small', 'large', 'source_with_format']))
+
+
+class PregeneratedFilesTest(TestCase):
+    def setUp(self):
+        self.instance = TestPregeneratedSizesModel.objects.create()
+
+    def tearDown(self):
+        if self.instance.logo:
+            self.instance.logo.storage.delete_temporary_storage()
+        if self.instance.photo:
+            self.instance.photo.storage.delete_temporary_storage()
+
+        super(PregeneratedFilesTest, self).tearDown()
+
+    def test_image_field(self):
+        # Test for thumbanils with pregenerated sizes
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.logo = File(image_file)
+            self.instance.save()
+
+        logo_folder = \
+            os.path.join(self.instance.logo.storage.temporary_location, conf.BASE_DIR, 'logos')
+        logo_basename = os.path.basename(self.instance.logo.path)
+        logo_filename, logo_ext = os.path.splitext(logo_basename)
+
+        pregenerated_files = os.listdir(logo_folder)
+        self.assertEqual(len(pregenerated_files), 2)
+        for size in ['_large', '_small']:
+            self.assertIn(logo_filename + size + logo_ext, pregenerated_files)
+
+        # Test for thumbnails with resource to and pregenerated files
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.photo = File(image_file)
+            self.instance.save()
+
+        photo_folder = \
+            os.path.join(self.instance.photo.storage.temporary_location, conf.BASE_DIR, 'photos')
+        photo_basename = os.path.basename(self.instance.photo.path)
+        photo_filename, photo_ext = os.path.splitext(photo_basename)
+
+        pregenerated_files = os.listdir(photo_folder)
+        self.assertEqual(len(pregenerated_files), 3)
+        for size in ['_large', '_default', '_source_with_format']:
+            self.assertIn(photo_filename + size + photo_ext, pregenerated_files)
