@@ -1,5 +1,7 @@
 from django.db.models.fields.files import ImageFieldFile
 
+from thumbnails import compat
+
 from . import conf, images
 from .backends.storage import get_backend
 from .images import Thumbnail, FallbackImage
@@ -27,6 +29,24 @@ class ThumbnailedImageFile(ImageFieldFile):
         thumbnail = super(ThumbnailedImageFile, self).save(name, content, save)
         self.metadata_backend.add_source(self.name)
         return thumbnail
+
+    def delete(self, with_thumbnails=True, save=True):
+        if not with_thumbnails:
+            super().delete(save=save)
+            return
+
+        backend = self.thumbnails.metadata_backend
+        # TODO: add support for Database Backend
+        try:
+            key = backend.get_thumbnail_key(self.name)
+        except AttributeError:
+            raise NotImplementedError("This feature is currently only available for redis backend")
+
+        sizes = backend.redis.hgetall(key)
+        for size in sizes:
+            self.thumbnails.delete(compat.as_text(size))
+
+        super().delete(save=save)
 
 
 class ThumbnailManager(object):
@@ -104,7 +124,9 @@ class ThumbnailManager(object):
         """
         images.delete(self.source_image.name, size,
                       self.metadata_backend, self.storage)
-        del(self._thumbnails[size])
+
+        if self._thumbnails is not None and self._thumbnails.get(size):
+            del(self._thumbnails[size])
 
 
 def exists(source_name, size=None):
