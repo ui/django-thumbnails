@@ -1,7 +1,5 @@
 from django.db.models.fields.files import ImageFieldFile
 
-from thumbnails import compat
-
 from . import conf, images
 from .backends.storage import get_backend
 from .images import Thumbnail, FallbackImage
@@ -44,7 +42,7 @@ class ThumbnailedImageFile(ImageFieldFile):
 
         sizes = backend.redis.hgetall(key)
         for size in sizes:
-            self.thumbnails.delete(compat.as_text(size))
+            self.thumbnails.delete(size.decode())
 
         super().delete(save=save)
 

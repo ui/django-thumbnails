@@ -40,19 +40,24 @@ class FilesTest(TestCase):
         self.instance.avatar.thumbnails.small
 
         # delete without thumbnails
-        filepath = os.path.dirname(self.instance.avatar.path)
+        avatar_path = self.instance.avatar.path
+        # ensure file still exists
+        self.assertTrue(os.path.exists(avatar_path))
+
         metadata_name = os.path.join('thumbs', 'avatars', self.filename + "_small" + self.ext)
 
         self.instance.avatar.delete(with_thumbnails=False)
 
         # image file is deleted
-        self.assertEqual(len(os.listdir(filepath)), 0)
+        self.assertFalse(os.path.exists(avatar_path))
         # thumbnails and their metadata are not deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 1)
         self.assertTrue(ThumbnailMeta.objects.filter(name=metadata_name).exists())
 
     def test_delete_with_thumbnails_redis(self):
-        filepath = os.path.dirname(self.instance.avatar.path)
+        avatar_path = self.instance.avatar.path
+        # ensure file still exists
+        self.assertTrue(os.path.exists(avatar_path))
 
         backend = RedisBackend()
 
@@ -65,8 +70,8 @@ class FilesTest(TestCase):
         self.instance.avatar.delete()
 
         # image file is deleted
-        self.assertEqual(len(os.listdir(filepath)), 0)
+        self.assertFalse(os.path.exists(avatar_path))
 
         # thumbnails and their metadata are also deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
-        self.assertEqual(backend.redis.hgetall(key), {})
+        self.assertFalse(backend.redis.exists(key))
