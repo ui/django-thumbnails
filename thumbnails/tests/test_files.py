@@ -65,7 +65,7 @@ class FilesTest(TestCase):
         key = backend.get_thumbnail_key(self.instance.avatar.name)
 
         self.instance.avatar.thumbnails.small
-        self.assertIsNotNone(backend.redis.hgetall(key)[self.size.encode()])
+        self.assertTrue(backend.redis.exists(key))
 
         self.instance.avatar.delete()
 
