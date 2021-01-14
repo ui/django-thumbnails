@@ -60,7 +60,7 @@ class FallbackImage(object):
 
 def get_thumbnail_name(source_name, size):
     name, extension = os.path.splitext(source_name)
-    if 'FORMAT' in conf.SIZES[size]:
+    if conf.SIZES.get(size) and 'FORMAT' in conf.SIZES[size]:
         extension = ".{}".format(conf.SIZES[size]['FORMAT'])
     filename = "%s_%s%s" % (name, size, extension)
     return os.path.join(conf.BASE_DIR, filename)
