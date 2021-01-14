@@ -1,7 +1,7 @@
 import os
 
 from django.core.files import File
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from thumbnails import conf
 from thumbnails import images
@@ -25,27 +25,24 @@ class FilesTest(TestCase):
         self.avatar_folder = \
             os.path.join(self.instance.avatar.storage.temporary_location, conf.BASE_DIR, 'avatars')
 
+        self.instance.avatar.thumbnails.small
+
         self.basename = os.path.basename(self.instance.avatar.path)
         self.filename, self.ext = os.path.splitext(self.basename)
+        self.small_metadata_name = os.path.join('thumbs', 'avatars', self.filename + "_" + self.size + self.ext)
 
     def tearDown(self):
         self.instance.avatar.storage.delete_temporary_storage()
         super(FilesTest, self).tearDown()
 
     def test_get_file_path(self):
-        self.instance.avatar.thumbnails.small
-        expected_path = os.path.join('thumbs', 'avatars', self.filename + "_small" + self.ext)
-        self.assertEqual(expected_path, get_path(self.instance.avatar.name, self.size))
+        self.assertEqual(self.small_metadata_name, get_path(self.instance.avatar.name, self.size))
 
     def test_delete_without_thumbnails(self):
-        self.instance.avatar.thumbnails.small
-
         # delete without thumbnails
         avatar_path = self.instance.avatar.path
         # ensure file still exists
         self.assertTrue(os.path.exists(avatar_path))
-
-        metadata_name = os.path.join('thumbs', 'avatars', self.filename + "_small" + self.ext)
 
         self.instance.avatar.delete(with_thumbnails=False)
 
@@ -53,20 +50,13 @@ class FilesTest(TestCase):
         self.assertFalse(os.path.exists(avatar_path))
         # thumbnails and their metadata are not deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 1)
-        self.assertTrue(ThumbnailMeta.objects.filter(name=metadata_name).exists())
+        self.assertTrue(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
 
-    def test_delete_with_thumbnails_redis(self):
+    def test_delete_with_thumbnails(self):
         avatar_path = self.instance.avatar.path
         # ensure file still exists
         self.assertTrue(os.path.exists(avatar_path))
-
-        backend = RedisBackend()
-
-        self.instance.avatar.thumbnails.metadata_backend = backend
-        key = backend.get_thumbnail_key(self.instance.avatar.name)
-
-        self.instance.avatar.thumbnails.small
-        self.assertTrue(backend.redis.exists(key))
+        self.assertTrue(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
 
         self.instance.avatar.delete()
 
@@ -75,30 +65,49 @@ class FilesTest(TestCase):
 
         # thumbnails and their metadata are also deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
-        self.assertFalse(backend.redis.exists(key))
+        self.assertFalse(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
 
-    def test_with_not_exists_thumbnail_files(self):
+
+class RedifFilesTest(TestCase):
+    def setUp(self):
+        self.source_name = "tests.png"
+        self.size = "small"
+
+        self.instance = TestModel.objects.create()
+        with open('thumbnails/tests/tests.png', 'rb') as image_file:
+            self.instance.avatar = File(image_file)
+            self.instance.save()
+        self.backend = RedisBackend()
+        self.instance.avatar.thumbnails.metadata_backend = self.backend
+        self.avatar_folder = \
+            os.path.join(self.instance.avatar.storage.temporary_location, conf.BASE_DIR, 'avatars')
+
+        self.instance.avatar.thumbnails.small
+
+        self.basename = os.path.basename(self.instance.avatar.path)
+        self.filename, self.ext = os.path.splitext(self.basename)
+
+    def tearDown(self):
+        if self.instance.avatar:
+            key = self.backend.get_thumbnail_key(self.instance.avatar.name)
+            self.backend.redis.delete(key)
+
+        self.instance.avatar.storage.delete_temporary_storage()
+        super(RedifFilesTest, self).tearDown()
+
+    def test_delete_with_thumbnails(self):
         avatar_path = self.instance.avatar.path
+        # ensure file still exists
         self.assertTrue(os.path.exists(avatar_path))
 
-        backend = RedisBackend()
-        self.instance.avatar.thumbnails.metadata_backend = backend
-        self.instance.avatar.thumbnails.small
-        key = backend.get_thumbnail_key(self.instance.avatar.name)
-
-        thumbnail_name = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, self.size))
-        thumbnail_path = os.path.join(self.avatar_folder, thumbnail_name)
-        self.assertTrue(os.path.exists(thumbnail_path))
-
-        # test delete non existence thumbnail file, should not raise error
-        os.remove(thumbnail_path)
-        self.assertFalse(os.path.exists(thumbnail_path))
+        key = self.backend.get_thumbnail_key(self.instance.avatar.name)
+        self.assertTrue(self.backend.redis.exists(key))
 
         self.instance.avatar.delete()
 
-        # file sucessfully deleted
+        # image file is deleted
         self.assertFalse(os.path.exists(avatar_path))
 
         # thumbnails and their metadata are also deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
-        self.assertFalse(backend.redis.exists(key))
+        self.assertFalse(self.backend.redis.exists(key))
