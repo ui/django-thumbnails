@@ -78,7 +78,7 @@ class ImageTest(TestCase):
         self.assertEqual(basename, expected_basename)
 
         # test with non existen keys, should use the original extension
-        expected_basename = "%s_%s%s" % (self.filename, "invalid_size", ".png")
+        expected_basename = "%s_%s%s" % (self.filename, "invalid_size", self.ext)
         basename = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, "invalid_size"))
         self.assertEqual(basename, expected_basename)
 
