@@ -44,7 +44,7 @@ class FilesTest(TestCase):
         # ensure file still exists
         self.assertTrue(os.path.exists(avatar_path))
 
-        self.instance.avatar.delete(with_thumbnails=False)
+        self.instance.avatar.delete()
 
         # image file is deleted
         self.assertFalse(os.path.exists(avatar_path))
@@ -58,7 +58,7 @@ class FilesTest(TestCase):
         self.assertTrue(os.path.exists(avatar_path))
         self.assertTrue(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
 
-        self.instance.avatar.delete()
+        self.instance.avatar.delete(with_thumbnails=True)
 
         # image file is deleted
         self.assertFalse(os.path.exists(avatar_path))
@@ -103,7 +103,7 @@ class RedifFilesTest(TestCase):
         key = self.backend.get_thumbnail_key(self.instance.avatar.name)
         self.assertTrue(self.backend.redis.exists(key))
 
-        self.instance.avatar.delete()
+        self.instance.avatar.delete(with_thumbnails=True)
 
         # image file is deleted
         self.assertFalse(os.path.exists(avatar_path))
