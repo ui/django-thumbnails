@@ -4,6 +4,7 @@ from django.core.files import File
 from django.test import TestCase
 
 from thumbnails import conf
+from thumbnails import images
 from thumbnails.backends.metadata import RedisBackend
 from thumbnails.metadata import get_path
 from thumbnails.models import ThumbnailMeta
@@ -67,7 +68,22 @@ class FilesTest(TestCase):
         self.instance.avatar.thumbnails.small
         self.assertTrue(backend.redis.exists(key))
 
+        # test no thumbnails file existed, should not raise error
+        thumbnail_name = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, self.size))
+        thumbnail_path = os.path.join(self.avatar_folder, thumbnail_name)
+
+        thumbnail_name = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, self.size))
+        thumbnail_path = os.path.join(self.avatar_folder, thumbnail_name)
+        self.assertTrue(os.path.exists(thumbnail_path))
+
+        os.remove(thumbnail_path)
+        self.assertFalse(os.path.exists(thumbnail_path))
+
         self.instance.avatar.delete()
+
+        # reset thumbanils
+        backend.redis.delete(key)
+        self.instance.avatar.thumbnails.small
 
         # image file is deleted
         self.assertFalse(os.path.exists(avatar_path))
