@@ -68,16 +68,19 @@ class ImageTest(TestCase):
 
     def test_get_thumbnail_name(self):
         # test with size in settings
-        expected_filename = "%s_%s%s" % (self.instance.avatar.name, self.size, "png")
-        self.assertEqual(images.get_thumbnail_name(self.instance.avatar.name, self.size), expected_filename)
+        expected_basename = "%s_%s%s" % (self.filename, "small", self.ext)
+        basename = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, "small"))
+        self.assertEqual(basename, expected_basename)
 
         # test with format
-        expected_filename = "%s_%s%s" % (self.instance.avatar.name, "source_with_format", "webp")
-        self.assertEqual(images.get_thumbnail_name(self.instance.avatar.name, "source_with_format"), expected_filename)
+        expected_basename = "%s_%s%s" % (self.filename, "source_with_format", ".webp")
+        basename = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, "source_with_format"))
+        self.assertEqual(basename, expected_basename)
 
         # test with non existen keys, should use the original extension
-        expected_filename = "%s_%s%s" % (self.instance.avatar.name, "invalid_size", "png")
-        self.assertEqual(images.get_thumbnail_name(self.instance.avatar.name, "invalid_size"), expected_filename)
+        expected_basename = "%s_%s%s" % (self.filename, "invalid_size", ".png")
+        basename = os.path.basename(images.get_thumbnail_name(self.instance.avatar.name, "invalid_size"))
+        self.assertEqual(basename, expected_basename)
 
     def test_delete(self):
         """
