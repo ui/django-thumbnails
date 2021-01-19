@@ -133,4 +133,3 @@ class ImageTest(TestCase):
         # thumbnails and their metadata are also deleted
         self.assertEqual(len(os.listdir(avatar_folder)), 0)
         self.assertIsNone(self.metadata_backend.get_thumbnail(self.source_name, size))
-        
