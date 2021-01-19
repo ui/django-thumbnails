@@ -1,10 +1,9 @@
 import os
 
 from django.core.files import File
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from thumbnails import conf
-from thumbnails import images
 from thumbnails.backends.metadata import RedisBackend
 from thumbnails.metadata import get_path
 from thumbnails.models import ThumbnailMeta
@@ -67,8 +66,16 @@ class FilesTest(TestCase):
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
         self.assertFalse(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
 
+    def test_flush(self):
+        thumbnails = self.instance.avatar.thumbnails
 
-class RedifFilesTest(TestCase):
+        thumbnails.flush()
+        # thumbnails and their metadata are deleted
+        self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
+        self.assertFalse(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
+
+
+class RedisFilesTest(TestCase):
     def setUp(self):
         self.source_name = "tests.png"
         self.size = "small"
@@ -93,7 +100,7 @@ class RedifFilesTest(TestCase):
             self.backend.redis.delete(key)
 
         self.instance.avatar.storage.delete_temporary_storage()
-        super(RedifFilesTest, self).tearDown()
+        super(RedisFilesTest, self).tearDown()
 
     def test_delete_with_thumbnails(self):
         avatar_path = self.instance.avatar.path
@@ -109,5 +116,15 @@ class RedifFilesTest(TestCase):
         self.assertFalse(os.path.exists(avatar_path))
 
         # thumbnails and their metadata are also deleted
+        self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
+        self.assertFalse(self.backend.redis.exists(key))
+
+    def test_flush(self):
+        thumbnails = self.instance.avatar.thumbnails
+        key = self.backend.get_thumbnail_key(self.instance.avatar.name)
+        self.assertTrue(self.backend.redis.exists(key))
+
+        thumbnails.flush()
+        # thumbnails and their metadata are deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
         self.assertFalse(self.backend.redis.exists(key))

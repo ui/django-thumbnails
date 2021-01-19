@@ -33,10 +33,7 @@ class ThumbnailedImageFile(ImageFieldFile):
             super().delete(save=save)
             return
 
-        sizes = list(self.thumbnails.all().keys())
-        for size in sizes:
-            self.thumbnails.delete(size)
-
+        self.thumbnails.flush()
         super().delete(save=save)
 
 
@@ -118,6 +115,16 @@ class ThumbnailManager(object):
 
         if self._thumbnails is not None and self._thumbnails.get(size):
             del(self._thumbnails[size])
+
+    def flush(self):
+        self._thumbnails = None
+
+        storage_backend = self.storage
+        metadata_backend = self.metadata_backend
+
+        for size, thumbnail in self.all().items():
+            storage_backend.delete(thumbnail.name)
+            metadata_backend.delete_thumbnail(self.source_image.name, size)
 
 
 def exists(source_name, size=None):
