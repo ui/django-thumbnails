@@ -119,13 +119,10 @@ class ThumbnailManager(object):
     def flush(self):
         self._thumbnails = None
 
-        storage_backend = self.storage
-        metadata_backend = self.metadata_backend
-
         for size, thumbnail in self.all().items():
-            storage_backend.delete(thumbnail.name)
+            self.storage.delete(thumbnail.name)
 
-        metadata_backend.flush_thumbnails(self.source_image.name)
+        self.metadata_backend.flush_thumbnails(self.source_image.name)
 
 
 def exists(source_name, size=None):
