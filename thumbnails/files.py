@@ -124,7 +124,8 @@ class ThumbnailManager(object):
 
         for size, thumbnail in self.all().items():
             storage_backend.delete(thumbnail.name)
-            metadata_backend.delete_thumbnail(self.source_image.name, size)
+
+        metadata_backend.flush_thumbnails(self.source_image.name)
 
 
 def exists(source_name, size=None):

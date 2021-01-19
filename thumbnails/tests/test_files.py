@@ -64,7 +64,7 @@ class FilesTest(TestCase):
 
         # thumbnails and their metadata are also deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
-        self.assertFalse(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
+        self.assertFalse(ThumbnailMeta.objects.filter(source__name=self.instance.avatar.name).exists())
 
     def test_flush(self):
         thumbnails = self.instance.avatar.thumbnails
@@ -72,7 +72,7 @@ class FilesTest(TestCase):
         thumbnails.flush()
         # thumbnails and their metadata are deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
-        self.assertFalse(ThumbnailMeta.objects.filter(name=self.small_metadata_name).exists())
+        self.assertFalse(ThumbnailMeta.objects.filter(source__name=self.instance.avatar.name).exists())
 
 
 class RedisFilesTest(TestCase):
@@ -95,11 +95,10 @@ class RedisFilesTest(TestCase):
         self.filename, self.ext = os.path.splitext(self.basename)
 
     def tearDown(self):
-        if self.instance.avatar:
-            key = self.backend.get_thumbnail_key(self.instance.avatar.name)
-            self.backend.redis.delete(key)
-
+        key = self.backend.get_thumbnail_key(self.instance.avatar.name)
+        self.backend.redis.delete(key)
         self.instance.avatar.storage.delete_temporary_storage()
+
         super(RedisFilesTest, self).tearDown()
 
     def test_delete_with_thumbnails(self):
