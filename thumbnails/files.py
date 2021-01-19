@@ -28,7 +28,7 @@ class ThumbnailedImageFile(ImageFieldFile):
         self.metadata_backend.add_source(self.name)
         return thumbnail
 
-    def delete(self, with_thumbnails=False, save=True):
+    def delete(self, with_thumbnails=True, save=True):
         if not with_thumbnails:
             super().delete(save=save)
             return
