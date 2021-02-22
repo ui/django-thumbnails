@@ -66,10 +66,10 @@ class FilesTest(TestCase):
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
         self.assertFalse(ThumbnailMeta.objects.filter(source__name=self.instance.avatar.name).exists())
 
-    def test_flush(self):
+    def test_delete_all(self):
         thumbnails = self.instance.avatar.thumbnails
 
-        thumbnails.flush()
+        thumbnails.delete_all()
         # thumbnails and their metadata are deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
         self.assertFalse(ThumbnailMeta.objects.filter(source__name=self.instance.avatar.name).exists())
@@ -118,12 +118,12 @@ class RedisFilesTest(TestCase):
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
         self.assertFalse(self.backend.redis.exists(key))
 
-    def test_flush(self):
+    def test_delete_all(self):
         thumbnails = self.instance.avatar.thumbnails
         key = self.backend.get_thumbnail_key(self.instance.avatar.name)
         self.assertTrue(self.backend.redis.exists(key))
 
-        thumbnails.flush()
+        thumbnails.delete_all()
         # thumbnails and their metadata are deleted
         self.assertEqual(len(os.listdir(self.avatar_folder)), 0)
         self.assertFalse(self.backend.redis.exists(key))
