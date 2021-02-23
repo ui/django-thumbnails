@@ -33,17 +33,7 @@ class ThumbnailedImageFile(ImageFieldFile):
             super().delete(save=save)
             return
 
-        backend = self.thumbnails.metadata_backend
-        # TODO: add support for Database Backend
-        try:
-            key = backend.get_thumbnail_key(self.name)
-        except AttributeError:
-            raise NotImplementedError("This feature is currently only available for redis backend")
-
-        sizes = backend.redis.hgetall(key)
-        for size in sizes:
-            self.thumbnails.delete(size.decode())
-
+        self.thumbnails.delete_all()
         super().delete(save=save)
 
 
@@ -125,6 +115,14 @@ class ThumbnailManager(object):
 
         if self._thumbnails is not None and self._thumbnails.get(size):
             del(self._thumbnails[size])
+
+    def delete_all(self):
+        self._thumbnails = None
+
+        for size, thumbnail in self.all().items():
+            self.storage.delete(thumbnail.name)
+
+        self.metadata_backend.flush_thumbnails(self.source_image.name)
 
 
 def exists(source_name, size=None):
