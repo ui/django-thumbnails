@@ -60,7 +60,7 @@ class FallbackImage(object):
 
 def get_thumbnail_name(source_name, size):
     name, extension = os.path.splitext(source_name)
-    if 'FORMAT' in conf.SIZES[size]:
+    if conf.SIZES[size].get("FORMAT"):
         extension = ".{}".format(conf.SIZES[size]['FORMAT'])
     filename = "%s_%s%s" % (name, size, extension)
     return os.path.join(conf.BASE_DIR, filename)
@@ -115,5 +115,9 @@ def delete(source_name, size, metadata_backend=None, storage_backend=None):
         storage_backend = backends.storage.get_backend()
     if metadata_backend is None:
         metadata_backend = backends.metadata.get_backend()
-    storage_backend.delete(get_thumbnail_name(source_name, size))
+
+    thumbnail = get(source_name, size, metadata_backend, storage_backend)
+    if thumbnail:
+        storage_backend.delete(thumbnail.name)
+
     metadata_backend.delete_thumbnail(source_name, size)

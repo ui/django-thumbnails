@@ -54,6 +54,15 @@ class DatabaseBackendTest(TestCase):
             ]
         )
 
+    def test_flush_thumbnails(self):
+        source_name = 'image.jpg'
+        self.backend.add_source(source_name)
+        self.backend.add_thumbnail(source_name, 'small', 'image_small.jpg')
+        self.backend.add_thumbnail(source_name, 'default', 'image_default.jpg')
+
+        self.backend.flush_thumbnails(source_name)
+        self.assertFalse(ThumbnailMeta.objects.filter(source__name=source_name).exists())
+
 
 class RedisBackendTest(TestCase):
 
@@ -121,3 +130,14 @@ class RedisBackendTest(TestCase):
         self.redis.hdel(self.backend.get_source_key(source_name), source_name)
         self.redis.hdel(thumbnail_key, 'small')
         self.redis.hdel(thumbnail_key, 'large')
+
+    def test_flush_thumbnails(self):
+        source_name = 'test-thumbnail.jpg'
+        thumbnail_key = self.backend.get_thumbnail_key(source_name)
+
+        self.backend.add_source(source_name)
+        self.backend.add_thumbnail(source_name, "small", 'test-thumbnail_small.jpg')
+        self.backend.add_thumbnail(source_name, "default", 'test-thumbnail_default.jpg')
+
+        self.backend.flush_thumbnails(source_name)
+        self.assertFalse(self.redis.exists(thumbnail_key))

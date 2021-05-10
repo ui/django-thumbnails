@@ -46,6 +46,9 @@ class BaseBackend:
     def delete_thumbnail(name, size):
         raise NotImplementedError
 
+    def flush_thumbnails(name):
+        raise NotImplementedError
+
 
 class DatabaseBackend(BaseBackend):
 
@@ -76,6 +79,9 @@ class DatabaseBackend(BaseBackend):
 
     def delete_thumbnail(self, source_name, size):
         ThumbnailMeta.objects.filter(source__name=source_name, size=size).delete()
+
+    def flush_thumbnails(self, source_name):
+        ThumbnailMeta.objects.filter(source__name=source_name).delete()
 
 
 class RedisBackend(BaseBackend):
@@ -121,3 +127,6 @@ class RedisBackend(BaseBackend):
 
     def delete_thumbnail(self, source_name, size):
         self.redis.hdel(self.get_thumbnail_key(source_name), size)
+
+    def flush_thumbnails(self, source_name):
+        self.redis.delete(self.get_thumbnail_key(source_name))
