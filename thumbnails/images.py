@@ -66,14 +66,11 @@ def get_thumbnail_name(source_name, size):
     return os.path.join(conf.BASE_DIR, filename)
 
 
-def create(source_name, size, metadata_backend=None, storage_backend=None):
+def create(source_name, size, storage_backend, metadata_backend=None):
     """
     Creates a thumbnail file and its relevant metadata. Returns a
     Thumbnail instance.
     """
-
-    if storage_backend is None:
-        storage_backend = backends.storage.get_backend()
     if metadata_backend is None:
         metadata_backend = backends.metadata.get_backend()
 
@@ -91,12 +88,10 @@ def save(source_name, size, metadata_backend, storage_backend, image_file):
     return Thumbnail(metadata=metadata, storage=storage_backend)
 
 
-def get(source_name, size, metadata_backend=None, storage_backend=None):
+def get(source_name, size, storage_backend, metadata_backend=None):
     """
     Returns a Thumbnail instance, or None if thumbnail does not yet exist.
     """
-    if storage_backend is None:
-        storage_backend = backends.storage.get_backend()
     if metadata_backend is None:
         metadata_backend = backends.metadata.get_backend()
 
@@ -107,12 +102,10 @@ def get(source_name, size, metadata_backend=None, storage_backend=None):
         return Thumbnail(metadata=metadata, storage=storage_backend)
 
 
-def delete(source_name, size, metadata_backend=None, storage_backend=None):
+def delete(source_name, size, storage_backend, metadata_backend=None):
     """
     Deletes a thumbnail file and its relevant metadata.
     """
-    if storage_backend is None:
-        storage_backend = backends.storage.get_backend()
     if metadata_backend is None:
         metadata_backend = backends.metadata.get_backend()
 

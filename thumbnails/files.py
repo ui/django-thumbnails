@@ -89,7 +89,7 @@ class ThumbnailManager(object):
 
         if thumbnail is None:
             thumbnail = images.get(self.source_image.name, size,
-                                   self.metadata_backend, self.storage)
+                                   self.storage, self.metadata_backend)
 
             if thumbnail is None:
                 thumbnail = self.create(size)
@@ -103,7 +103,7 @@ class ThumbnailManager(object):
         Creates and return a thumbnail of a given size.
         """
         thumbnail = images.create(self.source_image.name, size,
-                                  self.metadata_backend, self.storage)
+                                  self.storage, self.metadata_backend)
         return thumbnail
 
     def delete(self, size):
@@ -111,7 +111,7 @@ class ThumbnailManager(object):
         Deletes a thumbnail of a given size
         """
         images.delete(self.source_image.name, size,
-                      self.metadata_backend, self.storage)
+                      self.storage, self.metadata_backend)
 
         if self._thumbnails is not None and self._thumbnails.get(size):
             del(self._thumbnails[size])
