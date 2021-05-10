@@ -109,7 +109,7 @@ def delete(source_name, size, storage_backend, metadata_backend=None):
     if metadata_backend is None:
         metadata_backend = backends.metadata.get_backend()
 
-    thumbnail = get(source_name, size, metadata_backend, storage_backend)
+    thumbnail = get(source_name, size, storage_backend, metadata_backend)
     if thumbnail:
         storage_backend.delete(thumbnail.name)
 
