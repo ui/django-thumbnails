@@ -9,7 +9,7 @@ class TestModel(models.Model):
     profile_picture = ImageField(upload_to='avatars', blank=True, null=True, resize_source_to='source')
     card_identity_picture = ImageField(upload_to='identity_card', blank=True, null=True,
                                        resize_source_to='source_with_format',
-                                       storage=storage.TemporaryStorage2)
+                                       storage=storage.TemporaryStorage2())
 
 
 class TestPregeneratedSizesModel(models.Model):

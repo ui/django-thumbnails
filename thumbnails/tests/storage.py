@@ -24,7 +24,7 @@ class TemporaryStorage(FileSystemStorage):
         if location is None:
             location = tempfile.mkdtemp()
             self.temporary_location = location
-        
+
         super(TemporaryStorage, self).__init__(location=location, *args,
                                                **kwargs)
 

@@ -10,6 +10,7 @@ from thumbnails.fields import fetch_thumbnails
 from thumbnails.files import Thumbnail, FallbackImage
 
 from .models import TestModel, TestPregeneratedSizesModel
+from .storage import TemporaryStorage2, TemporaryStorage
 
 
 class ImageFieldTest(TestCase):
@@ -61,6 +62,8 @@ class ImageFieldTest(TestCase):
         # Test convert png image to webp image, ImageField with resize and pregenerated sizes
         self.assertEqual(self.identity_ext, '.webp')
 
+        self.assertIsInstance(thumb.storage, TemporaryStorage)
+
         # After convert to webp, make sure resize can be running as normal
         # 1. Test for thumbnail creation
         self.assertFalse(os.path.isfile(os.path.join(self.identity_card_folder, self.identity_filename + '_small' + self.identity_ext)))
@@ -74,6 +77,8 @@ class ImageFieldTest(TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self.identity_card_folder, self.identity_filename + '_small' + self.identity_ext)))
         self.instance.card_identity_picture.thumbnails.delete(size='small')
         self.assertFalse(os.path.isfile(os.path.join(self.identity_card_folder, self.identity_filename + '_small' + self.identity_ext)))
+
+        self.assertIsInstance(thumb.storage, TemporaryStorage2)
 
     def test_thumbnail_field(self):
         # Make sure ThumbnailManager return the correct thumbnail
