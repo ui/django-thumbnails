@@ -1,11 +1,6 @@
-import io
-from typing import final
-
-from django.core.files.base import ContentFile
-from django.db.models.expressions import Value
-
 from da_vinci import images
-from PIL import Image
+
+from .utils import write_to_content_file
 
 
 def resize(image, **kwargs):
@@ -69,9 +64,4 @@ def process(file, size):
     for processor in size_dict['PROCESSORS']:
         raw_image = processor['processor'](raw_image, **processor['kwargs'])
 
-    # write to Content File
-    image_io = io.BytesIO()
-    raw_image.save(file=image_io)
-    image_file = ContentFile(image_io.getvalue())
-
-    return image_file
+    return write_to_content_file(raw_image)

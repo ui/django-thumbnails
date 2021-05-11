@@ -1,17 +1,23 @@
 from da_vinci import images
-from PIL import Image
+
+from .utils import write_to_content_file
 
 
 def attach_watermark(image, watermark_path):
+    raw_image = images.from_file(image)
     watermark_image = images.from_file(watermark_path)
-    if image.get_pil_image().size != watermark_image.get_pil_image.size:
+    pil_image = raw_image.get_pil_image()
+    watermark_pil_image = watermark_image.get_pil_image()
+    if pil_image.size != watermark_pil_image.size:
         # TODO: parse watermark dynamically based on ratio
         raise ValueError("Watermark image should have the same dimension as image")
 
     if watermark_image.format != "PNG":
         raise ValueError("Watermark must be PNG")
 
-    final_image = Image.new("RGBA", image.size)
-    final_image = Image.alpha_composite(final_image, image)
-    final_image = Image.alpha_composite(final_image, watermark_image)
-    return final_image
+    if watermark_pil_image.mode != "RGBA":
+        watermark_pil_image = watermark_pil_image.convert(mode="RGBA")
+
+    pil_image.paste(watermark_pil_image, (0, 0), watermark_pil_image)
+    raw_image.set_pil_image(pil_image)
+    return write_to_content_file(raw_image)

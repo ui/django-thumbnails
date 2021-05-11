@@ -9,7 +9,7 @@ from .backends import metadata, storage
 from .backends.metadata import ImageMeta
 from .files import ThumbnailedImageFile
 from .images import Thumbnail, save
-from . import processors, post_processors, conf
+from . import pre_processors, processors, post_processors, conf
 
 
 class ImageField(DjangoImageField):
@@ -42,6 +42,9 @@ class ImageField(DjangoImageField):
             image_file = file
             original_filename = file.name
             file_type = os.path.splitext(original_filename)[1]
+
+            if self.watermark_path:
+                image_file = pre_processors.attach_watermark(image_file, self.watermark_path)
 
             if self.resize_source_to:
                 file.seek(0)

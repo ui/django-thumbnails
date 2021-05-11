@@ -1,4 +1,7 @@
+import io
 from copy import deepcopy
+
+from django.core.files.base import ContentFile
 
 try:
     import importlib
@@ -46,3 +49,10 @@ def parse_processors(processor_definition):
         })
 
     return parsed_processors
+
+
+def write_to_content_file(image):
+    # write to Content File
+    image_io = io.BytesIO()
+    image.save(file=image_io)
+    return ContentFile(image_io.getvalue())
