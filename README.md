@@ -78,9 +78,9 @@ Aside from settings, you can specify storage backend directly from field:
 
 ```{.sourceCode .python}
     profile_picture = ImageField(storage=FileSystemStorage(), upload_to='profile_picture')
+```
 
 Storage that is specified on field will be used instead storage that is specified in the settings.
-```
 
 In python:
 
