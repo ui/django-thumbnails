@@ -133,6 +133,11 @@ Use `pregenerated_sizes` to save your thumbnails into storage backend while savi
 
     Processors are applied sequentially in the same order of definition.
 
+When deleting file you can opt to retain thumbnails, by set `with_thumbnails` to False:
+
+.. code-block:: python
+    banner.image.delete(with_thumbnails=False)
+
 
 Performance
 -----------
