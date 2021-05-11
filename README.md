@@ -15,18 +15,16 @@ Supported image formats:
 -   PNG
 -   WEBP
 
-Installation
-============
+## Installation
 
--   Add thumbnails to INSTALLED\_APPS in settings.py.
+-   Add thumbnails to INSTALLED_APPS in settings.py.
 -   Run python manage.py migrate to create database metadata backend.
 
-Usage
-=====
+## Usage
 
 settings.py:
 
-``` {.sourceCode .python}
+```python
 THUMBNAILS = {
     'METADATA': {
         'BACKEND': 'thumbnails.backends.metadata.DatabaseBackend',
@@ -59,10 +57,19 @@ THUMBNAILS = {
 }
 ```
 
-If you prefer to use Redis as your metadata storage backend (like I do
-:):
+`django-thumbnails` comes with a few builtin image processors:
 
-``` {.sourceCode .python}
+    # To use the following processors, put the arguments of processors in SIZES definition
+    thumbnails.processors.resize(width, height, method) ## `method` can be `stretch`, `fit` or `fill`
+    thumbnails.processors.rotate(degrees)
+    thumbnails.processors.flip(direction)
+    thumbnails.processors.crop(width, height, center)
+
+Processors are applied sequentially in the same order of definition.
+
+If you prefer to use Redis as your metadata storage backend (like I do :):
+
+```python
 THUMBNAILS = {
     'METADATA': {
         'PREFIX': 'thumbs',
@@ -85,7 +92,7 @@ Storage that is specified on field will be used instead of storage that is speci
 
 In python:
 
-``` {.sourceCode .python}
+```python
 from thumbnails.fields import ImageField
 
 class Food(models.Model):
@@ -101,13 +108,13 @@ food.image.thumbnails.small.url  # Returns "small" sized thumbnail URL
 
 And here's how you'd use it in Django's template:
 
-``` {.sourceCode .html}
+```python
 {{ food.image.thumbnails.small.url }}  # Returns "small" sized thumbnail URL
 ```
 
-Use resize\_source\_to to resize your image while saving it:
+Use resize_source_to to resize your image while saving it:
 
-``` {.sourceCode .python}
+```python
 from thumbnails.fields import ImageField
 
 class Food(models.Model):
@@ -117,39 +124,30 @@ class Food(models.Model):
 Assuming medium is the size that you define in the settings. By passing
 medium your saved image will be resized into medium's size
 
-Use pregenerated\_sizes to save your thumbnails into storage backend
+Use pregenerated_sizes to save your thumbnails into storage backend
 while saving it:
 
-``` {.sourceCode .python}
+```python
 from thumbnails.fields import ImageField
 
 class Food(models.Model):
     image = ImageField(pregenerated_sizes=["small", "large", "medium")
 ```
 
-django-thumbnails comes with a few builtin image processors:
-
-    # To use the following processors, put the arguments of processors in SIZES definition
-    thumbnails.processors.resize(width, height)
-    thumbnails.processors.rotate(degrees)
-    thumbnails.processors.flip(direction)
-    thumbnails.processors.crop(width, height, center)
-
-    Processors are applied sequentially in the same order of definition.
 
 When deleting file you can opt to retain thumbnails, by set `with_thumbnails` to False:
 ``` {.sourceCode .python}
     banner.image.delete(with_thumbnails=False)
 ```
 
-Performance
-===========
+
+## Performance
 
 If you need to fetch multiple thumbnails at once, use `fetch` function
 for better performance. `fetch` uses Redis pipeline to retrieve
 thumbnail metadata in one go, avoiding multiple round trips to Redis.
 
-``` {.sourceCode .python}
+```python
 from thumbnails.field import fetch_thumbnails
 
 food_a = Food.objects.get(id=1)
@@ -158,52 +156,54 @@ food_b = Food.objects.get(id=2)
 fetch_thumbnails([food_a.image, food_b.image], ['small', 'large'])
 ```
 
-This way, when we get thumbnails like thumbnail1.size\_small or even
+This way, when we get thumbnails like thumbnail1.size_small or even
 thumbnail1.all() we won't query to redis anymore. This feature is
-currently only available for RedisBackend.
+currently only available for Redis metadata Backend.
 
-Management Commands
-===================
+## Management Commands
 
 If you changed your size definition and want to regenerate the
 thumbnails, use:
 
     python manage.py delete_thumbnails --model=app.Model --size=thumbnail_size_to_delete
 
-Running Tests
-=============
+## Running Tests
 
 To run tests:
 
     `which django-admin.py` test thumbnails --settings=thumbnails.tests.settings --pythonpath=.
 
-Changelog
----------
+## Changelog
+
+### Version 0.5.0 (2021-05-1)
+
+* You can now pass in `storage` kwarg into `ImageField` so you can specify different storage backends for different fields. Thanks @marsha97!
+* Calling `image.delete(with_thumbnails=True)` will delete original image along with all thumbnails. Thanks @marsha97!
 
 ### Version 0.4.0 (2021-01-08)
 
--   Support for Django \>= 3.0. Thanks @christianciu!
--   Added pregenerated\_sizes to ImageField to allow thumbnails to be
+-   Support for Django >= 3.0. Thanks @christianciu!
+-   Added `pregenerated_sizes` to ImageField to allow thumbnails to be
     pregenerated on upload. Thanks @marsha97!
 -   Thumbnails can be generated in different formats (e.g: JPG source
     image to WEBP thumbnail). Thanks @yosephbernandus!
 
 ### Version 0.3.2
 
--   Fixed another bug in fetch\_thumbnails() bug. Thanks @marsha97!
+-   Fixed another bug in `fetch_thumbnails()` bug. Thanks @marsha97!
 
 ### Version 0.3.1
 
--   Fixed fetch\_thumbnails() bug. Thanks @marsha97!
+-   Fixed `fetch_thumbnails()` bug. Thanks @marsha97!
 
 ### Version 0.3.0
 
--   Added fetch\_thumbnails() command to fetch multiple thumbnail
+-   Added `fetch_thumbnails()` command to fetch multiple thumbnail
     metadata from Redis. Thanks @marsha97!
 
 ### Version 0.2.2
 
--   Fixed RedisBackend.get\_thumbnail() bug that may cause excessive
+-   Fixed `RedisBackend.get_thumbnail()` bug that may cause excessive
     trips to Redis. Thanks @marsha97!
 
 ### Version 0.2.1
