@@ -81,6 +81,15 @@ THUMBNAILS = {
 }
 ```
 
+Aside from settings, you can specify storage backend directly from field:
+
+```python
+profile_picture = ImageField(storage=FileSystemStorage(), upload_to='profile_picture')
+```
+
+Storage that is specified on field will be used instead of storage that is specified in the settings.
+
+
 In python:
 
 ```python
@@ -125,12 +134,12 @@ class Food(models.Model):
     image = ImageField(pregenerated_sizes=["small", "large", "medium")
 ```
 
-If you want to delete an image along with its thumbnail metadata, use the `with_thumbnails` kwargs:
 
-```python
-food = Food.objects.first()
-food.image.delete(with_thumbnails=True)
+When deleting file you can opt to retain thumbnails, by set `with_thumbnails` to False:
+``` python
+banner.image.delete(with_thumbnails=False)
 ```
+
 
 ## Performance
 
