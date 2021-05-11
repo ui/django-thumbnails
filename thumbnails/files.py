@@ -89,7 +89,7 @@ class ThumbnailManager(object):
 
         if thumbnail is None:
             thumbnail = images.get(self.source_image.name, size,
-                                   self.metadata_backend)
+                                   self.metadata_backend, self.storage)
 
             if thumbnail is None:
                 thumbnail = self.create(size)
