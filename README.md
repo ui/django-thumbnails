@@ -57,17 +57,7 @@ THUMBNAILS = {
 }
 ```
 
-`django-thumbnails` comes with a few builtin image processors:
-
-    # To use the following processors, put the arguments of processors in SIZES definition
-    thumbnails.processors.resize(width, height, method) ## `method` can be `stretch`, `fit` or `fill`
-    thumbnails.processors.rotate(degrees)
-    thumbnails.processors.flip(direction)
-    thumbnails.processors.crop(width, height, center)
-
-Processors are applied sequentially in the same order of definition.
-
-If you prefer to use Redis as your metadata storage backend (like I do :):
+If you prefer to use Redis as your metadata storage backend (for performance reasons):
 
 ```python
 THUMBNAILS = {
@@ -81,10 +71,26 @@ THUMBNAILS = {
 }
 ```
 
-Aside from settings, you can specify storage backend directly from field:
+## Image Processors
+
+`django-thumbnails` comes with a few builtin image processors:
+
+    # To use the following processors, put the arguments of processors in SIZES definition
+    thumbnails.processors.resize(width, height, method) ## `method` can be `stretch`, `fit` or `fill`
+    thumbnails.processors.rotate(degrees)
+    thumbnails.processors.flip(direction)
+    thumbnails.processors.crop(width, height, center)
+
+Processors are applied sequentially in the same order of definition.
+
+## Storage Backend
+
+New in version 0.5.0 is per field, customizable storage backend. If you want specific fields to use
+a different storage backend, you can specify it directly when declaring the field. e.g:
 
 ```python
-profile_picture = ImageField(storage=FileSystemStorage(), upload_to='profile_picture')
+class Food(models.Model):
+    image = ImageField(storage=FileSystemStorage(), upload_to='food')
 ```
 
 Storage that is specified on field will be used instead of storage that is specified in the settings.
@@ -134,8 +140,7 @@ class Food(models.Model):
     image = ImageField(pregenerated_sizes=["small", "large", "medium")
 ```
 
-
-When deleting file you can opt to retain thumbnails, by set `with_thumbnails` to False:
+When deleting an image, you can opt to retain thumbnails by doing this:
 ``` python
 banner.image.delete(with_thumbnails=False)
 ```
@@ -143,8 +148,8 @@ banner.image.delete(with_thumbnails=False)
 
 ## Performance
 
-If you need to fetch multiple thumbnails at once, use `fetch` function
-for better performance. `fetch` uses Redis pipeline to retrieve
+If you need to fetch multiple thumbnails at once, use the provided `fetch_thumbnails` function
+for better performance. `fetch_thumbnails` uses Redis pipeline to retrieve
 thumbnail metadata in one go, avoiding multiple round trips to Redis.
 
 ```python
