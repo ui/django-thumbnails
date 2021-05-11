@@ -50,7 +50,6 @@ class ImageField(DjangoImageField):
 
                 if 'FORMAT' in conf.SIZES[self.resize_source_to]:
                     file_type = ".{}".format(conf.SIZES[self.resize_source_to]['FORMAT'])
-
             filename = str(shortuuid.uuid()) + file_type
             file.save(filename, image_file, save=False)
 

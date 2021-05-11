@@ -48,7 +48,7 @@ def set_quality(image, **kwargs):
     return image
 
 
-def process(file, size, watermark_path=None):
+def process(file, size):
     """
     Process an image through its defined processors
     params :file: filename or file-like object
@@ -69,27 +69,9 @@ def process(file, size, watermark_path=None):
     for processor in size_dict['PROCESSORS']:
         raw_image = processor['processor'](raw_image, **processor['kwargs'])
 
-    if watermark_path:
-        raw_image = attach_watermark(raw_image, watermark_path)
-
     # write to Content File
     image_io = io.BytesIO()
     raw_image.save(file=image_io)
     image_file = ContentFile(image_io.getvalue())
 
     return image_file
-
-
-def attach_watermark(image, watermark_path):
-    watermark_image = images.from_file(watermark_path)
-    if image.get_pil_image().size != watermark_image.get_pil_image.size:
-        # TODO: parse watermark dynamically based on ratio
-        raise ValueError("Watermark image should have the same dimension as image")
-
-    if watermark_image.format != "PNG":
-        raise ValueError("Watermark must be PNG")
-
-    final_image = Image.new("RGBA", image.size)
-    final_image = Image.alpha_composite(final_image, image)
-    final_image = Image.alpha_composite(final_image, watermark_image)
-    return final_image
