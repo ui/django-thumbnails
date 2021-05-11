@@ -22,6 +22,7 @@ class ImageField(DjangoImageField):
             raise ValueError('Please define storage backend in settings.py instead on the field itself')
         self.storage_backend = storage.get_backend()
         self.metadata_backend = metadata.get_backend()
+        self.watermark_path = kwargs.pop('watermark_path', None)
         kwargs['storage'] = self.storage_backend
         super(ImageField, self).__init__(*args, **kwargs)
 
