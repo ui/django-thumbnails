@@ -11,6 +11,7 @@ setup(
     license='MIT',
     description='A simple Django app to manage image/photo thumbnails. Supports remote/cloud storage systems like Amazon S3.',
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     zip_safe=False,
     include_package_data=True,
     package_data={'': ['README.md']},
