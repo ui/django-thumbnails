@@ -3,8 +3,8 @@ from da_vinci import images
 from .utils import write_to_content_file
 
 
-def attach_watermark(image_path, watermark_path):
-    raw_image = images.from_file(image_path)
+def attach_watermark(image, watermark_path):
+    raw_image = images.from_file(image)
     watermark_image = images.from_file(watermark_path)
     pil_image = raw_image.get_pil_image()
     watermark_pil_image = watermark_image.get_pil_image()

@@ -47,8 +47,8 @@ class ImageField(DjangoImageField):
                 image_file = pre_processors.attach_watermark(image_file, self.watermark_path)
 
             if self.resize_source_to:
-                file.seek(0)
-                image_file = processors.process(file, self.resize_source_to)
+                image_file.seek(0)
+                image_file = processors.process(image_file, self.resize_source_to)
                 image_file = post_processors.process(image_file, self.resize_source_to)
 
                 if 'FORMAT' in conf.SIZES[self.resize_source_to]:
