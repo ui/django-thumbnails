@@ -72,6 +72,13 @@ If you prefer to use Redis as your metadata storage backend (like I do :):
         },
     }
 
+Aside from settings, you can specify storage backend directly from field:
+
+..code-block:: python
+    profile_picture = ImageField(storage=FileSystemStorage(), upload_to='profile_picture')
+
+Storage that is specified on field will be used instead storage that is specified in the settings
+
 
 In python:
 
