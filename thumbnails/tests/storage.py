@@ -8,6 +8,8 @@ from django.core.files.storage import FileSystemStorage
 Temporary Storage class for test. Copied from Smiley Chris' Easy Thumbnails test package
 https://github.com/SmileyChris/easy-thumbnails/blob/master/easy_thumbnails/test.py
 """
+
+
 class TemporaryStorage(FileSystemStorage):
     """
     A storage class useful for tests that uses a temporary location to store
@@ -22,7 +24,7 @@ class TemporaryStorage(FileSystemStorage):
         if location is None:
             location = tempfile.mkdtemp()
             self.temporary_location = location
-        
+
         super(TemporaryStorage, self).__init__(location=location, *args,
                                                **kwargs)
 
@@ -36,3 +38,6 @@ class TemporaryStorage(FileSystemStorage):
         if temporary_location:
             shutil.rmtree(temporary_location)
 
+
+class TemporaryStorage2(TemporaryStorage):
+    pass

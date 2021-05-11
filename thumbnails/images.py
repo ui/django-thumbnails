@@ -71,7 +71,6 @@ def create(source_name, size, metadata_backend=None, storage_backend=None):
     Creates a thumbnail file and its relevant metadata. Returns a
     Thumbnail instance.
     """
-
     if storage_backend is None:
         storage_backend = backends.storage.get_backend()
     if metadata_backend is None:
