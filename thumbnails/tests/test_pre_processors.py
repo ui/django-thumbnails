@@ -38,12 +38,10 @@ class PreProcessorsTest(TestCase):
         converted_watermark = converted_watermark.resize((200, 200))
         converted_watermark.save(watermark_path)
 
-        with open(original_image_path, 'rb') as image_file:
-            self.assertRaises(ValueError, attach_watermark, image_file, watermark_path)
+        self.assertRaises(ValueError, attach_watermark, original_image_path, watermark_path)
 
         converted_image = original_image.resize((200, 200))
         converted_image.save(original_image_path)
 
         # no error raised
-        with open(original_image_path, 'rb') as image_file:
-            attach_watermark(image_file, watermark_path)
+        attach_watermark(original_image_path, watermark_path)
