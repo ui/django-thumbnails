@@ -38,8 +38,7 @@ class Command(BaseCommand):
         instances = model.objects.exclude(**exclude_args)
 
         metadata_backend = metadata.get_backend()
-        storage_backend = storage.get_backend()
 
         for instance in instances:
             field = getattr(instance, field_name)
-            images.delete(field.name, size, metadata_backend, storage_backend)
+            images.delete(field.name, size, metadata_backend, field.thumbnails.storage)
