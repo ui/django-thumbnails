@@ -44,6 +44,7 @@ class ImageField(DjangoImageField):
             file_type = os.path.splitext(original_filename)[1]
 
             if self.watermark_path:
+                image_file.seek(0)
                 image_file = pre_processors.attach_watermark(image_file, self.watermark_path)
 
             if self.resize_source_to:
