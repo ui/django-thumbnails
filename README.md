@@ -74,6 +74,14 @@ THUMBNAILS = {
 }
 ```
 
+Aside from settings, you can specify storage backend directly from field:
+
+```{.sourceCode .python}
+    profile_picture = ImageField(storage=FileSystemStorage(), upload_to='profile_picture')
+
+Storage that is specified on field will be used instead storage that is specified in the settings.
+```
+
 In python:
 
 ``` {.sourceCode .python}
@@ -127,6 +135,11 @@ django-thumbnails comes with a few builtin image processors:
     thumbnails.processors.crop(width, height, center)
 
     Processors are applied sequentially in the same order of definition.
+
+When deleting file you can opt to retain thumbnails, by set `with_thumbnails` to False:
+``` {.sourceCode .python}
+    banner.image.delete(with_thumbnails=False)
+```
 
 Performance
 ===========
