@@ -42,7 +42,7 @@ class ImageTest(TestCase):
         self.assertFalse(self.storage_backend.exists(thumbnail_name))
 
         thumbnail = images.create(self.source_name, 'small',
-                                  self.storage_backend, self.metadata_backend)
+                                  self.metadata_backend, self.storage_backend)
         self.assertTrue(self.storage_backend.exists(thumbnail.name))
         self.assertNotEqual(
             self.metadata_backend.get_thumbnail(self.source_name, 'small'),
@@ -55,15 +55,15 @@ class ImageTest(TestCase):
         """
         self.assertEqual(
             images.get(self.source_name, 'default',
-                       self.storage_backend, self.metadata_backend),
+                       self.metadata_backend, self.storage_backend),
             None
         )
         thumbnail = images.create(self.source_name, 'default',
-                                  self.storage_backend, self.metadata_backend)
+                                  self.metadata_backend, self.storage_backend)
 
         self.assertEqual(
             images.get(self.source_name, 'default',
-                       self.storage_backend, self.metadata_backend),
+                       self.metadata_backend, self.storage_backend),
             thumbnail
         )
 
@@ -83,10 +83,10 @@ class ImageTest(TestCase):
         Ensure that ``delete`` works properly.
         """
         thumbnail = images.create(self.source_name, 'small',
-                                  self.storage_backend, self.metadata_backend)
+                                  self.metadata_backend, self.storage_backend)
 
         images.delete(self.source_name, 'small',
-                      self.storage_backend, self.metadata_backend)
+                      self.metadata_backend, self.storage_backend)
         self.assertFalse(self.storage_backend.exists(thumbnail.name))
         self.assertEqual(
             self.metadata_backend.get_thumbnail(self.source_name, 'small'),
@@ -95,7 +95,7 @@ class ImageTest(TestCase):
 
         # key with format is not defined in settings anymore
         thumbnail = images.create(self.source_name, 'source_with_format',
-                                  self.storage_backend, self.metadata_backend)
+                                  self.metadata_backend, self.storage_backend)
 
         thumbnail_size_data = {
             'small': {
@@ -107,7 +107,7 @@ class ImageTest(TestCase):
         with patch('thumbnails.images.conf.SIZES', thumbnail_size_data):
             # ensure error not happening, and its files and metadata are still removed
             images.delete(self.source_name, 'source_with_format',
-                          self.storage_backend, self.metadata_backend)
+                          self.metadata_backend, self.storage_backend)
             self.assertFalse(self.storage_backend.exists(thumbnail.name))
             self.assertIsNone(self.metadata_backend.get_thumbnail(self.source_name, 'source_with_format'))
 
@@ -128,7 +128,7 @@ class ImageTest(TestCase):
         self.assertFalse(os.path.exists(thumbnail_path))
 
         images.delete(self.source_name, size,
-                      self.storage_backend, self.metadata_backend)
+                      self.metadata_backend, self.storage_backend)
 
         # thumbnails and their metadata are also deleted
         self.assertEqual(len(os.listdir(avatar_folder)), 0)
