@@ -57,8 +57,17 @@ THUMBNAILS = {
 }
 ```
 
-If you prefer to use Redis as your metadata storage backend (like I do
-:):
+`django-thumbnails` comes with a few builtin image processors:
+
+    # To use the following processors, put the arguments of processors in SIZES definition
+    thumbnails.processors.resize(width, height, method) ## `method` can be `stretch`, `fit` or `fill`
+    thumbnails.processors.rotate(degrees)
+    thumbnails.processors.flip(direction)
+    thumbnails.processors.crop(width, height, center)
+
+Processors are applied sequentially in the same order of definition.
+
+If you prefer to use Redis as your metadata storage backend (like I do :):
 
 ```python
 THUMBNAILS = {
@@ -122,16 +131,6 @@ If you want to delete an image along with its thumbnail metadata, use the `with_
 food = Food.objects.first()
 food.image.delete(with_thumbnails=True)
 ```
-
-`django-thumbnails` comes with a few builtin image processors:
-
-    # To use the following processors, put the arguments of processors in SIZES definition
-    thumbnails.processors.resize(width, height, method) ## `method` can be `stretch`, `fit` or `fill`
-    thumbnails.processors.rotate(degrees)
-    thumbnails.processors.flip(direction)
-    thumbnails.processors.crop(width, height, center)
-
-Processors are applied sequentially in the same order of definition.
 
 ## Performance
 
