@@ -46,13 +46,12 @@ def set_quality(image, **kwargs):
 
 
 def add_watermark(image, **kwargs):
-    watermark_path = kwargs["path"]
+    watermark_path = kwargs["image_path"]
     watermark_image = images.from_file(watermark_path)
     pil_image = image.get_pil_image()
     watermark_pil_image = watermark_image.get_pil_image()
 
-    if (watermark_pil_image.width != kwargs['width'])\
-       and (watermark_pil_image.height != kwargs['height']):
+    if watermark_pil_image.size != pil_image.size:
         # TODO: parse watermark dynamically based on ratio
         raise ValueError("Watermark image should have the same dimension as image")
 

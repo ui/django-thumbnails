@@ -52,6 +52,12 @@ THUMBNAILS = {
                 {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
                 {'PATH': 'thumbnails.processors.flip', 'direction': 'horizontal'}
             ],
+        },
+        'watermarked': {
+            'PROCESSORS': [
+                {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
+                {'PATH': 'thumbnails.processors.add_watermark', 'image_path': 'watermark.png'}
+            ],
         }
     }
 }
