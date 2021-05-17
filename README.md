@@ -64,8 +64,10 @@ THUMBNAILS = {
     thumbnails.processors.rotate(degrees)
     thumbnails.processors.flip(direction)
     thumbnails.processors.crop(width, height, center)
+    thumbnails.processors.add_watermark(path, width, height)
 
 Processors are applied sequentially in the same order of definition.
+Add watermark only support PNG file with alpha channel, and the dimension must be equal to width and height parameters.
 
 If you prefer to use Redis as your metadata storage backend (like I do :):
 
