@@ -29,7 +29,7 @@ class ProcessorsTest(TestCase):
         converted_watermark.save(watermark_path)
 
         kwargs = {
-            "image_path": watermark_path
+            "watermark_path": watermark_path
         }
         self.assertRaises(ValueError, add_watermark, original_image_file, **kwargs)
 

@@ -56,7 +56,7 @@ THUMBNAILS = {
         'watermarked': {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
-                {'PATH': 'thumbnails.processors.add_watermark', 'image_path': 'watermark.png'}
+                {'PATH': 'thumbnails.processors.add_watermark', 'watermark_path': 'watermark.png'}
             ],
         }
     }
@@ -70,10 +70,11 @@ THUMBNAILS = {
     thumbnails.processors.rotate(degrees)
     thumbnails.processors.flip(direction)
     thumbnails.processors.crop(width, height, center)
-    thumbnails.processors.add_watermark(path, width, height)
+    thumbnails.processors.add_watermark(watermark_path)
 
 Processors are applied sequentially in the same order of definition.
-`add_watermark` only support PNG file with alpha channel, and the dimension must be equal to width and height parameters.
+`add_watermark` only support PNG file with alpha channel, and the dimension must be equal thumbnail's final dimension.
+In the example  `watermark.png` should be 20x20.
 
 If you prefer to use Redis as your metadata storage backend (like I do :):
 

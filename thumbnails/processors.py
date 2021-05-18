@@ -46,7 +46,7 @@ def set_quality(image, **kwargs):
 
 
 def add_watermark(image, **kwargs):
-    watermark_path = kwargs["image_path"]
+    watermark_path = kwargs["watermark_path"]
     watermark_image = images.from_file(watermark_path)
     pil_image = image.get_pil_image()
     watermark_pil_image = watermark_image.get_pil_image()
