@@ -4,7 +4,7 @@ Status](https://travis-ci.org/ui/django-thumbnails.png?branch=master)](https://t
 Design:
 
 -   Uses Django Storage API
--   Uses flexible meta data store. Supports DB and Redis backend.
+-   Uses flexible meta data store. Uses Redis as metadata store.
 -   Supports creating thumbnails in different formats, for example from
     JPG to WEBP to reduce file size
 
@@ -56,6 +56,7 @@ THUMBNAILS = {
         'watermarked': {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
+                # Only supports PNG. File must be of the same size with thumbnail (20 x 20 in this case)
                 {'PATH': 'thumbnails.processors.add_watermark', 'watermark_path': 'watermark.png'}
             ],
         }
@@ -81,16 +82,17 @@ THUMBNAILS = {
 
 `django-thumbnails` comes with a few builtin image processors:
 
+```python
     # To use the following processors, put the arguments of processors in SIZES definition
     thumbnails.processors.resize(width, height, method) ## `method` can be `stretch`, `fit` or `fill`
     thumbnails.processors.rotate(degrees)
     thumbnails.processors.flip(direction)
     thumbnails.processors.crop(width, height, center)
     thumbnails.processors.add_watermark(watermark_path)
+```
 
 Processors are applied sequentially in the same order of definition.
-`add_watermark` only support PNG file with alpha channel, and the dimension must be equal thumbnail's final dimension.
-In the example  `watermark.png` should be 20x20.
+
 
 ## Storage Backend
 
@@ -188,6 +190,10 @@ To run tests:
     `which django-admin.py` test thumbnails --settings=thumbnails.tests.settings --pythonpath=.
 
 ## Changelog
+
+### Version 0.6.0 (2021-05-28)
+
+* Added support for watermarking thumbnails. Thanks @marsha97!
 
 ### Version 0.5.0 (2021-05-1)
 
