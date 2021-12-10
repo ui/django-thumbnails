@@ -1,6 +1,6 @@
 import os
 
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_str
 
 from . import conf
 from . import backends
@@ -19,7 +19,7 @@ class Thumbnail(object):
         self.name = getattr(metadata, 'name', None)
 
     def __str__(self):
-        return smart_text(self.name or '')
+        return force_str(self.name or '')
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.name or "None")
