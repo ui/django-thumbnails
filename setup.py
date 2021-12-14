@@ -15,7 +15,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     package_data={'': ['README.md']},
-    install_requires=['django>=2.0', 'da-vinci', 'shortuuid'],
+    install_requires=['django>=2.0', 'da-vinci', 'shortuuid', 'pillow'],
     extras_require = {
         'redis':  ['redis']
     },
