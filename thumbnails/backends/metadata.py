@@ -1,4 +1,7 @@
-from redis import StrictRedis
+try:
+    from redis import StrictRedis
+except ImportError:
+    StrictRedis = None
 
 from thumbnails import compat, conf
 from thumbnails.models import Source, ThumbnailMeta
@@ -93,6 +96,9 @@ class RedisBackend(BaseBackend):
         db = conf.METADATA.get('db', 0)
         prefix = conf.METADATA.get('PREFIX', 'djthumbs')
         self.prefix = prefix + ":"
+        if not StrictRedis:
+            msg = "Could not import Redis. Please install 'redis' extra."
+            raise ImportError(msg)
         self.redis = StrictRedis(host=host, port=port, password=password, db=db)
 
     def get_source_key(self, name):

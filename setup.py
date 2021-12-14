@@ -16,6 +16,9 @@ setup(
     include_package_data=True,
     package_data={'': ['README.md']},
     install_requires=['django>=2.0', 'da-vinci', 'shortuuid'],
+    extras_require = {
+        'redis':  ['redis']
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
