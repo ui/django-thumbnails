@@ -191,6 +191,11 @@ To run tests:
 
 ## Changelog
 
+### Version 0.7.0 (2022-01-03)
+
+* Compatibility with django 4.0. Thanks @yosephbernandus!
+* Improved setup.py. Thanks @Le09!
+
 ### Version 0.6.0 (2021-05-28)
 
 * Added support for watermarking thumbnails. Thanks @marsha97!
