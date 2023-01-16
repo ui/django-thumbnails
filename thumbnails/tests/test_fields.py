@@ -5,10 +5,11 @@ from django.template import Context, Template
 from django.test import TestCase
 
 from thumbnails import conf
-from thumbnails.backends.metadata import RedisBackend
+from thumbnails.backends.metadata import RedisBackend, DatabaseBackend
 from thumbnails.fields import fetch_thumbnails
 from thumbnails.files import Thumbnail, FallbackImage
 
+from .metadata import CustomRedisBackend
 from .models import TestModel, TestPregeneratedSizesModel
 from .storage import TemporaryStorage2, TemporaryStorage
 
@@ -63,6 +64,7 @@ class ImageFieldTest(TestCase):
         self.assertEqual(self.identity_ext, '.webp')
 
         self.assertIsInstance(thumb.storage, TemporaryStorage)
+        self.assertIsInstance(self.instance.avatar.metadata_backend, DatabaseBackend)
 
         # After convert to webp, make sure resize can be running as normal
         # 1. Test for thumbnail creation
@@ -79,6 +81,7 @@ class ImageFieldTest(TestCase):
         self.assertFalse(os.path.isfile(os.path.join(self.identity_card_folder, self.identity_filename + '_small' + self.identity_ext)))
 
         self.assertIsInstance(thumb.storage, TemporaryStorage2)
+        self.assertIsInstance(self.instance.card_identity_picture.metadata_backend, CustomRedisBackend)
 
     def test_thumbnail_field(self):
         # Make sure ThumbnailManager return the correct thumbnail
