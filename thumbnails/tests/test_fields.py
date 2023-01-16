@@ -62,7 +62,7 @@ class ImageFieldTest(TestCase):
         # Test convert png image to webp image, ImageField with resize and pregenerated sizes
         self.assertEqual(self.identity_ext, '.webp')
 
-        self.assertIsInstance(thumb.storage, TemporaryStorage)
+        self.assertIsInstance(thumb.storage, TemporaryStorage2)
 
         # After convert to webp, make sure resize can be running as normal
         # 1. Test for thumbnail creation
