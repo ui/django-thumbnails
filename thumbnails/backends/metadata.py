@@ -89,12 +89,12 @@ class DatabaseBackend(BaseBackend):
 
 class RedisBackend(BaseBackend):
 
-    def __init__(self):
-        host = conf.METADATA.get('host', 'localhost')
-        port = conf.METADATA.get('port', 6379)
-        password = conf.METADATA.get('password', None)
-        db = conf.METADATA.get('db', 0)
-        prefix = conf.METADATA.get('PREFIX', 'djthumbs')
+    def __init__(self, host=None, port=None, password=None, db=None, prefix=None):
+        host = host or conf.METADATA.get('host', 'localhost')
+        port = port or conf.METADATA.get('port', 6379)
+        password = password if password is not None else conf.METADATA.get('password', None)
+        db = db or conf.METADATA.get('db', 0)
+        prefix = prefix if prefix is not None else conf.METADATA.get('PREFIX', 'djthumbs')
         self.prefix = prefix + ":"
         if not StrictRedis:
             msg = "Could not import Redis. Please install 'redis' extra."
