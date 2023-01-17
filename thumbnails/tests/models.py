@@ -1,7 +1,7 @@
 from django.db import models
 
 from thumbnails.fields import ImageField
-from . import storage
+from . import storage, metadata
 
 
 class TestModel(models.Model):
@@ -9,7 +9,8 @@ class TestModel(models.Model):
     profile_picture = ImageField(upload_to='avatars', blank=True, null=True, resize_source_to='source')
     card_identity_picture = ImageField(upload_to='identity_card', blank=True, null=True,
                                        resize_source_to='source_with_format',
-                                       storage=storage.TemporaryStorage2())
+                                       storage=storage.TemporaryStorage2(),
+                                       metadata=metadata.CustomRedisBackend())
 
 
 class TestPregeneratedSizesModel(models.Model):

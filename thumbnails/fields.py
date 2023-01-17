@@ -19,7 +19,7 @@ class ImageField(DjangoImageField):
         self.resize_source_to = kwargs.pop('resize_source_to', None)
         self.pregenerated_sizes = kwargs.pop('pregenerated_sizes', [])
         self.storage_backend = kwargs.get('storage') or storage.get_backend()
-        self.metadata_backend = metadata.get_backend()
+        self.metadata_backend = kwargs.pop('metadata', None) or metadata.get_backend()
         kwargs['storage'] = self.storage_backend
         super(ImageField, self).__init__(*args, **kwargs)
 
