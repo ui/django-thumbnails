@@ -107,6 +107,17 @@ class Food(models.Model):
 Storage that is specified on field will be used instead of storage that is specified in the settings.
 
 
+## Metadata Backend
+If you want specific fields to use different metadata backend, you can specify it directly when declaring the field. e.g:
+
+```python
+class Food(models.Model):
+    image = ImageField(metadata_backend=CustomMetadataBackend(), upload_to='food')
+```
+
+Metadata backend that is specified on field will be used instead of metadata backend that is specified in the settings. 
+
+
 In python:
 
 ```python
