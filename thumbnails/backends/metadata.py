@@ -76,7 +76,12 @@ class DatabaseBackend(BaseBackend):
             return None
 
     def add_thumbnail(self, source_name, size, name):
-        source = self.get_source(source_name)
+        try:
+            source = self.get_source(source_name)
+        except Source.DoesNotExist:
+            # If the source doesn't exist, create it
+            # For example when migrating from a regular ImageField to a thumbnailed ImageField
+            source = self.add_source(source_name)
         meta = ThumbnailMeta.objects.create(source=source, size=size, name=name)
         return ImageMeta(source_name, meta.name, meta.size)
 
