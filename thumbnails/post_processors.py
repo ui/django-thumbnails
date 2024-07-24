@@ -57,7 +57,7 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
     f.close()
 
     # Detect filetype
-    filetype = Image.open(thumbnail_filename).format
+    filetype = Image.open(thumbnail_filename).format.lower()
 
     # Construct command to optimize image based on filetype
     command = None
