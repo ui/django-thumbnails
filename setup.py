@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='django-thumbnails',
-    version='0.7.0',
+    version='0.8.0',
     author='Selwin Ong',
     author_email='selwin.ong@gmail.com',
     packages=['thumbnails'],
@@ -28,9 +28,10 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]

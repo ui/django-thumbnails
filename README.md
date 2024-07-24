@@ -202,6 +202,11 @@ To run tests:
 
 ## Changelog
 
+### Version 0.8.0 (2024-07-24)
+* Automatically create a `Source` image if it doesn't exist. This feature makes migrating regular `ImageField` do django-thumbnails easier. Thanks @JobDoesburg!
+* Added compatibility with Python 3.13. Thanks @nZac!
+* `ImageField` now supports custom `metadata` backends. Thanks @marsha97!
+
 ### Version 0.7.0 (2022-01-03)
 
 * Compatibility with django 4.0. Thanks @yosephbernandus!
