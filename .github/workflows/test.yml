@@ -21,8 +21,8 @@ jobs:
           - 6379:6379
     strategy:
       matrix:
-        python-version: [3.8.15, 3.9, 3.10.9]
-        django-version: [2.1.3, 2.2.9, 3.0.11, 3.1.1, 4.0, 4.1.4]
+        python-version: [3.9, 3.10.9, 3.11, 3.12]
+        django-version: [3.2.25, 4.0, 4.1.4, 4.2.14, 5.0.7]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
