@@ -1,4 +1,4 @@
-import imghdr
+from PIL import Image
 import os
 from subprocess import call
 import tempfile
@@ -57,7 +57,7 @@ def optimize(thumbnail_file, jpg_command=None, png_command=None,
     f.close()
 
     # Detect filetype
-    filetype = imghdr.what(thumbnail_filename)
+    filetype = Image.open(thumbnail_filename).format
 
     # Construct command to optimize image based on filetype
     command = None
