@@ -23,7 +23,9 @@ def process(thumbnail_file, size, **kwargs):
 
     size_dict = conf.SIZES[size]
     for processor in size_dict['POST_PROCESSORS']:
-        processor['processor'](thumbnail_file, **processor['kwargs'])
+        thumbnail_file = processor['processor'](
+            thumbnail_file, **processor['kwargs']
+        )
 
     return thumbnail_file
 
